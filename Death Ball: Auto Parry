@@ -1,0 +1,5 @@
+script_key="PASTE UR KEY";
+loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/2077a9f225b098c350401dd5ab1286da.lua"))()
+
+
+--get key here https://ads.luarmor.net/get_key?for=xDHUB-tIqkHGLMyJrH
