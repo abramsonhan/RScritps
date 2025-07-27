@@ -1,0 +1,216 @@
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local VirtualUser = game:GetService("VirtualUser")
+local LocalPlayer = Players.LocalPlayer
+
+-- Anti-AFK
+warn("Anti afk running")
+LocalPlayer.Idled:Connect(function()
+    warn("Anti afk ran")
+    VirtualUser:CaptureController()
+    VirtualUser:ClickButton2(Vector2.new())
+end)
+
+-- GUI Kurulumu
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Parent = game:GetService("CoreGui")
+ScreenGui.Name = "EchelonCheatGUI"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.IgnoreGuiInset = true
+ScreenGui.DisplayOrder = 1000
+
+local Frame = Instance.new("Frame")
+Frame.Size = UDim2.new(0, 250, 0, 150)
+Frame.Position = UDim2.new(0.5, -125, 0.5, -75)
+Frame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+Frame.BorderSizePixel = 0
+Frame.Parent = ScreenGui
+
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 12)
+UICorner.Parent = Frame
+
+local UIStroke = Instance.new("UIStroke")
+UIStroke.Color = Color3.fromRGB(150, 0, 255)
+UIStroke.Thickness = 2
+UIStroke.Transparency = 0.5
+UIStroke.Parent = Frame
+
+-- Echelon Yazısı
+local EchelonLabel = Instance.new("TextLabel")
+EchelonLabel.Size = UDim2.new(0, 120, 0, 25)
+EchelonLabel.Position = UDim2.new(0, 10, 0, 8)
+EchelonLabel.BackgroundTransparency = 1
+EchelonLabel.Text = "Echelon"
+EchelonLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+EchelonLabel.TextSize = 18
+EchelonLabel.Font = Enum.Font.GothamBold
+EchelonLabel.Parent = Frame
+
+local EchelonGlow = Instance.new("UIGradient")
+EchelonGlow.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 0, 0)),
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(150, 0, 255)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(100, 0, 150))
+})
+EchelonGlow.Parent = EchelonLabel
+local tweenEchelon = TweenService:Create(EchelonGlow, TweenInfo.new(2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), {Rotation = 360})
+tweenEchelon:Play()
+
+-- Kapatma Butonu
+local CloseButton = Instance.new("TextButton")
+CloseButton.Size = UDim2.new(0, 25, 0, 25)
+CloseButton.Position = UDim2.new(1, -35, 0, 8)
+CloseButton.BackgroundColor3 = Color3.fromRGB(100, 0, 150)
+CloseButton.Text = "X"
+CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseButton.TextSize = 14
+CloseButton.Font = Enum.Font.GothamBold
+CloseButton.Parent = Frame
+
+local CloseCorner = Instance.new("UICorner")
+CloseCorner.CornerRadius = UDim.new(0, 5)
+CloseCorner.Parent = CloseButton
+
+-- Küçültme Butonu
+local MinimizeButton = Instance.new("TextButton")
+MinimizeButton.Size = UDim2.new(0, 25, 0, 25)
+MinimizeButton.Position = UDim2.new(1, -65, 0, 8)
+MinimizeButton.BackgroundColor3 = Color3.fromRGB(50, 0, 75)
+MinimizeButton.Text = "-"
+MinimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+MinimizeButton.TextSize = 14
+MinimizeButton.Font = Enum.Font.GothamBold
+MinimizeButton.Parent = Frame
+
+local MinimizeCorner = Instance.new("UICorner")
+MinimizeCorner.CornerRadius = UDim.new(0, 5)
+MinimizeCorner.Parent = MinimizeButton
+
+-- Butonlar
+local function CreateButton(name, yPos)
+    local Button = Instance.new("TextButton")
+    Button.Size = UDim2.new(0, 210, 0, 40)
+    Button.Position = UDim2.new(0, 20, 0, yPos)
+    Button.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    Button.Text = name .. ": OFF"
+    Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Button.TextSize = 14
+    Button.Font = Enum.Font.Gotham
+    Button.Parent = Frame
+
+    local ButtonCorner = Instance.new("UICorner")
+    ButtonCorner.CornerRadius = UDim.new(0, 8)
+    ButtonCorner.Parent = Button
+
+    local ButtonGlow = Instance.new("UIStroke")
+    ButtonGlow.Color = Color3.fromRGB(150, 0, 255)
+    ButtonGlow.Thickness = 1.5
+    ButtonGlow.Transparency = 0.5
+    ButtonGlow.Parent = Button
+
+    Button.MouseEnter:Connect(function()
+        TweenService:Create(Button, TweenInfo.new(0.3), {Size = UDim2.new(0, 215, 0, 42)}):Play()
+        TweenService:Create(ButtonGlow, TweenInfo.new(0.3), {Transparency = 0}):Play()
+    end)
+    Button.MouseLeave:Connect(function()
+        TweenService:Create(Button, TweenInfo.new(0.3), {Size = UDim2.new(0, 210, 0, 40)}):Play()
+        TweenService:Create(ButtonGlow, TweenInfo.new(0.3), {Transparency = 0.5}):Play()
+    end)
+
+    return Button
+end
+
+local AutoClaimButton = CreateButton("Auto Claim", 40)
+local TeleportButton = CreateButton("Reward TP", 90)
+
+-- GUI Sürükleme
+local dragging
+local dragInput
+local dragStart
+local startPos
+
+local function update(input)
+    local delta = input.Position - dragStart
+    Frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
+
+Frame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = Frame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+Frame.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        update(input)
+    end
+end)
+
+-- Değişkenler
+local AutoClaimActive = false
+local TeleportActive = false
+local OriginalPosition = nil
+
+-- Auto Claim Fonksiyonu
+AutoClaimButton.MouseButton1Click:Connect(function()
+    AutoClaimActive = not AutoClaimActive
+    AutoClaimButton.Text = "Auto Claim: " .. (AutoClaimActive and "ON" or "OFF")
+    AutoClaimButton.BackgroundColor3 = AutoClaimActive and Color3.fromRGB(150, 0, 255) or Color3.fromRGB(20, 20, 20)
+    if AutoClaimActive then
+        task.spawn(function()
+            for i = 1, 1000 do
+                if not AutoClaimActive then break end
+                ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("ClaimReward"):FireServer()
+                task.wait(0.1)
+            end
+        end)
+    end
+end)
+
+-- Reward Teleport Fonksiyonu
+TeleportButton.MouseButton1Click:Connect(function()
+    TeleportActive = not TeleportActive
+    TeleportButton.Text = "Reward TP: " .. (TeleportActive and "ON" or "OFF")
+    TeleportButton.BackgroundColor3 = TeleportActive and Color3.fromRGB(150, 0, 255) or Color3.fromRGB(20, 20, 20)
+    if TeleportActive then
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            OriginalPosition = LocalPlayer.Character.HumanoidRootPart.CFrame
+            LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-730.91015625, -3.4000017642974854, 811.9042358398438)
+        end
+    else
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and OriginalPosition then
+            LocalPlayer.Character.HumanoidRootPart.CFrame = OriginalPosition
+        end
+    end
+end)
+
+-- Buton İşlevleri
+CloseButton.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+end)
+
+MinimizeButton.MouseButton1Click:Connect(function()
+    Minimized = not Minimized
+    MinimizeButton.Text = Minimized and "+" or "-"
+    AutoClaimButton.Visible = not Minimized
+    TeleportButton.Visible = not Minimized
+    Frame.Size = Minimized and UDim2.new(0, 250, 0, 40) or UDim2.new(0, 250, 0, 150)
+end)
