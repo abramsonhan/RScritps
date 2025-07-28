@@ -1,0 +1,8 @@
+while wait(0.0000001) do
+        local args = {
+	RubyCorn
+}
+gameGetService(ReplicatedStorage)WaitForChild(CollectCornEvent)FireServer(unpack(args))
+gameGetService(ReplicatedStorage)WaitForChild(ClickEvent)FireServer()
+gameGetService(ReplicatedStorage)WaitForChild(GenerationEvent)FireServer()
+end
