@@ -1,0 +1,14 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local SellStrength = ReplicatedStorage.Events.SellStrength
+local SwingSaber = ReplicatedStorage.Events.SwingSaber
+
+while true do
+    spawn(function()
+        for i = 1, 50 do 
+            SellStrength:FireServer()
+            SwingSaber:FireServer()
+            task.wait()
+        end
+    end)
+    task.wait(0.1)
+end
