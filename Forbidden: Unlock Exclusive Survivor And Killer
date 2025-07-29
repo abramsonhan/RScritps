@@ -1,0 +1,113 @@
+-- JaneDoe
+
+local args = {
+	"PurchaseContent",
+	game:GetService("ReplicatedStorage"):WaitForChild("Assets"):WaitForChild("Skins"):WaitForChild("Survivors"):WaitForChild("JaneDoe"):WaitForChild("JaneTammy")
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Modules"):WaitForChild("Network"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
+
+-- Chance
+
+local args = {
+	"PurchaseContent",
+	game:GetService("ReplicatedStorage"):WaitForChild("Assets"):WaitForChild("Skins"):WaitForChild("Survivors"):WaitForChild("Chance"):WaitForChild("PlayerMlg")
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Modules"):WaitForChild("Network"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
+
+local args = {
+	"PurchaseContent",
+	game:GetService("ReplicatedStorage"):WaitForChild("Assets"):WaitForChild("Skins"):WaitForChild("Survivors"):WaitForChild("Chance"):WaitForChild("Mlg")
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Modules"):WaitForChild("Network"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
+
+local args = {
+	"PurchaseContent",
+	game:GetService("ReplicatedStorage"):WaitForChild("Assets"):WaitForChild("Skins"):WaitForChild("Survivors"):WaitForChild("Chance"):WaitForChild("Gubby")
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Modules"):WaitForChild("Network"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
+
+local args = {
+	"PurchaseContent",
+	game:GetService("ReplicatedStorage"):WaitForChild("Assets"):WaitForChild("Skins"):WaitForChild("Survivors"):WaitForChild("Chance"):WaitForChild("UltrakillChance")
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Modules"):WaitForChild("Network"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
+
+local args = {
+	"PurchaseContent",
+	game:GetService("ReplicatedStorage"):WaitForChild("Assets"):WaitForChild("Skins"):WaitForChild("Survivors"):WaitForChild("Chance"):WaitForChild("John Wick")
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Modules"):WaitForChild("Network"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
+
+-- Guest 1337
+
+local args = {
+	"PurchaseContent",
+	game:GetService("ReplicatedStorage"):WaitForChild("Assets"):WaitForChild("Skins"):WaitForChild("Survivors"):WaitForChild("Guest1337"):WaitForChild("_GuestKath")
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Modules"):WaitForChild("Network"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
+
+local args = {
+	"PurchaseContent",
+	game:GetService("ReplicatedStorage"):WaitForChild("Assets"):WaitForChild("Skins"):WaitForChild("Survivors"):WaitForChild("Guest1337"):WaitForChild("UltrakillGuest")
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Modules"):WaitForChild("Network"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
+
+-- Taph
+
+local args = {
+	"PurchaseContent",
+	game:GetService("ReplicatedStorage"):WaitForChild("Assets"):WaitForChild("Skins"):WaitForChild("Survivors"):WaitForChild("Taph"):WaitForChild("CringeTaph")
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Modules"):WaitForChild("Network"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
+
+-- H3LP3R
+
+local args = {
+	"PurchaseContent",
+	game:GetService("ReplicatedStorage"):WaitForChild("Assets"):WaitForChild("Skins"):WaitForChild("Survivors"):WaitForChild("H3LP3R"):WaitForChild("Colorable Jak")
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Modules"):WaitForChild("Network"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
+
+-- Killer
+
+local args = {
+	"PurchaseContent",
+	game:GetService("ReplicatedStorage"):WaitForChild("Assets"):WaitForChild("Skins"):WaitForChild("Killers"):WaitForChild("Jason"):WaitForChild("JeffKiller")
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Modules"):WaitForChild("Network"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
+
+-- c00lkidd
+
+local args = {
+	"PurchaseContent",
+	game:GetService("ReplicatedStorage"):WaitForChild("Assets"):WaitForChild("Skins"):WaitForChild("Killers"):WaitForChild("c00lkidd"):WaitForChild("PurpleGirl")
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Modules"):WaitForChild("Network"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
+
+-- Noli
+
+local args = {
+	"PurchaseContent",
+	game:GetService("ReplicatedStorage"):WaitForChild("Assets"):WaitForChild("Skins"):WaitForChild("Killers"):WaitForChild("Noli"):WaitForChild("DevestoNoli")
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Modules"):WaitForChild("Network"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
+
+local args = {
+	"PurchaseContent",
+	game:GetService("ReplicatedStorage"):WaitForChild("Assets"):WaitForChild("Skins"):WaitForChild("Killers"):WaitForChild("Noli"):WaitForChild("YAAINoli")
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Modules"):WaitForChild("Network"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
+
+-- JohnDoe
+
+local args = {
+	"PurchaseContent",
+	game:GetService("ReplicatedStorage"):WaitForChild("Assets"):WaitForChild("Skins"):WaitForChild("Killers"):WaitForChild("JohnDoe"):WaitForChild("D1Clairehater")
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Modules"):WaitForChild("Network"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
+
+local args = {
+	"PurchaseContent",
+	game:GetService("ReplicatedStorage"):WaitForChild("Assets"):WaitForChild("Skins"):WaitForChild("Killers"):WaitForChild("JohnDoe"):WaitForChild("TimmyJohnDoe")
+}
+game:GetService("ReplicatedStorage"):WaitForChild("Modules"):WaitForChild("Network"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
