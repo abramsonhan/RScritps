@@ -1,0 +1,5 @@
+for i = 1, 1000 do -- change this it doesnt matter
+    local args = {i}
+    game:GetService("ReplicatedStorage"):WaitForChild("ClaimFreeItem"):FireServer(unpack(args))
+    task.wait(0.1)
+end
