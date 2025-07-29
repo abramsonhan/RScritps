@@ -1,0 +1,162 @@
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local player = Players.LocalPlayer
+local PlayerGui = player:WaitForChild("PlayerGui")
+
+local gui = Instance.new("ScreenGui", PlayerGui)
+gui.Name = "AllRemotesGui"
+gui.ResetOnSpawn = false
+
+local frame = Instance.new("Frame", gui)
+frame.Size = UDim2.new(0, 200, 0, 200)
+frame.Position = UDim2.new(0.05, 0, 0.3, 0)
+frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+frame.BorderSizePixel = 0
+frame.Active = true
+frame.Draggable = true
+
+local corner = Instance.new("UICorner", frame)
+corner.CornerRadius = UDim.new(0, 12)
+
+local close = Instance.new("TextButton", frame)
+close.Size = UDim2.new(0, 30, 0, 30)
+close.Position = UDim2.new(1, -35, 0, 5)
+close.BackgroundColor3 = Color3.fromRGB(180, 30, 30)
+close.Text = ""
+close.TextColor3 = Color3.new(1, 1, 1)
+close.Font = Enum.Font.SourceSansBold
+close.TextSize = 20
+close.MouseButton1Click:Connect(function()
+	gui:Destroy()
+end)
+
+local discord = Instance.new("TextLabel", frame)
+discord.Position = UDim2.new(0, 10, 0, 5)
+discord.Size = UDim2.new(0, 150, 0, 25)
+discord.BackgroundTransparency = 1
+discord.Text = "discord: 1w69"
+discord.TextColor3 = Color3.fromRGB(255, 255, 255)
+discord.Font = Enum.Font.SourceSansBold
+discord.TextSize = 16
+discord.TextXAlignment = Enum.TextXAlignment.Left
+
+local buttonHolder = Instance.new("Frame", frame)
+buttonHolder.Size = UDim2.new(1, -20, 0, 130) -- زودت الارتفاع لاستيعاب الزرين
+buttonHolder.Position = UDim2.new(0, 10, 0, 45)
+buttonHolder.BackgroundTransparency = 1
+
+local layout = Instance.new("UIListLayout", buttonHolder)
+layout.Padding = UDim.new(0, 10)
+layout.FillDirection = Enum.FillDirection.Vertical
+layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+layout.SortOrder = Enum.SortOrder.LayoutOrder
+
+local function rainbowColor(speed)
+	local t = tick() * speed
+	return Color3.fromHSV((t % 1), 1, 1)
+end
+
+RunService.RenderStepped:Connect(function()
+	for _, child in pairs(buttonHolder:GetChildren()) do
+		if child:IsA("TextButton") then
+			child.TextColor3 = rainbowColor(0.25)
+		end
+	end
+end)
+
+local remotes = {
+	ReplicatedStorage.Remotes.ChopEvent,
+	ReplicatedStorage.Remotes.SellChoiceEvent,
+	ReplicatedStorage.Remotes.SellResultEvent,
+	ReplicatedStorage.Remotes.ChangePet,
+	ReplicatedStorage.Remotes.UnlockPet,
+	ReplicatedStorage.Remotes.Rebirth,
+	ReplicatedStorage.Remotes.UnlockAxe,
+	ReplicatedStorage.Remotes.Equipped,
+	ReplicatedStorage.Remotes.TeleportEvent,
+	ReplicatedStorage.Remotes.ChangeAxe,
+	ReplicatedStorage.Remotes.StartTutorial,
+	ReplicatedStorage.Remotes.FinishTutorial,
+	ReplicatedStorage.Remotes.NextStep,
+	ReplicatedStorage.Remotes.GiveCoins,
+	ReplicatedStorage.Remotes.SpawnMeteor,
+	ReplicatedStorage.Remotes.ChangeBackpack,
+	ReplicatedStorage.Remotes.UnlockBackpack,
+	ReplicatedStorage.Remotes.IncreaseSlots,
+	ReplicatedStorage.Remotes.LogAdjuster,
+	ReplicatedStorage.Remotes.MeteorsEvent,
+	ReplicatedStorage.Remotes.MeteorEvent,
+	ReplicatedStorage.Remotes.FavoriteEvent,
+	ReplicatedStorage.Remotes.GroupRankEvent,
+	ReplicatedStorage.Remotes.AdminTeleport,
+	ReplicatedStorage.Remotes.GiftAccept,
+	ReplicatedStorage.Remotes.GiftingReceived,
+	ReplicatedStorage.Remotes.GiftingSent,
+	ReplicatedStorage.Remotes.GlobalMessageEvent,
+	ReplicatedStorage.Remotes.ToggleSFX,
+	ReplicatedStorage.Remotes.BlessingResult,
+	ReplicatedStorage.Remotes.BlessingChoice,
+	ReplicatedStorage.Remotes.MutateEvent,
+	ReplicatedStorage.Remotes.MutateResult,
+	ReplicatedStorage.Remotes.AutoPickup,
+	ReplicatedStorage.Remotes.ModTeleport,
+	ReplicatedStorage.Remotes.ModGiveCoins
+}
+
+local isAutoRunning = false
+local isArabic = true
+
+local autoRemoteButton = Instance.new("TextButton")
+autoRemoteButton.Name = "AutoRemoteButton"
+autoRemoteButton.Size = UDim2.new(1, 0, 0, 40)
+autoRemoteButton.BackgroundColor3 = Color3.fromRGB(60, 90, 60)
+autoRemoteButton.Text = "مستوى عالي"
+autoRemoteButton.Font = Enum.Font.SourceSansBold
+autoRemoteButton.TextSize = 22
+autoRemoteButton.BorderSizePixel = 0
+Instance.new("UICorner", autoRemoteButton).CornerRadius = UDim.new(0, 8)
+autoRemoteButton.Parent = buttonHolder
+
+autoRemoteButton.MouseButton1Click:Connect(function()
+	isAutoRunning = not isAutoRunning
+	if isAutoRunning then
+		autoRemoteButton.BackgroundColor3 = Color3.fromRGB(90, 150, 90)
+	else
+		autoRemoteButton.BackgroundColor3 = Color3.fromRGB(60, 90, 60)
+	end
+end)
+
+local translationButton = Instance.new("TextButton")
+translationButton.Name = "TranslationButton"
+translationButton.Size = UDim2.new(1, 0, 0, 30)
+translationButton.BackgroundColor3 = Color3.fromRGB(40, 40, 80)
+translationButton.Text = "English"
+translationButton.Font = Enum.Font.SourceSansBold
+translationButton.TextSize = 18
+translationButton.BorderSizePixel = 0
+Instance.new("UICorner", translationButton).CornerRadius = UDim.new(0, 8)
+translationButton.Parent = buttonHolder
+
+translationButton.MouseButton1Click:Connect(function()
+	isArabic = not isArabic
+	if isArabic then
+		autoRemoteButton.Text = "مستوى عالي"
+		translationButton.Text = "English"
+	else
+		autoRemoteButton.Text = "High Level"
+		translationButton.Text = "عربي"
+	end
+end)
+
+RunService.RenderStepped:Connect(function()
+	if isAutoRunning then
+		for _, remote in pairs(remotes) do
+			if remote and remote:IsA("RemoteEvent") and remote.FireServer then
+				pcall(function()
+					remote:FireServer(math.random(1, 10000))
+				end)
+			end
+		end
+	end
+end)
