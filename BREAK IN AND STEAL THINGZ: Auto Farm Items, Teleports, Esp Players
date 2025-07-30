@@ -1,0 +1,180 @@
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+    Name = "BIAST",
+    LoadingTitle = "Zzz",
+    LoadingSubtitle = "by None",
+    ConfigurationSaving = {
+        Enabled = true,
+        FolderName = "RayfieldConfig",
+        FileName = "ESP_Stamina_Config"
+    }
+})
+
+local MainTab = Window:CreateTab("Main", 4483362458)
+local TeleportTab = Window:CreateTab("Teleports", 4483362458)
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+local Items = workspace:WaitForChild("Items")
+
+local staminaLoop = false
+local function startStaminaLoop()
+    staminaLoop = true
+    task.spawn(function()
+        while staminaLoop do
+            for _, teamFolder in pairs(workspace:WaitForChild("Characters"):GetChildren()) do
+                for _, model in pairs(teamFolder:GetChildren()) do
+                    local stamina = model:FindFirstChild("Stamina")
+                    if stamina and stamina:IsA("NumberValue") and stamina.Value < 100 then
+                        stamina.Value = math.min(100, stamina.Value + 2)
+                    end
+                end
+            end
+            task.wait(0.1)
+        end
+    end)
+end
+local function stopStaminaLoop()
+    staminaLoop = false
+end
+
+local espEnabled = false
+local espDrawings = {}
+local renderConnection
+
+local function createDrawingLabel(name)
+    local drawing = Drawing.new("Text")
+    drawing.Text = name
+    drawing.Size = 16
+    drawing.Center = true
+    drawing.Outline = true
+    drawing.Font = 2
+    drawing.Color = Color3.fromRGB(255, 255, 0)
+    drawing.Visible = false
+    return drawing
+end
+
+local function getItemPart(item)
+    return item:IsA("BasePart") and item or item:FindFirstChildWhichIsA("BasePart")
+end
+
+local function updateESPTable()
+    for _, item in pairs(Items:GetChildren()) do
+        if not espDrawings[item] then
+            local part = getItemPart(item)
+            if part then
+                espDrawings[item] = {
+                    part = part,
+                    text = createDrawingLabel(item.Name)
+                }
+            end
+        end
+    end
+
+    for item, data in pairs(espDrawings) do
+        if not item:IsDescendantOf(workspace) then
+            if data.text then data.text:Remove() end
+            espDrawings[item] = nil
+        end
+    end
+end
+
+local function enableESP()
+    espEnabled = true
+    updateESPTable()
+    renderConnection = RunService.RenderStepped:Connect(function()
+        if not espEnabled then return end
+        updateESPTable()
+        for item, data in pairs(espDrawings) do
+            if item and data.part and data.part.Parent and data.text then
+                local pos, visible = Camera:WorldToViewportPoint(data.part.Position)
+                data.text.Visible = visible
+                if visible then
+                    data.text.Position = Vector2.new(pos.X, pos.Y)
+                end
+            else
+                if data.text then
+                    data.text.Visible = false
+                end
+            end
+        end
+    end)
+end
+
+local function disableESP()
+    espEnabled = false
+    if renderConnection then renderConnection:Disconnect() end
+    for _, data in pairs(espDrawings) do
+        if data.text then data.text:Remove() end
+    end
+    espDrawings = {}
+end
+
+MainTab:CreateToggle({
+    Name = "Infinite Stamina",
+    CurrentValue = false,
+    Flag = "StaminaToggle",
+    Callback = function(state)
+        if state then startStaminaLoop() else stopStaminaLoop() end
+    end
+})
+
+MainTab:CreateToggle({
+    Name = "Item ESP (now doesnt kick you)",
+    CurrentValue = false,
+    Flag = "ESPToggle",
+    Callback = function(state)
+        if state then enableESP() else disableESP() end
+    end
+})
+
+local selectedItem = nil
+
+local function refreshItemList()
+    local list = {}
+    for _, item in pairs(Items:GetChildren()) do
+        table.insert(list, item.Name)
+    end
+    return list
+end
+
+local itemNames = {
+    "BloxyCola",
+    "Cheeseburger",
+    "Drakkobloxxer",
+    "Superball",
+    "SubspaceTripmine",
+    "BloxyRadar",
+    "Bomb",
+    "Medkit",
+    "ScrollOfSevenless",
+    "Shotgun",
+    "Teapot",
+    "RocketLauncher",
+    "BodySwapPotion",
+    "Trowel",
+}
+
+local function getItemPart(item)
+    return item:IsA("BasePart") and item or item:FindFirstChildWhichIsA("BasePart")
+end
+
+for _, itemName in pairs(itemNames) do
+    TeleportTab:CreateButton({
+        Name = "Teleport to " .. itemName,
+        Callback = function()
+            for _, item in pairs(Items:GetChildren()) do
+                if item.Name == itemName then
+                    local part = getItemPart(item)
+                    if part then
+                        LocalPlayer.Character:MoveTo(part.Position + Vector3.new(0, 3, 0))
+                        break
+                    end
+                end
+            end
+        end
+    })
+end
