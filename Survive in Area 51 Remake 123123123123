@@ -1,0 +1,64 @@
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/liebertsx/Tora-Library/main/src/library",true))()
+local tab = library:CreateWindow("SIA51:R")
+
+local main = tab:AddFolder("Get Weapons")
+main:AddList({
+    text = "Go To",
+    values = {"Bronze Medkit Pad","Dual LX1", "Icicle Launcher Pad", "LXW Pad", "Platinum M1 Garand Pad", "Stygian Blaster Pad", "Vulcan Pad"},
+    callback = function(pad)
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = workspace.MapFolder.Inside["Hidden Pads"][pad].Pad.CFrame
+    end,
+    open = false,
+    flag = "color_option"
+})
+
+local gmfolder = tab:AddFolder("Weapons Mod")
+gmfolder:AddList({
+    text = "Gun",
+    values = {"Desert Eagle", "Golden Eagle", "Uzi", "SPAS-12","M16A4", "LX1", "LX2", "LX3", "AK-47", "Rocket Launcher", "Sniper", "AA-12", "Gatling", "Gun_Gun", "Bat Rifle", "Celebration Beamer", "Dual LX1", "Grenade Launcher", "Icicle Launcher", "LX4", "LX5", "LXW", "M1 Garand", "M60", "Platinum M1 Garand", "Stygian Blaster", "Vulcan", "Abyssal Cleaver", "BleedingScythe", "Blood Slusher", "Crystallized Scythe", "Deviant's Blade", "EmberScepter", "FrostbiteRevolver", "Glacial Scythe", "Gleaming Blaster", "HyperionRailgun", "Ichor Shatterer", "Infernal Expeller", "Magma Striker", "Obsidian Blaster", "Outburster", "Poison Generator", "Pulser", "Specteral-Storm", "SteampunkM1Garand", "Voltcaster", "WarriorSkull"},
+    callback = function(value)
+        local st = require(game:GetService("Players").LocalPlayer.Backpack[value].Setting)
+        if st then
+            st.Auto = true
+            st.AmmoPerClip = math.huge
+            st.FireRate = 0
+            st.Spread = 0
+            st.BulletTransparency = 1
+            st.CameraShakingEnabled = false
+        end
+    end,
+    open = false,
+    flag = "color_option"
+})
+gmfolder:AddButton({
+	text = "Mod all Guns",
+	flag = "button",
+	callback = function()
+	for _, table in pairs(getgc(true)) do
+	    if type(table) == "table" and rawget(table, "Auto") then
+	        rawset(table, "Auto", true)
+	    end
+	end
+	    for _, table in pairs(getgc(true)) do
+	    if type(table) == "table" and rawget(table, "AmmoPerClip") then
+	        rawset(table, "AmmoPerClip", math.huge)
+	    end
+	end
+	    for _, table in pairs(getgc(true)) do
+	    if type(table) == "table" and rawget(table, "FireRate") then
+	        rawset(table, "FireRate", 0)
+	    end
+	end
+	    for _, table in pairs(getgc(true)) do
+	    if type(table) == "table" and rawget(table, "Spread") then
+	        rawset(table, "Spread", 0)
+	    end
+	end
+	    for _, table in pairs(getgc(true)) do
+	    if type(table) == "table" and rawget(table, "CameraShakingEnabled") then
+	        rawset(table, "CameraShakingEnabled", false)
+	    end
+	end
+end
+})
+library:Init()
