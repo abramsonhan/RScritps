@@ -1,0 +1,12 @@
+task.spawn(function()
+    local r = game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("EnteredRingRemoteFunction")
+    while true do
+        for _, v in ipairs(workspace:WaitForChild("FlightRings"):GetDescendants()) do
+            if v.Name == "Ring" and v:IsA("BasePart") then
+                r:InvokeServer(v)
+                task.wait()
+            end
+        end
+        task.wait()
+    end
+end)
