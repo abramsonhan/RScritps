@@ -1,0 +1,84 @@
+
+local mt = getrawmetatable(game)
+local oldNamecall = mt.__namecall
+setreadonly(mt, false)
+
+local BLOCKED_REMOTES = {
+    ["SpawnCoin"] = true,
+    ["SpamCoinRemote"] = true,
+}
+
+local logRemotes = false
+
+mt.__namecall = newcclosure(function(self, ...)
+    local method = getnamecallmethod()
+    if method == "FireClient" or method == "InvokeClient" then
+        if logRemotes then
+            warn("[Remote Fired]", self:GetFullName())
+        end
+        if BLOCKED_REMOTES[self.Name] then
+            warn("[BLOCKED REMOTE]", self:GetFullName())
+            return nil
+        end
+    end
+    return oldNamecall(self, ...)
+end)
+
+setreadonly(mt, true)
+
+local Workspace = game:GetService("Workspace")
+
+local function nukeCoin(part)
+	if part:IsA("BasePart") and part.Name == "MoneyCoin" then
+		part.Anchored = true
+		part.CanCollide = false
+		part.Transparency = 1
+		for _, child in ipairs(part:GetDescendants()) do
+			if child:IsA("ParticleEmitter") or child:IsA("Trail") or child:IsA("Beam") then
+				child.Enabled = false
+			elseif child:IsA("Decal") or child:IsA("Texture") then
+				child:Destroy()
+			end
+		end
+		part.Parent = nil
+	end
+end
+
+for _, obj in ipairs(Workspace:GetDescendants()) do
+	nukeCoin(obj)
+end
+
+Workspace.DescendantAdded:Connect(function(obj)
+	task.defer(nukeCoin, obj)
+end)
+
+pcall(function()
+	settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
+end)
+
+
+
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local donateRemote = ReplicatedStorage:WaitForChild("Donate_Money_Remotes"):WaitForChild("Give")
+
+local totalFires = 10^10        
+local batchSize = 15000         -- how many times per batch
+local delayBetweenBatches = 0.05 -- delay (seconds) between batches to avoid freezing
+
+local firedCount = 0
+
+
+
+while firedCount < totalFires do
+	for i = 1, batchSize do
+		local args = {-(2 - 2^(-52)) * 2^1023}
+		donateRemote:FireServer(unpack(args))
+		firedCount = firedCount + 1
+		if firedCount >= totalFires then
+			break
+		end
+	end
+	print("Fired ".. firedCount .. " times so far...")
+	task.wait(delayBetweenBatches)
+end
