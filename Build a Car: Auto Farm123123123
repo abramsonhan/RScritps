@@ -1,0 +1,87 @@
+--// Services
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TweenService = game:GetService("TweenService")
+
+--// UI Elements
+local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
+ScreenGui.Name = "AutoFarmUI"
+
+local Frame = Instance.new("Frame", ScreenGui)
+Frame.Size = UDim2.new(0, 220, 0, 100)
+Frame.Position = UDim2.new(0, 20, 0, 150)
+Frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+Frame.BorderSizePixel = 0
+Frame.Active = true
+Frame.Draggable = true
+
+-- Rounded Corners
+local UICorner = Instance.new("UICorner", Frame)
+UICorner.CornerRadius = UDim.new(0, 12)
+
+-- Rainbow Border
+local Border = Instance.new("UIStroke", Frame)
+Border.Thickness = 3
+Border.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+Border.Color = Color3.new(1, 0, 0)
+
+-- Toggle Button
+local Toggle = Instance.new("TextButton", Frame)
+Toggle.Size = UDim2.new(0, 180, 0, 35)
+Toggle.Position = UDim2.new(0, 20, 0, 30)
+Toggle.Text = "Auto Farm: OFF"
+Toggle.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+Toggle.TextColor3 = Color3.new(1, 1, 1)
+Toggle.Font = Enum.Font.Gotham
+Toggle.TextSize = 16
+
+local ToggleCorner = Instance.new("UICorner", Toggle)
+ToggleCorner.CornerRadius = UDim.new(0, 8)
+
+-- State control
+local autoFarmEnabled = false
+
+-- Auto Farm Loop (Persistent and never stops)
+task.spawn(function()
+    while true do
+        if autoFarmEnabled then
+            local success, err = pcall(function()
+                local SpawnRemote = workspace:WaitForChild("__THINGS"):WaitForChild("__REMOTES"):WaitForChild("vehicle_spawn")
+                local StopRemote = workspace:WaitForChild("__THINGS"):WaitForChild("__REMOTES"):WaitForChild("vehicle_stop")
+                local player = Players.LocalPlayer
+                local character = player.Character or player.CharacterAdded:Wait()
+
+                SpawnRemote:InvokeServer()
+                task.wait(0.2)
+                character:WaitForChild("HumanoidRootPart").CFrame = CFrame.new(9000000000e9, 90000000000e9, 9000000000e9)
+                task.wait(0.2)
+                StopRemote:InvokeServer()
+            end)
+
+            if not success then
+                warn("AutoFarm error: " .. tostring(err))
+            end
+
+            task.wait(0.5)
+        else
+            task.wait(0.1)
+        end
+    end
+end)
+
+-- Toggle click
+Toggle.MouseButton1Click:Connect(function()
+    autoFarmEnabled = not autoFarmEnabled
+    Toggle.Text = "Auto Farm: " .. (autoFarmEnabled and "ON" or "OFF")
+    Toggle.BackgroundColor3 = autoFarmEnabled and Color3.fromRGB(30, 120, 30) or Color3.fromRGB(60, 60, 60)
+end)
+
+-- Rainbow Border Loop
+task.spawn(function()
+    local hue = 0
+    while true do
+        hue = (hue + 1) % 360
+        Border.Color = Color3.fromHSV(hue / 360, 1, 1)
+        task.wait(0.03)
+    end
+end)
