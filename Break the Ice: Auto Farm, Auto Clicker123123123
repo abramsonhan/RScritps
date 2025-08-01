@@ -1,0 +1,70 @@
+--// SERVICES
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local PlayerGui = Players.LocalPlayer:WaitForChild("PlayerGui")
+
+--// REMOTES
+local AttackRemote = ReplicatedStorage:WaitForChild("attack")
+local HeldRemote = ReplicatedStorage:WaitForChild("held")
+
+--// UI SETUP
+local ScreenGui = Instance.new("ScreenGui", PlayerGui)
+ScreenGui.Name = "AutoFarmUI"
+ScreenGui.ResetOnSpawn = false
+
+-- Rainbow Border Function
+local function createRainbowGlow(frame)
+	local border = Instance.new("UIStroke", frame)
+	border.Thickness = 3
+	border.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	border.LineJoinMode = Enum.LineJoinMode.Round
+	coroutine.wrap(function()
+		local hue = 0
+		while frame and frame.Parent do
+			hue = (hue + 0.01) % 1
+			border.Color = Color3.fromHSV(hue, 1, 1)
+			task.wait(0.03)
+		end
+	end)()
+end
+
+--// Main Frame
+local Frame = Instance.new("Frame", ScreenGui)
+Frame.Size = UDim2.new(0, 220, 0, 100)
+Frame.Position = UDim2.new(0.5, -110, 0.5, -50)
+Frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+Frame.Active = true
+Frame.Draggable = true
+local UICorner = Instance.new("UICorner", Frame)
+UICorner.CornerRadius = UDim.new(0, 10)
+createRainbowGlow(Frame)
+
+--// Auto Farm Toggle Button
+local AutoFarmEnabled = false
+local AutoFarmBtn = Instance.new("TextButton", Frame)
+AutoFarmBtn.Size = UDim2.new(0, 180, 0, 40)
+AutoFarmBtn.Position = UDim2.new(0.5, -90, 0, 25)
+AutoFarmBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+AutoFarmBtn.TextColor3 = Color3.new(1, 1, 1)
+AutoFarmBtn.Font = Enum.Font.SourceSansBold
+AutoFarmBtn.TextSize = 16
+AutoFarmBtn.Text = "Start Auto Farm"
+local btnCorner = Instance.new("UICorner", AutoFarmBtn)
+btnCorner.CornerRadius = UDim.new(0, 8)
+
+AutoFarmBtn.MouseButton1Click:Connect(function()
+	AutoFarmEnabled = not AutoFarmEnabled
+	AutoFarmBtn.Text = AutoFarmEnabled and "Stop Auto Farm" or "Start Auto Farm"
+end)
+
+--// Looping Auto Farm
+task.spawn(function()
+	while true do
+		if AutoFarmEnabled then
+			-- Fire the attack and held remotes
+			AttackRemote:FireServer()
+			HeldRemote:FireServer(false)
+		end
+		task.wait(0.1) -- Adjust delay if needed
+	end
+end)
