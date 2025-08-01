@@ -1,0 +1,221 @@
+--// SERVICES
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local RunService = game:GetService("RunService")
+local Lighting = game:GetService("Lighting")
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+
+--// REMOTES
+local DestroySegment = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("DestroySegment")
+local BuyUpgrade = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("BuyUpgrade")
+local BuyGear = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("BuyGear") -- ✅ NEW
+
+--// CONFIG
+local maxSegments = 400
+local isFarming = false
+local selectedArea = "Spawn"
+local optimizeFPS = false
+local autoBuyGear = false -- ✅ NEW toggle
+local areaList = {
+    "Spawn", "TrainingGrounds", "SakuraFields", "CastleKeep", "ArcticBase", "CrystalCave"
+}
+
+--// UI SETUP
+local ScreenGui = Instance.new("ScreenGui", PlayerGui)
+ScreenGui.Name = "AutoFarmUI"
+ScreenGui.ResetOnSpawn = false
+
+local function createRainbowBorder(parent)
+    local border = Instance.new("Frame")
+    border.Size = UDim2.new(1, 6, 1, 6)
+    border.Position = UDim2.new(0, -3, 0, -3)
+    border.ZIndex = 0
+    border.BackgroundColor3 = Color3.new(1, 0, 0)
+    border.BorderSizePixel = 0
+    border.Parent = parent
+    coroutine.wrap(function()
+        local hue = 0
+        while parent and parent.Parent do
+            hue = (hue + 0.01) % 1
+            border.BackgroundColor3 = Color3.fromHSV(hue, 1, 1)
+            task.wait(0.03)
+        end
+    end)()
+end
+
+-- Toggle UI Button
+local ToggleMain = Instance.new("TextButton", ScreenGui)
+ToggleMain.Size = UDim2.new(0, 130, 0, 40)
+ToggleMain.Position = UDim2.new(0, 10, 0.5, -100)
+ToggleMain.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+ToggleMain.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleMain.Text = "Toggle AutoFarm UI"
+ToggleMain.Font = Enum.Font.SourceSansBold
+ToggleMain.TextSize = 18
+
+-- FPS Label
+local FPSLabel = Instance.new("TextLabel", ScreenGui)
+FPSLabel.Size = UDim2.new(0, 130, 0, 30)
+FPSLabel.Position = UDim2.new(0, 10, 0.5, -60)
+FPSLabel.BackgroundTransparency = 1
+FPSLabel.TextColor3 = Color3.fromRGB(255, 0, 0)
+FPSLabel.Text = "FPS: 0"
+FPSLabel.Font = Enum.Font.SourceSansBold
+FPSLabel.TextSize = 24
+FPSLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+-- FPS Counter Logic
+local last = tick()
+local frames = 0
+RunService.RenderStepped:Connect(function()
+    frames += 1
+    if tick() - last >= 1 then
+        FPSLabel.Text = "FPS: " .. frames
+        frames = 0
+        last = tick()
+    end
+end)
+
+-- Main Frame
+local Frame = Instance.new("Frame", ScreenGui)
+Frame.Size = UDim2.new(0, 250, 0, 340)
+Frame.Position = UDim2.new(0.5, -125, 0.5, -160)
+Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Frame.Active = true
+Frame.Draggable = true
+Frame.Visible = true
+createRainbowBorder(Frame)
+
+-- Start Button
+local StartButton = Instance.new("TextButton", Frame)
+StartButton.Size = UDim2.new(0, 230, 0, 35)
+StartButton.Position = UDim2.new(0, 10, 0, 10)
+StartButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+StartButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+StartButton.Text = "Start Auto Farm"
+StartButton.Font = Enum.Font.SourceSans
+StartButton.TextSize = 20
+
+-- Dropdown Area Selection
+local Dropdown = Instance.new("TextButton", Frame)
+Dropdown.Size = UDim2.new(0, 230, 0, 35)
+Dropdown.Position = UDim2.new(0, 10, 0, 55)
+Dropdown.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+Dropdown.TextColor3 = Color3.fromRGB(255, 255, 255)
+Dropdown.Text = "Select Area"
+Dropdown.Font = Enum.Font.SourceSans
+Dropdown.TextSize = 20
+
+-- Scrollable Area List
+local OptionsContainer = Instance.new("ScrollingFrame", Frame)
+OptionsContainer.Size = UDim2.new(0, 230, 0, 130)
+OptionsContainer.Position = UDim2.new(0, 10, 0, 95)
+OptionsContainer.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+OptionsContainer.Visible = false
+OptionsContainer.ScrollBarThickness = 6
+OptionsContainer.CanvasSize = UDim2.new(0, 0, 0, #areaList * 35)
+
+local Layout = Instance.new("UIListLayout", OptionsContainer)
+Layout.Padding = UDim.new(0, 3)
+Layout.SortOrder = Enum.SortOrder.LayoutOrder
+
+for _, area in ipairs(areaList) do
+    local btn = Instance.new("TextButton", OptionsContainer)
+    btn.Size = UDim2.new(1, 0, 0, 30)
+    btn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.Text = area
+    btn.Font = Enum.Font.SourceSans
+    btn.TextSize = 18
+    btn.MouseButton1Click:Connect(function()
+        selectedArea = area
+        Dropdown.Text = "Area: " .. selectedArea
+        OptionsContainer.Visible = false
+    end)
+end
+
+Dropdown.MouseButton1Click:Connect(function()
+    OptionsContainer.Visible = not OptionsContainer.Visible
+end)
+
+-- Optimize FPS Button
+local OptimizeButton = Instance.new("TextButton", Frame)
+OptimizeButton.Size = UDim2.new(0, 230, 0, 35)
+OptimizeButton.Position = UDim2.new(0, 10, 0, 200)
+OptimizeButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+OptimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+OptimizeButton.Text = "Optimize FPS"
+OptimizeButton.Font = Enum.Font.SourceSans
+OptimizeButton.TextSize = 18
+
+OptimizeButton.MouseButton1Click:Connect(function()
+    Lighting.GlobalShadows = false
+    Lighting.FogEnd = 1e10
+    Lighting.Brightness = 0
+    if Workspace:FindFirstChild("Terrain") then
+        local Terrain = Workspace.Terrain
+        Terrain.WaterWaveSize = 0
+        Terrain.WaterWaveSpeed = 0
+        Terrain.WaterReflectance = 0
+        Terrain.WaterTransparency = 1
+    end
+    for _, v in ipairs(game:GetDescendants()) do
+        if v:IsA("Texture") or v:IsA("Decal") or v:IsA("ParticleEmitter") or v:IsA("Trail") then
+            v:Destroy()
+        end
+    end
+    if setfpscap then setfpscap(30) end
+end)
+
+-- Auto Buy Gear Button
+local AutoGearButton = Instance.new("TextButton", Frame)
+AutoGearButton.Size = UDim2.new(0, 230, 0, 35)
+AutoGearButton.Position = UDim2.new(0, 10, 0, 245)
+AutoGearButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+AutoGearButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+AutoGearButton.Text = "Auto Buy Gear"
+AutoGearButton.Font = Enum.Font.SourceSans
+AutoGearButton.TextSize = 18
+
+AutoGearButton.MouseButton1Click:Connect(function()
+    autoBuyGear = not autoBuyGear
+    AutoGearButton.Text = autoBuyGear and "Stop Buying Gear" or "Auto Buy Gear"
+end)
+
+-- Button Toggles
+StartButton.MouseButton1Click:Connect(function()
+    isFarming = not isFarming
+    StartButton.Text = isFarming and "Stop Auto Farm" or "Start Auto Farm"
+end)
+
+ToggleMain.MouseButton1Click:Connect(function()
+    Frame.Visible = not Frame.Visible
+end)
+
+-- MAIN FARMING LOOP
+task.spawn(function()
+    while true do
+        if isFarming and selectedArea then
+            for id = 1, maxSegments do
+                pcall(function()
+                    DestroySegment:FireServer(id, selectedArea, 2)
+                end)
+            end
+        end
+        RunService.Heartbeat:Wait()
+    end
+end)
+
+-- AUTO GEAR LOOP
+task.spawn(function()
+    while true do
+        if autoBuyGear then
+            pcall(function()
+                BuyGear:InvokeServer()
+            end)
+        end
+        task.wait(0.5)
+    end
+end)
