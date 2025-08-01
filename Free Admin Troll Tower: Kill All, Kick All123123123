@@ -1,0 +1,15 @@
+shared.Type = 'Kill'
+
+local cloneref = cloneref or function(obj)
+    return obj
+end
+
+local playersService = cloneref(game:GetService('Players'))
+local lplr = playersService.LocalPlayer
+local Type = shared.Type
+
+for i,v in playersService:GetPlayers() do
+    if v ~= lplr then
+        lplr:WaitForChild("PlayerGui"):WaitForChild("TrollGui"):WaitForChild("RemoteEvent"):FireServer(v.Name, shared.Type == 'Kill' and 'Button8' or 'Button11', 9e9)
+    end
+end
