@@ -1,0 +1,46 @@
+-- Only Auto Sell (using remote) - Custom UI
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local SellCrypto = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("Events"):WaitForChild("SellCrypto")
+
+-- Variables
+local autoSell = false
+
+-- UI Setup
+local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
+ScreenGui.Name = "AutoSellUI"
+ScreenGui.ResetOnSpawn = false
+
+local Frame = Instance.new("Frame", ScreenGui)
+Frame.Size = UDim2.new(0, 180, 0, 60)
+Frame.Position = UDim2.new(0.05, 0, 0.3, 0)
+Frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+Frame.BorderSizePixel = 0
+Frame.Active = true
+Frame.Draggable = true
+
+local ToggleButton = Instance.new("TextButton", Frame)
+ToggleButton.Size = UDim2.new(1, 0, 1, 0)
+ToggleButton.Text = "Auto Sell: OFF"
+ToggleButton.TextColor3 = Color3.new(1, 1, 1)
+ToggleButton.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+ToggleButton.Font = Enum.Font.SourceSansBold
+ToggleButton.TextScaled = true
+
+-- Toggle Logic
+ToggleButton.MouseButton1Click:Connect(function()
+    autoSell = not autoSell
+    ToggleButton.Text = "Auto Sell: " .. (autoSell and "ON" or "OFF")
+end)
+
+-- Auto Sell Loop
+task.spawn(function()
+    while true do
+        if autoSell then
+            pcall(function()
+                SellCrypto:FireServer("All")
+            end)
+        end
+        task.wait(1)
+    end
+end)
