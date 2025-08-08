@@ -1,0 +1,95 @@
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local localPlayer = Players.LocalPlayer
+local VirtualUser = game:GetService("VirtualUser")
+local VirtualInputManager = game:GetService("VirtualInputManager")
+local workspace = game:GetService("Workspace")
+VirtualUser:CaptureController()
+
+VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.LeftAlt, false, game)
+wait(0.1)
+VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.LeftAlt, false, game)
+
+local function collectBeacons()
+    local character = localPlayer.Character
+    if not character then return end
+
+    local hrp = character:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+
+    local beaconsFolder = workspace:FindFirstChild("Beacons")
+    if not beaconsFolder then warn("Beacons folder not found") return end
+
+    local beacons = beaconsFolder:GetChildren()
+    if #beacons > 0 then
+        for _, beaconPart in ipairs(beacons) do
+            if beaconPart:IsA("BasePart") then
+                hrp.CFrame = beaconPart.CFrame
+                VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.C, false, game)
+                RunService.Heartbeat:Wait()
+            end
+        end
+        repeat RunService.Heartbeat:Wait() until #beaconsFolder:GetChildren() == 1
+        wait(3)
+        local guiTimer = localPlayer.PlayerGui:WaitForChild("TIMER")
+        local layerGui = guiTimer
+        local anymoreBtn = guiTimer:WaitForChild("anymore"):WaitForChild("y")
+        repeat RunService.Heartbeat:Wait() until anymoreBtn.Visible
+        wait(2)
+        local xpLabel = guiTimer:WaitForChild("willgetyou"):WaitForChild("xp")
+        local xpText  = xpLabel.Text or ""
+        local xpValue = tonumber(xpText:match("(%d+)") ) or 0
+        if xpValue > 15000 then -- Change this to the xp value you want to farm, 15000 is the default value for pc/emulator. It heavily relies on your FPS.
+            local noBtn = guiTimer:WaitForChild("anymore"):WaitForChild("n")
+            repeat RunService.Heartbeat:Wait() until noBtn.Visible
+            wait(2)
+            local posN = noBtn.AbsolutePosition + noBtn.AbsoluteSize/2
+            local yOffsetN = math.max(4, math.floor(noBtn.AbsoluteSize.Y * 0.4))
+            local moveXN, moveYN = posN.X, posN.Y + yOffsetN
+            VirtualInputManager:SendMouseMoveEvent(moveXN, moveYN, layerGui)
+            wait(0.5); wait(0.2)
+            VirtualInputManager:SendMouseButtonEvent(moveXN, moveYN, 0, true, layerGui, 0)
+            VirtualInputManager:SendMouseButtonEvent(moveXN, moveYN, 0, false, layerGui, 0)
+            local sureBtn = guiTimer:WaitForChild("sure"):WaitForChild("y")
+            repeat RunService.Heartbeat:Wait() until sureBtn.Visible
+            wait(2)
+            local posS = sureBtn.AbsolutePosition + sureBtn.AbsoluteSize/2
+            local yOffsetS = math.max(4, math.floor(sureBtn.AbsoluteSize.Y * 0.4))
+            local moveXS, moveYS = posS.X, posS.Y + yOffsetS
+            VirtualInputManager:SendMouseMoveEvent(moveXS, moveYS, layerGui)
+            wait(0.5); wait(0.2)
+            VirtualInputManager:SendMouseButtonEvent(moveXS, moveYS, 0, true, layerGui, 0)
+            VirtualInputManager:SendMouseButtonEvent(moveXS, moveYS, 0, false, layerGui, 0)
+        else
+            local pos = anymoreBtn.AbsolutePosition + anymoreBtn.AbsoluteSize/2
+            local yOffset = math.max(4, math.floor(anymoreBtn.AbsoluteSize.Y * 0.4))
+            local moveX, moveY = pos.X, pos.Y + yOffset
+            VirtualInputManager:SendMouseMoveEvent(moveX, moveY, layerGui)
+            wait(0.5); wait(0.2)
+            VirtualInputManager:SendMouseButtonEvent(moveX, moveY, 0, true, layerGui, 0)
+            VirtualInputManager:SendMouseButtonEvent(moveX, moveY, 0, false, layerGui, 0)
+            wait(2)
+            local choiceGui = guiTimer:WaitForChild("CHOICE")
+            local choices = {"RANDOM", "SAME", "TIME"}
+            local visibleChoices = {}
+            for _, name in ipairs(choices) do
+                local btnChoice = choiceGui:FindFirstChild(name)
+                if btnChoice and btnChoice.Visible then
+                    table.insert(visibleChoices, btnChoice)
+                end
+            end
+            if #visibleChoices > 0 then
+                local btnChoice = visibleChoices[math.random(1, #visibleChoices)]
+                local pos2 = btnChoice.AbsolutePosition + btnChoice.AbsoluteSize/2
+                local yOffset2 = math.max(4, math.floor(btnChoice.AbsoluteSize.Y * 0.6))
+                local moveX2, moveY2 = pos2.X, pos2.Y + yOffset2
+                VirtualInputManager:SendMouseMoveEvent(moveX2, moveY2, layerGui)
+                wait(0.5); wait(0.2)
+                VirtualInputManager:SendMouseButtonEvent(moveX2, moveY2, 0, true, layerGui, 0)
+                VirtualInputManager:SendMouseButtonEvent(moveX2, moveY2, 0, false, layerGui, 0)
+            end
+        end
+    end
+end
+
+game:GetService("RunService").Heartbeat:Connect(collectBeacons)
