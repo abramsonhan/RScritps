@@ -1,0 +1,42 @@
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local function getPlayerIsland()
+    local localPlayer = Players.LocalPlayer
+    for _, island in workspace.Islands:GetChildren() do
+        if island.Important.OwnerID.Value == localPlayer.UserId then
+            return island
+        end
+    end
+    return nil
+end
+
+local remotes = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("LaunchEvents")
+local launchRemote = remotes:WaitForChild("Launch")
+local returnRemote = remotes:WaitForChild("Return")
+
+local island = getPlayerIsland()
+if not island then
+    warn("Could not find player's island!")
+    return
+end
+
+while true do
+    launchRemote:FireServer()
+
+    local driverSeat
+    repeat
+        task.wait(0.1)
+        driverSeat = island.PlacedBlocks:FindFirstChild("driver_seat_1")
+    until driverSeat and driverSeat["Driver Seat"].Occupant
+
+    task.wait(2)
+
+    if island.PlacedBlocks:FindFirstChild("driver_seat_1") then
+        island.PlacedBlocks:FindFirstChild("driver_seat_1").PrimaryPart.CFrame = CFrame.new(1600, 1000, -410)
+    end
+
+    task.wait(4)
+
+    returnRemote:FireServer()
+end
