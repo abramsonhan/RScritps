@@ -1,0 +1,18 @@
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+-- Remote
+local Potion = ReplicatedStorage.Remotes.Potion -- RemoteEvent
+
+-- Variables
+local Data = Players.LocalPlayer.Data
+local PotionSubsM = Data.PlayerData.PotionSubsM
+local PotionSubs = Data.PlayerData.PotionSubs
+
+Potion:FireServer(
+    300,
+    1.5,
+    -5000000000000000000,
+    PotionSubsM,
+    PotionSubs
+)
