@@ -1,0 +1,99 @@
+--// GUI Setup
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+gui.Name = "CoinTeleporterGUI"
+
+local frame = Instance.new("Frame", gui)
+frame.Size = UDim2.new(0, 250, 0, 150)
+frame.Position = UDim2.new(0.5, -125, 0.6, 0)
+frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+frame.Active = true
+frame.Draggable = true
+
+-- Toggle Button
+local toggleButton = Instance.new("TextButton", frame)
+toggleButton.Size = UDim2.new(1, -20, 0, 40)
+toggleButton.Position = UDim2.new(0, 10, 0, 10)
+toggleButton.BackgroundColor3 = Color3.fromRGB(0, 170, 0)
+toggleButton.Text = "Teleport: OFF"
+toggleButton.TextColor3 = Color3.new(1, 1, 1)
+toggleButton.Font = Enum.Font.GothamBold
+toggleButton.TextScaled = true
+
+-- Manual Refresh Button
+local refreshButton = Instance.new("TextButton", frame)
+refreshButton.Size = UDim2.new(1, -20, 0, 30)
+refreshButton.Position = UDim2.new(0, 10, 0, 55)
+refreshButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+refreshButton.Text = "Manual Refresh"
+refreshButton.TextColor3 = Color3.new(1, 1, 1)
+refreshButton.Font = Enum.Font.Gotham
+refreshButton.TextScaled = true
+
+-- Collected Counter Label
+local counterLabel = Instance.new("TextLabel", frame)
+counterLabel.Size = UDim2.new(1, -20, 0, 30)
+counterLabel.Position = UDim2.new(0, 10, 0, 95)
+counterLabel.BackgroundTransparency = 1
+counterLabel.Text = "Coins Collected: 0"
+counterLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
+counterLabel.Font = Enum.Font.GothamBold
+counterLabel.TextScaled = true
+
+--// Teleporting Logic
+local coinFolder = workspace:WaitForChild("Coins")
+local running = false
+local coins = {}
+local collected = {}
+local collectedCount = 0
+
+-- Refresh function
+local function refreshCoins()
+	coins = {}
+	for _, coin in ipairs(coinFolder:GetChildren()) do
+		if coin:IsA("BasePart") and not collected[coin] then
+			table.insert(coins, coin)
+		end
+	end
+end
+
+-- Start teleport loop
+local function teleportLoop()
+	while running do
+		refreshCoins()
+		for i = #coins, 1, -1 do
+			local coin = coins[i]
+			if coin and coin:IsDescendantOf(workspace) then
+				local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+				if hrp then
+					hrp.CFrame = coin.CFrame + Vector3.new(0, 0, 0) -- 3 studs above
+					collected[coin] = true
+					collectedCount += 1
+					counterLabel.Text = "Coins Collected: " .. collectedCount
+					task.wait(0.25)
+				end
+			end
+		end
+		task.wait(0.1)
+	end
+end
+
+-- Toggle teleporting on/off
+toggleButton.MouseButton1Click:Connect(function()
+	running = not running
+	if running then
+		toggleButton.Text = "Teleport: ON"
+		toggleButton.BackgroundColor3 = Color3.fromRGB(170, 0, 0)
+		refreshCoins()
+		task.spawn(teleportLoop)
+	else
+		toggleButton.Text = "Teleport: OFF"
+		toggleButton.BackgroundColor3 = Color3.fromRGB(0, 170, 0)
+	end
+end)
+
+-- Manual refresh (optional)
+refreshButton.MouseButton1Click:Connect(function()
+	refreshCoins()
+end)
