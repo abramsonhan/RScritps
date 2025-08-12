@@ -1,0 +1,134 @@
+--[[
+	WARNING: Heads up! This script has not been verified by ScriptBlox. Use at your own risk!
+]]
+-- ==========================================================
+-- === +1 Age Every Click by Lokasorn ===
+-- ==========================================================
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+
+local player = Players.LocalPlayer
+
+-- Global variables for features
+local ageLoop = nil
+
+-- Global variables for GUI
+local isMinimized = false
+local isDragging = false
+local dragStartPosition
+local dragStartFramePosition
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "LokasornAgeGui"
+screenGui.Parent = player.PlayerGui
+screenGui.ResetOnSpawn = false
+
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "MainFrame"
+mainFrame.Size = UDim2.new(0, 350, 0, 200)
+mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+mainFrame.BorderSizePixel = 0
+mainFrame.Position = UDim2.new(0.5, -175, 0.5, -100)
+mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+mainFrame.Parent = screenGui
+
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Name = "TitleLabel"; titleLabel.Size = UDim2.new(1, 0, 0, 30); titleLabel.Position = UDim2.new(0, 0, 0, 0); titleLabel.BackgroundColor3 = Color3.fromRGB(50, 50, 50); titleLabel.Text = "+1 Age Every Click by Lokasorn"; titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255); titleLabel.TextSize = 18; titleLabel.Font = Enum.Font.SourceSansBold; titleLabel.Parent = mainFrame
+
+local dragBar = Instance.new("Frame")
+dragBar.Name = "DragBar"; dragBar.Size = UDim2.new(1, 0, 0, 30); dragBar.Position = UDim2.new(0, 0, 0, 0); dragBar.BackgroundTransparency = 1; dragBar.ZIndex = 2; dragBar.Parent = mainFrame
+
+local closeButton = Instance.new("TextButton")
+closeButton.Name = "CloseButton"; closeButton.Size = UDim2.new(0, 20, 0, 20); closeButton.Position = UDim2.new(1, -25, 0, 5); closeButton.BackgroundColor3 = Color3.fromRGB(70, 70, 70); closeButton.Text = "X"; closeButton.TextColor3 = Color3.fromRGB(255, 255, 255); closeButton.TextSize = 14; closeButton.Parent = mainFrame
+
+local minimizeButton = Instance.new("TextButton")
+minimizeButton.Name = "MinimizeButton"; minimizeButton.Size = UDim2.new(0, 20, 0, 20); minimizeButton.Position = UDim2.new(1, -50, 0, 5); minimizeButton.BackgroundColor3 = Color3.fromRGB(70, 70, 70); minimizeButton.Text = "-"; minimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255); minimizeButton.TextSize = 14; minimizeButton.Parent = mainFrame
+
+-- === Age Boost Switch ===
+local ageSwitchButton = Instance.new("TextButton")
+ageSwitchButton.Name = "AgeSwitchButton"; ageSwitchButton.Size = UDim2.new(0, 50, 0, 25); ageSwitchButton.Position = UDim2.new(0.1, 0, 0.3, 0); ageSwitchButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100); ageSwitchButton.Text = ""; ageSwitchButton.Parent = mainFrame
+
+local ageSwitchKnob = Instance.new("Frame")
+ageSwitchKnob.Name = "AgeSwitchKnob"; ageSwitchKnob.Size = UDim2.new(0, 25, 0, 25); ageSwitchKnob.Position = UDim2.new(0, 0, 0, 0); ageSwitchKnob.BackgroundColor3 = Color3.fromRGB(200, 200, 200); ageSwitchKnob.Parent = ageSwitchButton
+
+local ageSwitchLabel = Instance.new("TextLabel")
+ageSwitchLabel.Name = "AgeSwitchLabel"; ageSwitchLabel.Size = UDim2.new(0, 120, 0, 25); ageSwitchLabel.Position = UDim2.new(0.1, 60, 0.3, 0); ageSwitchLabel.BackgroundTransparency = 1; ageSwitchLabel.Text = "Age Boost: OFF"; ageSwitchLabel.TextColor3 = Color3.fromRGB(255, 255, 255); ageSwitchLabel.TextSize = 18; ageSwitchLabel.Font = Enum.Font.SourceSans; ageSwitchLabel.Parent = mainFrame
+
+-- === Coins Button ===
+local coinsButton = Instance.new("TextButton")
+coinsButton.Name = "CoinsButton"; coinsButton.Size = UDim2.new(0.8, 0, 0, 40); coinsButton.Position = UDim2.new(0.1, 0, 0.55, 0); coinsButton.BackgroundColor3 = Color3.fromRGB(70, 70, 70); coinsButton.Text = "Coins"; coinsButton.TextColor3 = Color3.fromRGB(255, 255, 255); coinsButton.TextSize = 18; coinsButton.Font = Enum.Font.SourceSans; coinsButton.Parent = mainFrame
+
+local hintLabel = Instance.new("TextLabel")
+hintLabel.Name = "HintLabel"; hintLabel.Size = UDim2.new(0.9, 0, 0, 20); hintLabel.Position = UDim2.new(0.05, 0, 0.85, 0); hintLabel.BackgroundTransparency = 1; hintLabel.Text = "Press RIGHT CTRL to toggle menu"; hintLabel.TextColor3 = Color3.fromRGB(180, 180, 180); hintLabel.TextSize = 12; hintLabel.Font = Enum.Font.SourceSans; hintLabel.TextXAlignment = Enum.TextXAlignment.Center; hintLabel.Parent = mainFrame
+
+local function firePlaytime()
+    pcall(function()
+        local event = ReplicatedStorage:FindFirstChild("Playtime")
+        if event and event:IsA("RemoteEvent") then
+            print("Firing 'Playtime' event for Coins...")
+            for i = 1, 10 do
+                event:FireServer()
+                task.wait(0.01)
+            end
+            print("Coins received!")
+        else
+            print("'Playtime' event not found.")
+        end
+    end)
+end
+
+local function fireAgeEvent()
+    pcall(function()
+        local event = ReplicatedStorage:FindFirstChild("MouseClicked")
+        if event and event:IsA("RemoteEvent") then
+            event:FireServer()
+        else
+            print("'MouseClicked' event not found, stopping Age Boost.")
+            if ageLoop then ageLoop:Disconnect(); ageLoop = nil end
+        end
+    end)
+end
+
+local function toggleAgeBoost(state)
+    if state then
+        if ageLoop then return end
+        print("Age Boost enabled!")
+        ageLoop = RunService.Stepped:Connect(fireAgeEvent)
+        ageSwitchKnob.Position = UDim2.new(0.5, 0, 0, 0)
+        ageSwitchLabel.Text = "Age Boost: ON"
+    else
+        if ageLoop then
+            ageLoop:Disconnect()
+            ageLoop = nil
+        end
+        print("Age Boost disabled!")
+        ageSwitchKnob.Position = UDim2.new(0, 0, 0, 0)
+        ageSwitchLabel.Text = "Age Boost: OFF"
+    end
+end
+
+local function minimizeGui() isMinimized = not isMinimized; mainFrame.Visible = not isMinimized end
+
+closeButton.MouseButton1Click:Connect(function() screenGui:Destroy() end)
+minimizeButton.MouseButton1Click:Connect(minimizeGui)
+ageSwitchButton.MouseButton1Click:Connect(function() local isOn = ageSwitchKnob.Position.X.Scale > 0; toggleAgeBoost(not isOn) end)
+coinsButton.MouseButton1Click:Connect(firePlaytime)
+dragBar.InputBegan:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseButton1 then isDragging = true; dragStartPosition = input.Position; dragStartFramePosition = mainFrame.Position end end)
+UserInputService.InputChanged:Connect(function(input) if isDragging and input.UserInputType == Enum.UserInputType.MouseMovement then local delta = input.Position - dragStartPosition; mainFrame.Position = UDim2.new(dragStartFramePosition.X.Scale, dragStartFramePosition.X.Offset + delta.X, dragStartFramePosition.Y.Scale, dragStartFramePosition.Y.Offset + delta.Y) end end)
+UserInputService.InputEnded:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseButton1 then isDragging = false end end)
+UserInputService.InputBegan:Connect(function(input, gameProcessed) if gameProcessed then return end; if input.KeyCode == Enum.KeyCode.RightControl then minimizeGui() end end)
+
+local defaultColor = Color3.fromRGB(70, 70, 70)
+local hoverRed = Color3.fromRGB(200, 50, 50)
+local hoverOrange = Color3.fromRGB(255, 150, 0)
+
+closeButton.MouseEnter:Connect(function() closeButton.BackgroundColor3 = hoverRed end)
+closeButton.MouseLeave:Connect(function() closeButton.BackgroundColor3 = defaultColor end)
+minimizeButton.MouseEnter:Connect(function() minimizeButton.BackgroundColor3 = hoverOrange end)
+minimizeButton.MouseLeave:Connect(function() minimizeButton.BackgroundColor3 = defaultColor end)
+
+mainFrame.Visible = true
+print("+1 Age Every Click by Lokasorn loaded. 💪💰")
