@@ -1,0 +1,761 @@
+local Fluent = loadstring(game:HttpGet("https://github.com/1dontgiveaf/Fluent/releases/latest/download/main.lua"))()
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/1dontgiveaf/Fluent/main/Addons/SaveManager.lua"))()
+local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/1dontgiveaf/Fluent/main/Addons/InterfaceManager.lua"))()
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
+local LocalPlayer = Players.LocalPlayer
+
+local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local hrp = character:WaitForChild("HumanoidRootPart")
+
+LocalPlayer.CharacterAdded:Connect(function(char)
+    character = char
+    hrp = char:WaitForChild("HumanoidRootPart")
+    if _G.__plainNoclipOn then
+        if _G.__enablePlainNoclip then _G.__enablePlainNoclip() end
+    end
+end)
+
+local Window = Fluent:CreateWindow({
+    Title = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name,
+    SubTitle = "By Perfectus",
+    TabWidth = 160,
+    Size = UDim2.fromOffset(480, 380),
+    Acrylic = false,
+    Theme = "Dark",
+    MinimizeKey = Enum.KeyCode.LeftControl
+})
+
+local Tabs = {
+    Main = Window:AddTab({ Title = "Main", Icon = "" }),
+    Upgrade = Window:AddTab({ Title = "Upgrade", Icon = "" }),
+    Client = Window:AddTab({ Title = "Client", Icon = "" }),
+    Amulets = Window:AddTab({ Title = "Amulets", Icon = "" })
+}
+
+local EventsFolder = ReplicatedStorage:WaitForChild("Events", 9e9)
+local UpgradeRemote = EventsFolder:WaitForChild("Upgrade", 9e9)
+local RollRoombaRemote = EventsFolder:WaitForChild("RollRoomba", 9e9)
+local PlinkoBallEvent = EventsFolder:WaitForChild("PlinkoBallEvent", 9e9)
+local LuckyRushActivatedRemote = EventsFolder:WaitForChild("LuckyRushActivated", 9e9)
+local PalFoundRemote = EventsFolder:WaitForChild("PalFound", 9e9)
+local CrateCollectedRemote = EventsFolder:WaitForChild("CrateCollected", 9e9)
+local MaxCapChangeEvent = EventsFolder:WaitForChild("MaxCapChange", 9e9)
+local SpawnTotemEvent = EventsFolder:WaitForChild("SpawnTotem", 9e9)
+local ShiftToSprintRemote = EventsFolder:WaitForChild("ShiftToSprint", 9e9)
+local ActivateTotemBoostRemote = EventsFolder:WaitForChild("ActivateTotemBoost", 9e9)
+local DeactivateTotemBoostRemote = EventsFolder:WaitForChild("DeactivateTotemBoost", 9e9)
+local HastyAmuletParticles = ReplicatedStorage:WaitForChild("Przetrzymywacz", 9e9):WaitForChild("HastyAmuletParticles", 9e9)
+local MaxCapChangeEvent = EventsFolder:WaitForChild("MaxCapChange", 9e9)
+local SpawnTotemEvent = EventsFolder:WaitForChild("SpawnTotem", 9e9)
+local ShiftToSprintRemote = EventsFolder:WaitForChild("ShiftToSprint", 9e9)
+local ActivateTotemBoostRemote = EventsFolder:WaitForChild("ActivateTotemBoost", 9e9)
+local DeactivateTotemBoostRemote = EventsFolder:WaitForChild("DeactivateTotemBoost", 9e9)
+local EmpoweredBoostRemote = EventsFolder:WaitForChild("EmpoweredBoost", 9e9)
+local RollAmuletRemote = EventsFolder:WaitForChild("RollAmulet", 9e9)
+local PickAmuletRemote = EventsFolder:WaitForChild("PickAmulet", 9e9)
+
+local UPGRADE_DELAY = 0.05
+local upgradeLoops = {}
+
+local CollectorToggle = Tabs.Main:AddToggle("CollectorBoost", { Title = "Collector Range Enable", Default = false })
+local NoclipToggle = Tabs.Main:AddToggle("PlainNoclip", { Title = "Noclip", Default = false })
+local CollectorTransparencyToggle = Tabs.Main:AddToggle("CollectorTransparency", { Title = "Collector Visible", Default = false })
+
+local collectorBoostOn = false
+local collectorMaintainThread
+local collectorOriginalSize
+local collectorScale = 10
+
+local collectorInvisOn = false
+local collectorInvisThread
+local collectorOriginalTransparency
+
+local function getCollectorPart()
+    local obj = workspace:FindFirstChild("Collector")
+    if not obj then return nil end
+    if obj:IsA("BasePart") then return obj end
+    if obj:IsA("Model") then
+        local inner = obj:FindFirstChild("Collector")
+        if inner and inner:IsA("BasePart") then return inner end
+        for _, d in ipairs(obj:GetDescendants()) do
+            if d:IsA("BasePart") then return d end
+        end
+    end
+    return nil
+end
+
+local function applyCollectorScale(enabled)
+    local part = getCollectorPart()
+    if not part then return end
+    if enabled then
+        if not collectorOriginalSize then
+            collectorOriginalSize = part.Size
+        end
+        local target = Vector3.new(
+            collectorOriginalSize.X * collectorScale,
+            collectorOriginalSize.Y * collectorScale,
+            collectorOriginalSize.Z * collectorScale
+        )
+        pcall(function()
+            part.Size = target
+        end)
+    else
+        if collectorOriginalSize then
+            pcall(function()
+                part.Size = collectorOriginalSize
+            end)
+        end
+    end
+end
+
+local function collectorMaintainLoop()
+    while collectorBoostOn do
+        applyCollectorScale(true)
+        task.wait(0.25)
+    end
+end
+
+CollectorToggle:OnChanged(function(value)
+    collectorBoostOn = value
+    if collectorBoostOn then
+        applyCollectorScale(true)
+        if not collectorMaintainThread or coroutine.status(collectorMaintainThread) == "dead" then
+            collectorMaintainThread = task.spawn(collectorMaintainLoop)
+        end
+    else
+        applyCollectorScale(false)
+    end
+end)
+
+local noclipConn
+local originalCollide = {}
+
+local function enablePlainNoclip()
+    if noclipConn then return end
+    _G.__plainNoclipOn = true
+    noclipConn = RunService.Stepped:Connect(function()
+        if character and character.Parent then
+            for _, p in ipairs(character:GetDescendants()) do
+                if p:IsA("BasePart") then
+                    if originalCollide[p] == nil then originalCollide[p] = p.CanCollide end
+                    p.CanCollide = false
+                end
+            end
+        end
+    end)
+end
+
+local function disablePlainNoclip()
+    _G.__plainNoclipOn = false
+    if noclipConn then
+        noclipConn:Disconnect()
+        noclipConn = nil
+    end
+    for part, was in pairs(originalCollide) do
+        if typeof(part) == "Instance" and part.Parent and part:IsA("BasePart") then
+            part.CanCollide = was
+        end
+    end
+    table.clear(originalCollide)
+end
+
+_G.__enablePlainNoclip = enablePlainNoclip
+
+NoclipToggle:OnChanged(function(state)
+    if state then
+        enablePlainNoclip()
+    else
+        disablePlainNoclip()
+    end
+end)
+
+local function applyCollectorTransparency(enabled)
+    local part = getCollectorPart()
+    if not part then return end
+    if enabled then
+        if collectorOriginalTransparency == nil then
+            collectorOriginalTransparency = part.Transparency
+        end
+        pcall(function()
+            part.Transparency = 1
+        end)
+    else
+        if collectorOriginalTransparency ~= nil then
+            pcall(function()
+                part.Transparency = collectorOriginalTransparency
+            end)
+            collectorOriginalTransparency = nil
+        end
+    end
+end
+
+local function collectorInvisMaintainLoop()
+    while collectorInvisOn do
+        applyCollectorTransparency(true)
+        task.wait(0.5)
+    end
+end
+
+CollectorTransparencyToggle:OnChanged(function(state)
+    collectorInvisOn = state
+    if collectorInvisOn then
+        applyCollectorTransparency(true)
+        if not collectorInvisThread or coroutine.status(collectorInvisThread) == "dead" then
+            collectorInvisThread = task.spawn(collectorInvisMaintainLoop)
+        end
+    else
+        applyCollectorTransparency(false)
+    end
+end)
+
+local CollectorScaleSlider = Tabs.Main:AddSlider("CollectorScale", {
+    Title = "Collector Range",
+    Description = "1 - 300",
+    Default = collectorScale,
+    Min = 1,
+    Max = 300,
+    Rounding = 0,
+    Callback = function(Value)
+        collectorScale = math.clamp(math.floor(Value + 0.5), 1, 1000)
+        if collectorBoostOn then
+            applyCollectorScale(true)
+        end
+    end
+})
+
+-- Section: Auto features under slider
+pcall(function()
+    Tabs.Main:AddSection("Automation")
+end)
+
+-- Re-add Collect Pal under slider
+local ZonesAutoClickToggle = Tabs.Main:AddToggle("ZonesAutoClick", { Title = "Collect Pal", Default = false })
+
+-- Main tab toggles for Auto Use CT / Auto Plinko / Auto Enable Lucky
+local function makeMainToggle(id, title, fireFunc)
+    local t = Tabs.Main:AddToggle(id, { Title = title, Default = false })
+    t:OnChanged(function(state)
+        upgradeLoops[id] = state
+        if state then
+            task.spawn(function()
+                while upgradeLoops[id] do
+                    pcall(fireFunc)
+                    task.wait(UPGRADE_DELAY)
+                end
+            end)
+        end
+    end)
+end
+
+makeMainToggle("M_CTUse", "Auto Use CT", function()
+    RollRoombaRemote:FireServer()
+end)
+
+makeMainToggle("M_AutoPlinko", "Auto Plinko", function()
+    local target = workspace:WaitForChild("Zones", 9e9)
+        :WaitForChild("Lvl10", 9e9)
+        :WaitForChild("PlinkoBallMachine", 9e9)
+        :GetChildren()[59]
+    PlinkoBallEvent:FireServer(target)
+end)
+
+makeMainToggle("M_AutoLucky", "Auto Enable Lucky", function()
+    LuckyRushActivatedRemote:FireServer()
+end)
+
+makeMainToggle("M_AutoCrate", "Auto Collect Crate", function()
+    CrateCollectedRemote:FireServer()
+end)
+
+-- Auto Empowered Boost toggle
+local AutoEmpowerToggle = Tabs.Main:AddToggle("M_AutoEmpower", { Title = "Auto Empowered Boost", Default = false })
+local autoEmpowerOn = false
+local autoEmpowerThread
+
+local function computeEmpowerDelay()
+    local player = Players.LocalPlayer
+    local delaySeconds = 5
+    local cooldownUpgrade = 0
+    local hugeBeam = 0
+
+    local upgrades = player:FindFirstChild("plrupgrades")
+    if upgrades then
+        local cu = upgrades:FindFirstChild("BeamCooldownUpgrade")
+        if cu then cooldownUpgrade = tonumber(cu.Value) or 0 end
+    end
+
+    local blessings = player:FindFirstChild("Blessings")
+    if blessings then
+        local hb = blessings:FindFirstChild("HugeBeam")
+        if hb then hugeBeam = tonumber(hb.Value) or 0 end
+    end
+
+    delaySeconds = 5 - (cooldownUpgrade * 0.2)
+    if hugeBeam >= 1 then delaySeconds = delaySeconds * 3 end
+    if delaySeconds < 0.2 then delaySeconds = 0.2 end
+    return delaySeconds
+end
+
+local function autoEmpowerLoop()
+    while autoEmpowerOn do
+        local canUse = true
+        local player = Players.LocalPlayer
+        local upgrades = player:FindFirstChild("plrupgrades")
+        if upgrades then
+            local bu = upgrades:FindFirstChild("BeamUpgrade")
+            if bu and tonumber(bu.Value) ~= 1 then
+                canUse = false
+            end
+        end
+        if canUse then
+            pcall(function()
+                EmpoweredBoostRemote:FireServer()
+            end)
+        end
+        task.wait(computeEmpowerDelay())
+    end
+end
+
+AutoEmpowerToggle:OnChanged(function(state)
+    autoEmpowerOn = state
+    if autoEmpowerOn and (not autoEmpowerThread or coroutine.status(autoEmpowerThread) == "dead") then
+        autoEmpowerThread = task.spawn(autoEmpowerLoop)
+    end
+end)
+
+local zonesClickOn = false
+local zonesClickThread
+local ZONES_DELAY = 0.25
+
+local function zonesClickLoop()
+    while zonesClickOn do
+        local zonesFolder = workspace:FindFirstChild("Zones")
+        if zonesFolder then
+            for _, levelFolder in ipairs(zonesFolder:GetChildren()) do
+                if levelFolder:IsA("Folder") then
+                    for _, d in ipairs(levelFolder:GetDescendants()) do
+                        if d:IsA("ClickDetector") then
+                            pcall(function()
+                                fireclickdetector(d)
+                            end)
+                        end
+                    end
+                end
+            end
+        end
+        -- Crate etkileşimi: Bartero111 ClickDetector ve mainpart ProximityPrompt
+        for _, obj in ipairs(workspace:GetChildren()) do
+            if obj:IsA("Model") then
+                local mainpart = obj:FindFirstChild("mainpart", true)
+                if mainpart and mainpart:IsA("BasePart") then
+                    -- ProximityPrompt tetikle (crate toplama)
+                    local prompt = mainpart:FindFirstChildOfClass("ProximityPrompt") or mainpart:FindFirstChild("ProximityPrompt")
+                    if prompt then
+                        pcall(function()
+                            if fireproximityprompt then
+                                fireproximityprompt(prompt)
+                            end
+                        end)
+                    end
+                    -- Pal tıklama (Bartero111)
+                    local bartero = obj:FindFirstChild("Bartero111", true)
+                    if bartero and bartero:IsA("BasePart") then
+                        local cd = bartero:FindFirstChildOfClass("ClickDetector") or bartero:FindFirstChild("ClickDetector")
+                        if cd then
+                            pcall(function()
+                                fireclickdetector(cd)
+                            end)
+                        end
+                    end
+                end
+            end
+        end
+        task.wait(ZONES_DELAY)
+    end
+end
+
+ZonesAutoClickToggle:OnChanged(function(state)
+    zonesClickOn = state
+    if zonesClickOn and (not zonesClickThread or coroutine.status(zonesClickThread) == "dead") then
+        zonesClickThread = task.spawn(zonesClickLoop)
+    end
+end)
+
+-- Client tab: toggles derived from StarterPlayerScripts
+-- 1) Auto MaxCap Sync (workspace.SlimeResp -> Events.MaxCapChange)
+local ClientMaxCapToggle = Tabs.Client:AddToggle("ClientMaxCap", { Title = "Auto MaxCap Sync", Default = false })
+local clientMaxCapOn = false
+local clientMaxCapThread
+
+local function clientMaxCapLoop()
+    while clientMaxCapOn do
+        local respFolder = workspace:FindFirstChild("SlimeResp")
+        if respFolder then
+            local occupiedCount = 0
+            for _, resp in ipairs(respFolder:GetChildren()) do
+                local occupied = resp:FindFirstChild("CzyZajety")
+                if occupied and occupied.Value == true then
+                    occupiedCount += 1
+                end
+            end
+            pcall(function()
+                MaxCapChangeEvent:Fire(occupiedCount)
+            end)
+        end
+        task.wait(0.1)
+    end
+end
+
+ClientMaxCapToggle:OnChanged(function(state)
+    clientMaxCapOn = state
+    if clientMaxCapOn and (not clientMaxCapThread or coroutine.status(clientMaxCapThread) == "dead") then
+        clientMaxCapThread = task.spawn(clientMaxCapLoop)
+    end
+end)
+
+-- 2) Corrupted MaxCap Sign Updater
+local ClientCorruptCapToggle = Tabs.Client:AddToggle("ClientCorruptCap", { Title = "Corrupted MaxCap Sign", Default = false })
+local clientCorruptCapOn = false
+local clientCorruptCapThread
+
+local function updateCorruptSign()
+    local zones = workspace:FindFirstChild("Zones")
+    local label
+    if zones then
+        local lvl150 = zones:FindFirstChild("Lvl150")
+        if lvl150 then
+            local corruptSign = lvl150:FindFirstChild("CorruptSign")
+            if corruptSign then
+                local meshes = corruptSign:FindFirstChild("Meshes") or corruptSign
+                local node = meshes and (meshes:FindFirstChild("tablica_Cube.001") or meshes:FindFirstChildOfClass("BasePart"))
+                if node then
+                    local sg = node:FindFirstChild("SurfaceGui")
+                    if sg then label = sg:FindFirstChild("TextLabel") end
+                end
+            end
+        end
+    end
+
+    local occupiedCount = 0
+    local respFolder = workspace:FindFirstChild("CorruptedSlimeResp")
+    if respFolder then
+        for _, resp in ipairs(respFolder:GetChildren()) do
+            local occupied = resp:FindFirstChild("CzyZajety")
+            if occupied and occupied.Value == true then
+                occupiedCount += 1
+            end
+        end
+    end
+
+    local maxCap = 0
+    local upgrades = LocalPlayer:FindFirstChild("plrupgrades")
+    if upgrades then
+        local cap = upgrades:FindFirstChild("CorruptedSlimeMaxCapUpgrade")
+        if cap then maxCap = tonumber(cap.Value) or 0 end
+    end
+
+    if label then
+        pcall(function()
+            label.Text = tostring(occupiedCount) .. "/" .. tostring(maxCap * 3)
+        end)
+    end
+end
+
+local function clientCorruptCapLoop()
+    while clientCorruptCapOn do
+        updateCorruptSign()
+        task.wait(0.25)
+    end
+end
+
+ClientCorruptCapToggle:OnChanged(function(state)
+    clientCorruptCapOn = state
+    if clientCorruptCapOn and (not clientCorruptCapThread or coroutine.status(clientCorruptCapThread) == "dead") then
+        clientCorruptCapThread = task.spawn(clientCorruptCapLoop)
+    end
+end)
+
+-- 3) Hasty Amulet: Auto Sprint
+local ClientHastyToggle = Tabs.Client:AddToggle("ClientHasty", { Title = "Hasty Amulet: Auto Sprint", Default = false })
+local clientHastyOn = false
+local clientHastyThread
+local hastyEffect
+
+local function hasHastyAmulet()
+    for i = 1, 4 do
+        local amulet = LocalPlayer:FindFirstChild("Amulet" .. i)
+        if amulet and amulet.Value == "HastyAmulet" then
+            return true
+        end
+    end
+    return false
+end
+
+local function onSprintChanged()
+    if not clientHastyOn then return end
+    local plrdata = LocalPlayer:FindFirstChild("plrdata")
+    local sprint = plrdata and plrdata:FindFirstChild("Sprint")
+    if sprint and sprint.Value then
+        if not hastyEffect and HastyAmuletParticles and hrp then
+            hastyEffect = HastyAmuletParticles:Clone()
+            hastyEffect.Parent = hrp
+        end
+    else
+        if hastyEffect then hastyEffect:Destroy(); hastyEffect = nil end
+    end
+end
+
+task.spawn(function()
+    local plrdata = LocalPlayer:FindFirstChild("plrdata")
+    if plrdata then
+        local sprint = plrdata:FindFirstChild("Sprint")
+        if sprint then
+            sprint.Changed:Connect(onSprintChanged)
+        end
+    end
+end)
+
+local function clientHastyLoop()
+    while clientHastyOn do
+        if hasHastyAmulet() then
+            pcall(function()
+                ShiftToSprintRemote:FireServer()
+            end)
+        end
+        task.wait(1)
+    end
+end
+
+ClientHastyToggle:OnChanged(function(state)
+    clientHastyOn = state
+    if clientHastyOn and (not clientHastyThread or coroutine.status(clientHastyThread) == "dead") then
+        clientHastyThread = task.spawn(clientHastyLoop)
+    else
+        if hastyEffect then hastyEffect:Destroy(); hastyEffect = nil end
+    end
+end)
+
+-- 4) Auto Totem Boost
+local ClientTotemToggle = Tabs.Client:AddToggle("ClientTotem", { Title = "Auto Totem Boost", Default = false })
+local clientTotemOn = false
+local totemConn
+
+ClientTotemToggle:OnChanged(function(state)
+    clientTotemOn = state
+    if clientTotemOn then
+        if not totemConn and SpawnTotemEvent and SpawnTotemEvent.OnClientEvent then
+            totemConn = SpawnTotemEvent.OnClientEvent:Connect(function()
+                pcall(function()
+                    ActivateTotemBoostRemote:FireServer()
+                end)
+                task.delay(120, function()
+                    pcall(function()
+                        DeactivateTotemBoostRemote:FireServer()
+                    end)
+                end)
+            end)
+        end
+    else
+        if totemConn then totemConn:Disconnect(); totemConn = nil end
+        pcall(function() DeactivateTotemBoostRemote:FireServer() end)
+    end
+end)
+
+-- 5) Lucky Rush: GUI/Timer Assist
+local ClientLuckyUIToggle = Tabs.Client:AddToggle("ClientLuckyUI", { Title = "Lucky Rush Timer Assist", Default = false })
+local clientLuckyUIOn = false
+local clientLuckyUIThread
+
+local function findLuckyUI()
+    local pg = LocalPlayer:FindFirstChild("PlayerGui")
+    if not pg then return nil, nil, nil end
+    local sg = pg:FindFirstChild("ScreenGui")
+    if not sg then return nil, nil, nil end
+    local abilities = sg:FindFirstChild("Abilities")
+    if not abilities then return nil, nil, nil end
+    local lucky = abilities:FindFirstChild("LuckyRush")
+    if not lucky then return nil, nil, nil end
+    local cooldown = lucky:FindFirstChild("Cooldown")
+    local timeLeft = lucky:FindFirstChild("TimeLeft")
+    return lucky, cooldown, timeLeft
+end
+
+local function clientLuckyUILoop()
+    while clientLuckyUIOn do
+        local lucky, cooldown, timeLeft = findLuckyUI()
+        local upgrades = LocalPlayer:FindFirstChild("plrupgrades")
+        if lucky and upgrades then
+            local lrUpgrade = upgrades:FindFirstChild("LuckyRushUpgrade")
+            if lrUpgrade then
+                lucky.Visible = (tonumber(lrUpgrade.Value) or 0) >= 1
+            end
+        end
+        local plrdata = LocalPlayer:FindFirstChild("plrdata")
+        if plrdata then
+            local cd2 = plrdata:FindFirstChild("LuckyRushCooldown2")
+            if cd2 and cooldown then
+                local val = tonumber(cd2.Value) or 0
+                cooldown.Visible = val > 0
+                local label = cooldown:FindFirstChild("TextLabel")
+                if label then
+                    label.Text = tostring(val)
+                end
+            end
+        end
+        if timeLeft then
+            -- leave TimeLeft to game logic; we only ensure it hides after cooldown
+            -- no-op here to avoid conflicting with game timers
+        end
+        task.wait(0.2)
+    end
+end
+
+ClientLuckyUIToggle:OnChanged(function(state)
+    clientLuckyUIOn = state
+    if clientLuckyUIOn and (not clientLuckyUIThread or coroutine.status(clientLuckyUIThread) == "dead") then
+        clientLuckyUIThread = task.spawn(clientLuckyUILoop)
+    end
+end)
+
+-- Amulets tab: Auto open until owned amulet count (Amulet1..4 not "None") reaches target
+local amuletTargetCount = 1
+local AutoAmuletToggle = Tabs.Amulets:AddToggle("A_AutoFillAmulets", { Title = "Auto Fill Amulets (Stop at Target)", Default = false })
+local AmuletTargetSlider = Tabs.Amulets:AddSlider("A_TargetCount", {
+    Title = "Target Owned Amulets",
+    Description = "1 - 4",
+    Default = 1,
+    Min = 1,
+    Max = 4,
+    Rounding = 0,
+    Callback = function(Value)
+        amuletTargetCount = math.clamp(math.floor(Value + 0.5), 1, 4)
+    end
+})
+
+local autoAmuletOn = false
+local autoAmuletThread
+
+local function countOwnedAmulets()
+    local count = 0
+    local player = Players.LocalPlayer
+    for i = 1, 4 do
+        local sv = player:FindFirstChild("Amulet" .. i)
+        if sv and typeof(sv.Value) == "string" and sv.Value ~= "None" and sv.Value ~= "" then
+            count += 1
+        end
+    end
+    return count
+end
+
+local function waitForAmuletValuesStable(maxWaitSeconds)
+    local start = os.clock()
+    local last = -1
+    local stableTicks = 0
+    while os.clock() - start < (maxWaitSeconds or 8) do
+        local now = countOwnedAmulets()
+        if now == last then
+            stableTicks += 1
+        else
+            stableTicks = 0
+        end
+        last = now
+        if stableTicks >= 5 then -- ~0.5s stabil
+            break
+        end
+        task.wait(0.05)
+    end
+    return last
+end
+
+local function autoAmuletLoop()
+    while autoAmuletOn do
+        local current = countOwnedAmulets()
+        if current >= amuletTargetCount then
+            -- Hedefe ulaşıldı, açmayı durdur
+            break
+        end
+
+        -- Yeni amulet aç
+        pcall(function()
+            RollAmuletRemote:FireServer()
+        end)
+
+        -- Kısa bekleme, sonra NEW kabul et (hedefe ulaşmak için slotları doldurmaya çalışıyoruz)
+        task.wait(0.05)
+        pcall(function()
+            PickAmuletRemote:FireServer("NEW")
+        end)
+
+        -- Değerlerin yansımasını bekle ve tekrar kontrol et
+        local finalCount = waitForAmuletValuesStable(8)
+        if finalCount >= amuletTargetCount then
+            break
+        end
+
+        task.wait(0.05)
+    end
+end
+
+AutoAmuletToggle:OnChanged(function(state)
+    autoAmuletOn = state
+    if autoAmuletOn and (not autoAmuletThread or coroutine.status(autoAmuletThread) == "dead") then
+        autoAmuletThread = task.spawn(autoAmuletLoop)
+    end
+end)
+
+local function makeUpgradeToggle(id, title, fireFunc)
+    local t = Tabs.Upgrade:AddToggle(id, { Title = title, Default = false })
+    t:OnChanged(function(state)
+        upgradeLoops[id] = state
+        if state then
+            task.spawn(function()
+                while upgradeLoops[id] do
+                    pcall(fireFunc)
+                    task.wait(UPGRADE_DELAY)
+                end
+            end)
+        end
+    end)
+end
+
+makeUpgradeToggle("T_ExpMultiplier", "Exp Multiplier", function()
+    UpgradeRemote:FireServer("LevelMultiplierUpgrade")
+end)
+
+makeUpgradeToggle("T_SlimeValue", "Slime Value", function()
+    UpgradeRemote:FireServer("SlimeValueUpgrade")
+end)
+
+makeUpgradeToggle("T_SlimeValueSP", "Slime Value SP", function()
+    UpgradeRemote:FireServer("SlimeValueUpgrade2")
+end)
+
+makeUpgradeToggle("T_GemValue", "Gem Value", function()
+    UpgradeRemote:FireServer("GemValueUpgrade")
+end)
+
+makeUpgradeToggle("T_GemValueSP", "Gem Value SP", function()
+    UpgradeRemote:FireServer("GemValueUpgrade2")
+end)
+
+makeUpgradeToggle("T_ExpMultiplierCS", "Exp Multiplier CS", function()
+    UpgradeRemote:FireServer("LevelMultiplierUpgrade3")
+end)
+
+makeUpgradeToggle("T_GlitchPower", "Glitch Power", function()
+    UpgradeRemote:FireServer("CorruptPowerUpgrade")
+end)
+
+makeUpgradeToggle("T_CorruptedSlimeValue", "Corrupted Slime Value", function()
+    UpgradeRemote:FireServer("CorruptedSlimeValueUpgrade")
+end)
+
+makeUpgradeToggle("T_ExpMultiGems", "Exp Multiplier Gems", function()
+    UpgradeRemote:FireServer("LevelMultiplierUpgrade2")
+end)
+
+Window:SelectTab(1)
