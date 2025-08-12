@@ -1,0 +1,130 @@
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+
+local player = Players.LocalPlayer
+local playerName = player.Name
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "AutoToolsGui"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = player:WaitForChild("PlayerGui")
+
+local function createToggleButton(name, position)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0, 140, 0, 40)
+    btn.Position = position
+    btn.Text = name .. ": OFF"
+    btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    btn.TextColor3 = Color3.new(1,1,1)
+    btn.Font = Enum.Font.SourceSansBold
+    btn.TextSize = 18
+    btn.AutoButtonColor = true
+    btn.Parent = ScreenGui
+    return btn
+end
+
+local autoCollectBtn = createToggleButton("Auto Collect", UDim2.new(0, 20, 0, 50))
+local autoLockBtn = createToggleButton("Auto Lock", UDim2.new(0, 20, 0, 110))
+
+local basesFolder = Workspace:WaitForChild("PlayerBases")
+
+local autoCollectOn = false
+local autoLockOn = false
+
+local function findMyBase()
+    for _, base in ipairs(basesFolder:GetChildren()) do
+        local perm = base:FindFirstChild("_PERMANENT")
+        if perm then
+            local sign = perm:FindFirstChild("PlayerNameSign")
+            if sign then
+                local display = sign:FindFirstChild("DisplayPart")
+                if display then
+                    local gui = display:FindFirstChild("NameSurfaceGui")
+                    if gui then
+                        local nameLabel = gui:FindFirstChild("PlayerName")
+                        if nameLabel and nameLabel:IsA("TextLabel") then
+                            local text = tostring(nameLabel.Text):lower()
+                            if text:find(playerName:lower(), 1, true) then
+                                return base
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+    return nil
+end
+
+local character = player.Character or player.CharacterAdded:Wait()
+local hrp = character:WaitForChild("HumanoidRootPart")
+
+spawn(function()
+    while true do
+        if autoCollectOn then
+            local myBase = findMyBase()
+            if myBase then
+                local perm = myBase:FindFirstChild("_PERMANENT")
+                if perm then
+                    local unitsPads = perm:FindFirstChild("UnitsPads")
+                    if unitsPads then
+                        for _, pad in ipairs(unitsPads:GetChildren()) do
+                            local claimPad = pad:FindFirstChild("IncomeClaimPad")
+                            if claimPad then
+                                firetouchinterest(hrp, claimPad, 0)
+                                wait(0.1)
+                                firetouchinterest(hrp, claimPad, 1)
+                            end
+                        end
+                    end
+                end
+            else
+                warn("Auto Collect: no base found.")
+            end
+        end
+        wait(5)
+    end
+end)
+
+spawn(function()
+    while true do
+        if autoLockOn then
+            local myBase = findMyBase()
+            if myBase then
+                local perm = myBase:FindFirstChild("_PERMANENT")
+                if perm then
+                    local baseEntrance = perm:FindFirstChild("BaseEntrance")
+                    if baseEntrance then
+                        local comm = baseEntrance:FindFirstChild("BaseEntrance_Comm")
+                        if comm then
+                            local rf = comm:FindFirstChild("RF")
+                            if rf then
+                                local lock = rf:FindFirstChild("Lock")
+                                if lock and lock:IsA("RemoteFunction") then
+                                    pcall(function()
+                                        lock:InvokeServer()
+                                    end)
+                                end
+                            end
+                        end
+                    end
+                end
+            else
+                warn("Auto Lock: No Base found.")
+            end
+            wait(2)
+        else
+            wait(0.1)
+        end
+    end
+end)
+
+autoCollectBtn.MouseButton1Click:Connect(function()
+    autoCollectOn = not autoCollectOn
+    autoCollectBtn.Text = "Auto Collect: " .. (autoCollectOn and "ON" or "OFF")
+end)
+
+autoLockBtn.MouseButton1Click:Connect(function()
+    autoLockOn = not autoLockOn
+    autoLockBtn.Text = "Auto Lock: " .. (autoLockOn and "ON" or "OFF")
+end)
