@@ -1,4 +1,4 @@
-# RScritps
+# RBXSCRIPT.COM all scripts https://rbxscript.com
 
 Eternal roblox scripts
 
