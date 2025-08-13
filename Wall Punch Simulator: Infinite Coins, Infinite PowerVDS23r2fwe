@@ -1,0 +1,53 @@
+loadstring(game:HttpGet("https://raw.githubusercontent.com/FlamesIsCool/FlamezHub/refs/heads/main/discordjoin.lua"))()
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
+local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
+
+local Window = Fluent:CreateWindow({
+    Title = "Wall Punch Simulator " .. Fluent.Version,
+    SubTitle = "by Flames/Aura",
+    TabWidth = 160,
+    Size = UDim2.fromOffset(580, 460),
+    Acrylic = true,
+    Theme = "Darker",
+    MinimizeKey = Enum.KeyCode.LeftControl
+})
+
+local Tabs = {
+    Main = Window:AddTab({ Title = "Main", Icon = "home" })
+}
+
+Tabs.Main:AddButton({
+    Title = "Infinite Power",
+    Description = "Grants massive power",
+    Callback = function()
+        local player = game:GetService("Players").LocalPlayer
+        local amount = 100000000000000
+
+        game:GetService("ReplicatedStorage"):WaitForChild("GP"):FireServer(player, amount)
+
+        Fluent:Notify({
+            Title = "Power Granted!",
+            Content = "You've gained Infinite Power.",
+            Duration = 5
+        })
+    end
+})
+
+Tabs.Main:AddButton({
+    Title = "Infinite Money",
+    Description = "Gives you insane money",
+    Callback = function()
+        local player = game:GetService("Players").LocalPlayer
+        local amount = 100000000000000
+
+        game:GetService("ReplicatedStorage"):WaitForChild("NL"):FireServer(player, amount)
+
+        Fluent:Notify({
+            Title = "Money Granted!",
+            Content = "You've received Infinite Money.",
+            Duration = 5
+        })
+    end
+})
+
