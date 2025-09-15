@@ -1,0 +1,21 @@
+local r = game:GetService("ReplicatedStorage").Remotes
+
+for i = 1, 303 do
+    task.spawn(function()
+        while true do
+            task.wait()
+            r.EventEvents.SpawnEvilEye:InvokeServer()
+            r.EventEvents.KillEvilEye:InvokeServer()
+        end
+    end)
+end
+
+for i = 1, 80 do
+    task.spawn(function()
+        while true do
+            task.wait()
+            r.SpinEvents.PurchaseSpin:InvokeServer()
+            r.SpinEvents.PerformSpin:InvokeServer()
+        end
+    end)
+end
