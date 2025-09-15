@@ -1,0 +1,245 @@
+-- DronePoint Script v8
+-- Подсветка шахедов/дронов, аимбот ПВО с автострельбой только с AK-47 и DSHK, список дронов с Rocket
+-- Shahid/drone esp, air defense aimbot with autofire only with AK-47 and DSHK, drone list with Rocket
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local StarterGui = game:GetService("StarterGui")
+
+local player = Players.LocalPlayer
+local guiParent = player:WaitForChild("PlayerGui")
+
+local droneNames = {
+    "droneday",
+    "dronenight",
+    "grbr",
+    "droner1",
+    "brbrbl",
+    "droner2",
+    "uav",
+    "uav-3",
+    "uv-2",
+    "bbr",
+    "hrp",
+    "hrpb",
+    "airbornek",
+    "airborne",
+    "an",
+    "rocket"
+}
+
+local allowedWeapons = {
+    ["AK-47"] = true,
+    ["DSHK (1/1)"] = true,
+    ["DSHK (0/1)"] = true
+}
+
+local activeESP = {}
+local autoAimEnabled = false
+local notifyDuration = 1.5
+
+local highlightFillColor = Color3.fromRGB(230, 255, 255) -- неоново-белый
+local highlightOutlineColor = Color3.fromRGB(180, 255, 255)
+
+local function lower(s) return (s or ""):lower() end
+
+local function isDrone(name)
+    name = lower(name)
+    for _, v in ipairs(droneNames) do
+        if string.find(name, v, 1, true) then
+            return true
+        end
+    end
+    return false
+end
+
+local function createESP(model)
+    if activeESP[model] then return end
+    if not model.PrimaryPart then
+        for _, p in ipairs(model:GetChildren()) do
+            if p:IsA("BasePart") then
+                model.PrimaryPart = p
+                break
+            end
+        end
+    end
+    if not model.PrimaryPart then return end
+
+    local highlight = Instance.new("Highlight")
+    highlight.Name = "DP_Highlight"
+    highlight.Adornee = model
+    highlight.FillColor = highlightFillColor
+    highlight.OutlineColor = highlightOutlineColor
+    highlight.FillTransparency = 0.3
+    highlight.OutlineTransparency = 0.1
+    highlight.Parent = model
+
+    activeESP[model] = {highlight = highlight}
+
+    model.AncestryChanged:Connect(function(_, parent)
+        if not parent then
+            if activeESP[model] and activeESP[model].highlight then
+                activeESP[model].highlight:Destroy()
+                activeESP[model] = nil
+            end
+        end
+    end)
+end
+
+local function removeESP(model)
+    local data = activeESP[model]
+    if data and data.highlight then
+        data.highlight:Destroy()
+        activeESP[model] = nil
+    end
+end
+
+local function notifySpawn(name)
+    StarterGui:SetCore("SendNotification", {
+        Title = "⚠ Внимание!",
+        Text = "Обнаружен: "..name,
+        Duration = notifyDuration,
+        Button1 = "ОК"
+    })
+end
+
+local function findClosestTarget()
+    local char = player.Character
+    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+    if not hrp then return nil end
+
+    local closest
+    local closestDist = math.huge
+
+    for model in pairs(activeESP) do
+        if model and model.PrimaryPart then
+            local dist = (model.PrimaryPart.Position - hrp.Position).Magnitude
+            if dist < closestDist then
+                closestDist = dist
+                closest = model
+            end
+        end
+    end
+    return closest
+end
+
+local function aimAt(target)
+    if not target or not target.PrimaryPart then return end
+    local cam = workspace.CurrentCamera
+    local targetHead = target:FindFirstChild("Head") or target.PrimaryPart
+    if not targetHead then return end
+    local targetPos = targetHead.Position
+    local dir = (targetPos - cam.CFrame.Position).Unit
+    local newCF = CFrame.new(cam.CFrame.Position, cam.CFrame.Position + dir)
+    workspace.CurrentCamera.CFrame = newCF
+end
+
+local function fireWeapon()
+    local tool = player.Character and player.Character:FindFirstChildOfClass("Tool")
+    if not tool then return false end
+    if not allowedWeapons[tool.Name] then return false end
+    -- эмуляция клика мыши для выстрела
+    local mouse = player:GetMouse()
+    mouse1press()
+    mouse1release()
+    return true
+end
+
+workspace.ChildAdded:Connect(function(child)
+    if child:IsA("Model") and isDrone(child.Name) then
+        createESP(child)
+        notifySpawn(child.Name)
+    end
+end)
+
+for _, obj in ipairs(workspace:GetChildren()) do
+    if obj:IsA("Model") and isDrone(obj.Name) then
+        createESP(obj)
+    end
+end
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "DronePointGui"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = guiParent
+
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 280, 0, 120)
+mainFrame.Position = UDim2.new(0, 50, 0, 50)
+mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+mainFrame.BorderSizePixel = 0
+mainFrame.Active = true
+mainFrame.Draggable = true
+mainFrame.Parent = ScreenGui
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 30)
+title.BackgroundTransparency = 1
+title.TextColor3 = highlightFillColor
+title.Font = Enum.Font.GothamBold
+title.TextSize = 20
+title.Text = "DronePoint Script"
+title.Parent = mainFrame
+
+local function createButton(text, posY)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1, -20, 0, 30)
+    btn.Position = UDim2.new(0, 10, 0, posY)
+    btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    btn.BorderSizePixel = 0
+    btn.TextColor3 = highlightFillColor
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 18
+    btn.Text = text
+    btn.Parent = mainFrame
+    return btn
+end
+
+local espBtn = createButton("Вкл/Выкл ESP", 40)
+local pvoBtn = createButton("ПВО (выкл)", 80)
+
+local autoAimEnabled = false
+
+espBtn.MouseButton1Click:Connect(function()
+    if next(activeESP) == nil then
+        for _, obj in ipairs(workspace:GetChildren()) do
+            if obj:IsA("Model") and isDrone(obj.Name) then
+                createESP(obj)
+            end
+        end
+        espBtn.Text = "Выключить ESP"
+    else
+        for model in pairs(activeESP) do
+            removeESP(model)
+        end
+        espBtn.Text = "Вкл ESP"
+    end
+end)
+
+pvoBtn.MouseButton1Click:Connect(function()
+    autoAimEnabled = not autoAimEnabled
+    pvoBtn.Text = autoAimEnabled and "ПВО (вкл)" or "ПВО (выкл)"
+end)
+
+RunService.RenderStepped:Connect(function()
+    if autoAimEnabled then
+        local target = findClosestTarget()
+        if target then
+            aimAt(target)
+        end
+    end
+end)
+
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if not autoAimEnabled then return end
+    if gameProcessed then return end
+    if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
+        local target = findClosestTarget()
+        if target then
+            if fireWeapon() then
+                aimAt(target)
+            end
+        end
+    end
+end)
