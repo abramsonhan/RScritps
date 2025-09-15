@@ -1,0 +1,201 @@
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer;
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local function createButton(parent, text, callback)
+	local btn = Instance.new("TextButton")
+	btn.Size = UDim2.new(0.9, 0, 0, 32)
+	btn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+	btn.TextColor3 = Color3.new(1, 1, 1)
+	btn.Font = Enum.Font.SourceSansBold;
+	btn.TextSize = 15;
+	btn.Text = text;
+	btn.Parent = parent;
+	btn.MouseButton1Click:Connect(callback)
+	return btn
+end;
+local gui = Instance.new("ScreenGui", game.CoreGui)
+gui.Name = ""
+local frame = Instance.new("Frame", gui)
+frame.Size = UDim2.new(0, 280, 0, 260)
+frame.Position = UDim2.new(0.5, -140, 0.5, -130)
+frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+frame.BorderSizePixel = 0;
+frame.Active = true;
+local dragging, dragInput, dragStart, startPos;
+frame.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		dragging = true;
+		dragStart = input.Position;
+		startPos = frame.Position;
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
+	end
+end)
+frame.InputChanged:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+		dragInput = input
+	end
+end)
+UserInputService.InputChanged:Connect(function(input)
+	if dragging and input == dragInput then
+		local delta = input.Position - dragStart;
+		frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+	end
+end)
+local title = Instance.new("TextLabel", frame)
+title.Size = UDim2.new(1, 0, 0, 30)
+title.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+title.Text = "Script"
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.Font = Enum.Font.SourceSansBold;
+title.TextSize = 18;
+local scroll = Instance.new("ScrollingFrame", frame)
+scroll.Size = UDim2.new(1, 0, 1, -30)
+scroll.Position = UDim2.new(0, 0, 0, 30)
+scroll.ScrollBarThickness = 4;
+scroll.BackgroundTransparency = 1;
+local layout = Instance.new("UIListLayout", scroll)
+layout.Padding = UDim.new(0, 6)
+layout.HorizontalAlignment = Enum.HorizontalAlignment.Center;
+scroll.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y + 10)
+layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+	scroll.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y + 10)
+end)
+local stealPos, lockBasePos, tpPart, infJump, infJumpDebounce;
+createButton(scroll, "Save Position for Steal", function()
+	stealPos = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position
+end)
+createButton(scroll, "Instant TP to Steal Position", function()
+	if stealPos then
+		LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(stealPos)
+	end
+end)
+createButton(scroll, "Save Position for Lock Base", function()
+	lockBasePos = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart").Position
+end)
+createButton(scroll, "Instant TP to Lock Base", function()
+	if lockBasePos then
+		LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(lockBasePos)
+	end
+end)
+local noclipEnabled = false;
+createButton(scroll, "Toggle Noclip", function()
+	noclipEnabled = not noclipEnabled
+end)
+RunService.Stepped:Connect(function()
+	if noclipEnabled and LocalPlayer.Character then
+		for _, part in pairs(LocalPlayer.Character:GetDescendants()) do
+			if part:IsA("BasePart") then
+				part.CanCollide = false
+			end
+		end
+	end
+end)
+createButton(scroll, "Speed Hack Really Fast OP", function()
+	pcall(function()
+		LocalPlayer.Character:WaitForChild("Humanoid").WalkSpeed = 80;
+		LocalPlayer.Character:WaitForChild("Humanoid"):GetPropertyChangedSignal("WalkSpeed"):Connect(function()
+			pcall(function()
+				LocalPlayer.Character.Humanoid.WalkSpeed = 80
+			end)
+		end)
+	end)
+end)
+createButton(scroll, "Speed Hack Not As Fast", function()
+	pcall(function()
+		LocalPlayer.Character:WaitForChild("Humanoid").WalkSpeed = 50;
+		LocalPlayer.Character:WaitForChild("Humanoid"):GetPropertyChangedSignal("WalkSpeed"):Connect(function()
+			pcall(function()
+				LocalPlayer.Character.Humanoid.WalkSpeed = 50
+			end)
+		end)
+	end)
+end)
+createButton(scroll, "Speed Hack Bypass Some Anticheats", function()
+	RunService.Heartbeat:Connect(function()
+		pcall(function()
+			local cam = workspace.CurrentCamera;
+			local move = Vector3.zero;
+			local character = LocalPlayer.Character;
+			local root = character and character:FindFirstChild("HumanoidRootPart")
+			if not root then
+				return
+			end;
+			local forward = Vector3.new(cam.CFrame.LookVector.X, 0, cam.CFrame.LookVector.Z).Unit;
+			local right = Vector3.new(cam.CFrame.RightVector.X, 0, cam.CFrame.RightVector.Z).Unit;
+			if UserInputService:IsKeyDown(Enum.KeyCode.W) then
+				move += forward
+			end;
+			if UserInputService:IsKeyDown(Enum.KeyCode.S) then
+				move -= forward
+			end;
+			if UserInputService:IsKeyDown(Enum.KeyCode.A) then
+				move -= right
+			end;
+			if UserInputService:IsKeyDown(Enum.KeyCode.D) then
+				move += right
+			end;
+			if move.Magnitude > 0 then
+				root.Velocity = move.Unit * 50
+			end
+		end)
+	end)
+end)
+createButton(scroll, "Infinite Jump", function()
+	if infJump then
+		infJump:Disconnect()
+	end;
+	infJumpDebounce = false;
+	infJump = UserInputService.JumpRequest:Connect(function()
+		if not infJumpDebounce then
+			infJumpDebounce = true;
+			LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid"):ChangeState(Enum.HumanoidStateType.Jumping)
+			task.wait()
+			infJumpDebounce = false
+		end
+	end)
+end)
+createButton(scroll, "Break Client-Sided Damage", function()
+	pcall(function()
+		local player = LocalPlayer;
+		local function onCharacter(char)
+			local humanoid = char:WaitForChild("Humanoid")
+			humanoid:GetPropertyChangedSignal("Health"):Connect(function()
+				pcall(function()
+					humanoid.Health = humanoid.MaxHealth
+				end)
+			end)
+		end;
+		if player.Character then
+			onCharacter(player.Character)
+		end;
+		player.CharacterAdded:Connect(onCharacter)
+	end)
+end)
+createButton(scroll, "Open Fly GUI", function()
+	loadstring(game:HttpGet("https://pastebin.com/raw/XS9ytz61"))()
+end)
+local descendantAddedConn;
+createButton(scroll, "Instant ProximityPrompts", function()
+	for _, v in ipairs(game:GetDescendants()) do
+		pcall(function()
+			if typeof(v) == "Instance" and v.ClassName == "ProximityPrompt" then
+				v.HoldDuration = 0
+			end
+		end)
+	end;
+	if descendantAddedConn then
+		descendantAddedConn:Disconnect()
+	end;
+	descendantAddedConn = game.DescendantAdded:Connect(function(descendant)
+		pcall(function()
+			if typeof(descendant) == "Instance" and descendant.ClassName == "ProximityPrompt" then
+				descendant.HoldDuration = 0
+			end
+		end)
+	end)
+end)
