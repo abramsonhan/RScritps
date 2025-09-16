@@ -1,0 +1,113 @@
+-- Services
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local GiveOutReward = ReplicatedStorage.Remotes.Roulette:WaitForChild("GiveOutReward")
+local Bubble = ReplicatedStorage.Remotes:WaitForChild("Bubble")
+
+-- GUI
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "BrainrotJumpingGUI"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+-- Main Frame
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 240, 0, 200)
+frame.Position = UDim2.new(0.1, 0, 0.2, 0)
+frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+frame.BorderSizePixel = 0
+frame.Active = true
+frame.Draggable = true
+frame.Parent = screenGui
+
+local frameCorner = Instance.new("UICorner")
+frameCorner.CornerRadius = UDim.new(0, 12)
+frameCorner.Parent = frame
+
+-- Title
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 30)
+title.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.Text = "Brainrot Jumping"
+title.Font = Enum.Font.SourceSansBold
+title.TextScaled = true
+title.Parent = frame
+
+local titleCorner = Instance.new("UICorner")
+titleCorner.CornerRadius = UDim.new(0, 12)
+titleCorner.Parent = title
+
+-- Inf Money Button
+local moneyBtn = Instance.new("TextButton")
+moneyBtn.Size = UDim2.new(0.8, 0, 0, 45)
+moneyBtn.Position = UDim2.new(0.1, 0, 0.25, 0)
+moneyBtn.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
+moneyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+moneyBtn.Text = "Get Inf Money"
+moneyBtn.Font = Enum.Font.SourceSansBold
+moneyBtn.TextScaled = true
+moneyBtn.Parent = frame
+
+local moneyCorner = Instance.new("UICorner")
+moneyCorner.CornerRadius = UDim.new(0, 10)
+moneyCorner.Parent = moneyBtn
+
+-- Auto Pump Toggle Button
+local pumpBtn = Instance.new("TextButton")
+pumpBtn.Size = UDim2.new(0.8, 0, 0, 45)
+pumpBtn.Position = UDim2.new(0.1, 0, 0.55, 0)
+pumpBtn.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
+pumpBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+pumpBtn.Text = "Auto Pump: OFF"
+pumpBtn.Font = Enum.Font.SourceSansBold
+pumpBtn.TextScaled = true
+pumpBtn.Parent = frame
+
+local pumpCorner = Instance.new("UICorner")
+pumpCorner.CornerRadius = UDim.new(0, 10)
+pumpCorner.Parent = pumpBtn
+
+-- Footer
+local footer = Instance.new("TextLabel")
+footer.Size = UDim2.new(1, 0, 0, 25)
+footer.Position = UDim2.new(0, 0, 1, -25)
+footer.BackgroundTransparency = 1
+footer.TextColor3 = Color3.fromRGB(200, 200, 200)
+footer.Text = "Made by Kezza"
+footer.Font = Enum.Font.SourceSansItalic
+footer.TextScaled = true
+footer.Parent = frame
+
+-- Logic
+local pumpToggle = false
+
+-- Inf Money button click
+moneyBtn.MouseButton1Click:Connect(function()
+    GiveOutReward:FireServer({
+        value = 3e+26,
+        type = "Money",
+        chance = 0.3
+    })
+end)
+
+-- Auto Pump toggle click
+pumpBtn.MouseButton1Click:Connect(function()
+    pumpToggle = not pumpToggle
+    if pumpToggle then
+        pumpBtn.BackgroundColor3 = Color3.fromRGB(80, 255, 80)
+        pumpBtn.Text = "Auto Pump: ON"
+    else
+        pumpBtn.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
+        pumpBtn.Text = "Auto Pump: OFF"
+    end
+end)
+
+-- Loop for auto pump
+task.spawn(function()
+    while true do
+        if pumpToggle then
+            Bubble:FireServer()
+        end
+        task.wait(0.05) -- pump speed
+    end
+end)
