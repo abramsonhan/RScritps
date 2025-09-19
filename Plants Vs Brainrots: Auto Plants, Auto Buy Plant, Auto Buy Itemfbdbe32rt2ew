@@ -1,0 +1,302 @@
+-- Load Rayfield
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+-- Window
+local Window = Rayfield:CreateWindow({
+    Name = "Hendar Hub",
+    LoadingTitle = "Hendar Hub",
+    LoadingSubtitle = "by Hendar",
+    ConfigurationSaving = {
+        Enabled = true,
+        FolderName = "HendarHub",
+        FileName = "MainConfig"
+    },
+    KeySystem = false,
+})
+
+-- Tab
+local MainTab = Window:CreateTab("Main", 4483362458)
+
+------------------------------------------------
+-- AUTO BUY PLANT
+------------------------------------------------
+local PlantOptions = {
+   "Cactus Seed",
+   "Strawberry Seed",
+   "Pumpkin Seed",
+   "Sunflower Seed",
+   "Dragon Fruit Seed",
+   "Eggplant Seed",
+   "Watermelon Seed",
+   "Cocotank Seed",
+   "Carnivorous Plant Seed",
+   "Mr Carrot Seed"
+}
+local SelectedPlants = {}
+
+MainTab:CreateDropdown({
+   Name = "Select Plants",
+   Options = PlantOptions,
+   CurrentOption = {},
+   MultipleOptions = true,
+   Flag = "PlantsDropdown",
+   Callback = function(Options)
+      SelectedPlants = Options
+   end,
+})
+
+MainTab:CreateToggle({
+   Name = "Auto Buy Plant",
+   CurrentValue = false,
+   Flag = "AutoBuyPlant",
+   Callback = function(Value)
+      if Value then
+         task.spawn(function()
+            while Rayfield.Flags.AutoBuyPlant.CurrentValue do
+               for _, plant in ipairs(SelectedPlants) do
+                  local args = {
+                     {plant, "\a"}
+                  }
+                  game:GetService("ReplicatedStorage"):WaitForChild("BridgeNet2"):WaitForChild("dataRemoteEvent")
+                     :FireServer(unpack(args))
+                  task.wait(0.5) -- kasih jeda antar buy biar ga skip
+               end
+               task.wait(1)
+            end
+         end)
+      end
+   end,
+})
+
+------------------------------------------------
+-- AUTO BUY ITEM
+------------------------------------------------
+local ItemOptions = {
+   "Water Bucket",
+   "Banana Gun",
+   "Frost Blower",
+   "Carrot Launcher"
+}
+local SelectedItems = {}
+
+MainTab:CreateDropdown({
+   Name = "Select Items",
+   Options = ItemOptions,
+   CurrentOption = {},
+   MultipleOptions = true,
+   Flag = "ItemsDropdown",
+   Callback = function(Options)
+      SelectedItems = Options
+   end,
+})
+
+MainTab:CreateToggle({
+   Name = "Auto Buy Item",
+   CurrentValue = false,
+   Flag = "AutoBuyItem",
+   Callback = function(Value)
+      if Value then
+         task.spawn(function()
+            while Rayfield.Flags.AutoBuyItem.CurrentValue do
+               for _, item in ipairs(SelectedItems) do
+                  local args = {{item, " "}}
+                  game:GetService("ReplicatedStorage"):WaitForChild("BridgeNet2"):WaitForChild("dataRemoteEvent")
+                     :FireServer(unpack(args))
+                  task.wait(0.5)
+               end
+               task.wait(1)
+            end
+         end)
+      end
+   end,
+})
+
+------------------------------------------------
+-- AUTO CLAIM MONEY 🤑 (Teleport GUI custom)
+------------------------------------------------
+MainTab:CreateButton({
+   Name = "Open Auto Claim Money 🤑",
+   Callback = function()
+      -- Teleport GUI Custom Multi-Slot Auto by Hendar (dengan Open/Close)
+      local Players = game:GetService("Players")
+      local player = Players.LocalPlayer
+      local hrp = player.Character and player.Character:WaitForChild("HumanoidRootPart")
+
+      -- Slot lokasi
+      local lokasi = {}
+      for i = 1, 10 do
+          lokasi["Lokasi " .. i] = nil
+      end
+
+      -- Variabel auto teleport
+      local autoTeleport = false
+      local delayAntarSlot = 1 -- detik
+      local checkboxes = {}
+
+      -- GUI
+      local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+      gui.Name = "TeleportGUI"
+
+      -- Frame utama
+      local frame = Instance.new("Frame", gui)
+      frame.Size = UDim2.new(0, 280, 0, 560)
+      frame.Position = UDim2.new(0.65, 0, 0.25, 0)
+      frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+      frame.Active = true
+      frame.Draggable = true
+
+      local title = Instance.new("TextLabel", frame)
+      title.Size = UDim2.new(1, -50, 0, 40)
+      title.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+      title.Text = "Teleport Menu"
+      title.TextColor3 = Color3.fromRGB(255, 255, 255)
+      title.Font = Enum.Font.SourceSansBold
+      title.TextSize = 20
+      title.TextXAlignment = Enum.TextXAlignment.Left
+
+      -- Tombol close [-]
+      local closeBtn = Instance.new("TextButton", frame)
+      closeBtn.Size = UDim2.new(0, 40, 0, 40)
+      closeBtn.Position = UDim2.new(1, -45, 0, 0)
+      closeBtn.Text = "-"
+      closeBtn.TextSize = 28
+      closeBtn.BackgroundColor3 = Color3.fromRGB(120, 40, 40)
+      closeBtn.TextColor3 = Color3.new(1,1,1)
+
+      -- Tombol open [+] (muncul saat close)
+      local openBtn = Instance.new("TextButton", gui)
+      openBtn.Size = UDim2.new(0, 60, 0, 40)
+      openBtn.Position = UDim2.new(0.65, 0, 0.25, 0)
+      openBtn.Text = "+"
+      openBtn.TextSize = 28
+      openBtn.BackgroundColor3 = Color3.fromRGB(40, 120, 40)
+      openBtn.TextColor3 = Color3.new(1,1,1)
+      openBtn.Visible = false
+
+      -- Toggle close/open
+      closeBtn.MouseButton1Click:Connect(function()
+          frame.Visible = false
+          openBtn.Visible = true
+      end)
+
+      openBtn.MouseButton1Click:Connect(function()
+          frame.Visible = true
+          openBtn.Visible = false
+      end)
+
+      -- Tombol save lokasi
+      local saveBtn = Instance.new("TextButton", frame)
+      saveBtn.Size = UDim2.new(1, -10, 0, 30)
+      saveBtn.Position = UDim2.new(0, 5, 0, 45)
+      saveBtn.Text = "Save Lokasi Aktif ke Slot"
+      saveBtn.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+      saveBtn.TextColor3 = Color3.new(1,1,1)
+
+      local slotBox = Instance.new("TextBox", frame)
+      slotBox.Size = UDim2.new(1, -10, 0, 25)
+      slotBox.Position = UDim2.new(0, 5, 0, 80)
+      slotBox.PlaceholderText = "Ketik Slot 1-10"
+      slotBox.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+      slotBox.TextColor3 = Color3.new(1,1,1)
+
+      saveBtn.MouseButton1Click:Connect(function()
+          local slot = tonumber(slotBox.Text)
+          if slot and slot >= 1 and slot <= 10 then
+              lokasi["Lokasi " .. slot] = hrp.Position
+              saveBtn.Text = "Slot " .. slot .. " tersimpan!"
+              task.wait(1.5)
+              saveBtn.Text = "Save Lokasi Aktif ke Slot"
+          else
+              saveBtn.Text = "Slot tidak valid!"
+              task.wait(1.5)
+              saveBtn.Text = "Save Lokasi Aktif ke Slot"
+          end
+      end)
+
+      -- CheckBox + tombol teleport manual
+      for i = 1, 10 do
+          local box = Instance.new("TextButton", frame)
+          box.Size = UDim2.new(0, 20, 0, 20)
+          box.Position = UDim2.new(0, 5, 0, 120 + (i-1)*28)
+          box.Text = ""
+          box.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+
+          local label = Instance.new("TextLabel", frame)
+          label.Size = UDim2.new(0, 200, 0, 20)
+          label.Position = UDim2.new(0, 30, 0, 120 + (i-1)*28)
+          label.Text = "Lokasi " .. i
+          label.TextColor3 = Color3.new(1,1,1)
+          label.BackgroundTransparency = 1
+
+          checkboxes[i] = false
+          box.MouseButton1Click:Connect(function()
+              checkboxes[i] = not checkboxes[i]
+              if checkboxes[i] then
+                  box.BackgroundColor3 = Color3.fromRGB(40, 120, 40)
+              else
+                  box.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+              end
+          end)
+
+          local btn = Instance.new("TextButton", frame)
+          btn.Size = UDim2.new(0.6, -10, 0, 20)
+          btn.Position = UDim2.new(0.35, 5, 0, 120 + (i-1)*28)
+          btn.Text = "Teleport"
+          btn.BackgroundColor3 = Color3.fromRGB(90, 90, 90)
+          btn.TextColor3 = Color3.new(1,1,1)
+
+          btn.MouseButton1Click:Connect(function()
+              if lokasi["Lokasi " .. i] then
+                  hrp.CFrame = CFrame.new(lokasi["Lokasi " .. i])
+              else
+                  btn.Text = "Kosong!"
+                  task.wait(1.5)
+                  btn.Text = "Teleport"
+              end
+          end)
+      end
+
+      -- Tombol auto teleport
+      local autoBtn = Instance.new("TextButton", frame)
+      autoBtn.Size = UDim2.new(1, -10, 0, 35)
+      autoBtn.Position = UDim2.new(0, 5, 0, 420)
+      autoBtn.Text = "Auto Teleport: OFF"
+      autoBtn.BackgroundColor3 = Color3.fromRGB(120, 40, 40)
+      autoBtn.TextColor3 = Color3.new(1,1,1)
+
+      autoBtn.MouseButton1Click:Connect(function()
+          autoTeleport = not autoTeleport
+          if autoTeleport then
+              autoBtn.Text = "Auto Teleport: ON"
+              autoBtn.BackgroundColor3 = Color3.fromRGB(40, 120, 40)
+
+              task.spawn(function()
+                  local index = 1
+                  while autoTeleport do
+                      local selected = {}
+                      for i,v in pairs(checkboxes) do
+                          if v then table.insert(selected, i) end
+                      end
+
+                      if #selected > 0 then
+                          local slotNum = selected[index]
+                          local slot = "Lokasi " .. slotNum
+                          if lokasi[slot] then
+                              hrp.CFrame = CFrame.new(lokasi[slot])
+                          end
+                          index = index + 1
+                          if index > #selected then index = 1 end
+                          task.wait(delayAntarSlot)
+                      else
+                          task.wait(1)
+                      end
+                  end
+              end)
+
+          else
+              autoBtn.Text = "Auto Teleport: OFF"
+              autoBtn.BackgroundColor3 = Color3.fromRGB(120, 40, 40)
+          end
+      end)
+   end,
+})
