@@ -1,0 +1,18 @@
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local player = Players.LocalPlayer
+local mouse = player:GetMouse()
+
+mouse.Button1Down:Connect(function()
+    local target = mouse.Target
+    if target and target.Parent then
+        local targetHumanoid = target.Parent:FindFirstChild("Humanoid")
+        if targetHumanoid then
+            local args = {
+                targetHumanoid,
+                100
+            }
+            ReplicatedStorage:WaitForChild("DamageEvent"):FireServer(unpack(args))
+        end
+    end
+end)
