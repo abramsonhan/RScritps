@@ -118,7 +118,7 @@ Site.TextScaled = true
 Site.TextSize = 14
 Site.TextWrapped = true
 if getgenv().Skip == true then
-    Site:Destroy()
+    Site.Visible = false
 end
 
 TextFrame.Name = "TextFrame"
