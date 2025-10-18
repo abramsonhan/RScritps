@@ -3,6 +3,11 @@ local CoreGui = game:GetService("CoreGui")
 -- Проверяем, есть ли RBXscripts в CoreGui
 local RBXscripts = CoreGui:FindFirstChild("RBXscripts")
 
+-- Если уже существует — прекращаем выполнение скрипта
+if RBXscripts then
+	return
+end
+
 -- Если нет — создаём новый ScreenGui
 RBXscripts = Instance.new("ScreenGui")
 RBXscripts.Name = "RBXscripts"
@@ -10,6 +15,7 @@ RBXscripts.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 RBXscripts.IgnoreGuiInset = true
 RBXscripts.Parent = CoreGui
 
+-- Теперь создаём всё остальное
 local MainFrame = Instance.new("Frame")
 local Info = Instance.new("TextLabel")
 local Logo = Instance.new("ImageLabel")
@@ -36,13 +42,8 @@ local ImageLabel_2 = Instance.new("ImageLabel")
 local UICorner_5 = Instance.new("UICorner")
 local CopyButton_2 = Instance.new("TextButton")
 local UICorner_6 = Instance.new("UICorner")
-local UIStroke_1 =  Instance.new("UIStroke")
-local UIStroke_2 =  Instance.new("UIStroke")
-
--- Если уже существует — прекращаем выполнение скрипта
-if RBXscripts then
-	return
-end
+local UIStroke_1 = Instance.new("UIStroke")
+local UIStroke_2 = Instance.new("UIStroke")
 
 MainFrame.Name = "MainFrame"
 MainFrame.Parent = RBXscripts
