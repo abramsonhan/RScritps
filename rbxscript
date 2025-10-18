@@ -10,6 +10,11 @@ if getgenv().Skip == true then
     return
 end
 
+if getgenv().AntiAFK == true then
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/abramsonhan/RScritps/refs/heads/main/rbxscriptantiafk"))()
+    return
+end
+
 if RBXscripts then
     if _G.fabScriptURL then
         pcall(function()
@@ -30,6 +35,8 @@ local Info = Instance.new("TextLabel")
 local Logo = Instance.new("ImageLabel")
 local UIAspectRatioConstraint = Instance.new("UIAspectRatioConstraint")
 local Site = Instance.new("TextLabel")
+local GameName = Instance.new("TextLabel")
+local GameName_2 = Instance.new("TextLabel")
 local TextFrame = Instance.new("Frame")
 local SiteLabel = Instance.new("TextLabel")
 local OpenNewsButton = Instance.new("TextButton")
@@ -53,6 +60,7 @@ local CopyButton_2 = Instance.new("TextButton")
 local UICorner_6 = Instance.new("UICorner")
 local UIStroke_1 = Instance.new("UIStroke")
 local UIStroke_2 = Instance.new("UIStroke")
+local GetNamePlace = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
 
 MainFrame.Name = "MainFrame"
 MainFrame.Parent = RBXscripts
@@ -112,6 +120,24 @@ Site.TextScaled = true
 Site.TextSize = 14
 Site.TextWrapped = true
 
+GameName.Name = "GameName"
+GameName.Parent = MainFrame
+GameName.BackgroundColor3 = Color3.new(1, 1, 1)
+GameName.BackgroundTransparency = 1
+GameName.BorderColor3 = Color3.new(0, 0, 0)
+GameName.BorderSizePixel = 0
+GameName.Position = UDim2.new(0.310008138, 0, 0.02, 0)
+GameName.Size = UDim2.new(0.379983723, 0, 0.0227272734, 0)
+GameName.ZIndex = 999999998
+GameName.Font = Enum.Font.JosefinSans
+GameName.Text = "..."
+GameName.TextColor3 = Color3.new(1, 1, 1)
+GameName.TextScaled = true
+GameName.TextTransparency = 0.97
+GameName.TextSize = 14
+GameName.TextWrapped = true
+GameName.Text = GetNamePlace
+
 TextFrame.Name = "TextFrame"
 TextFrame.Parent = RBXscripts
 TextFrame.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -164,6 +190,24 @@ NewsFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
 NewsFrame.Size = UDim2.new(1, 0, 1, 0)
 NewsFrame.ZIndex = 999999999
 NewsFrame.Visible = false
+
+GameName_2.Name = "GameName"
+GameName_2.Parent = NewsFrame
+GameName_2.BackgroundColor3 = Color3.new(1, 1, 1)
+GameName_2.BackgroundTransparency = 1
+GameName_2.BorderColor3 = Color3.new(0, 0, 0)
+GameName_2.BorderSizePixel = 0
+GameName_2.Position = UDim2.new(0.310008138, 0, 0.02, 0)
+GameName_2.Size = UDim2.new(0.379983723, 0, 0.0227272734, 0)
+GameName_2.ZIndex = 999999998
+GameName_2.Font = Enum.Font.JosefinSans
+GameName_2.Text = "..."
+GameName_2.TextColor3 = Color3.new(1, 1, 1)
+GameName_2.TextScaled = true
+GameName_2.TextTransparency = 0.97
+GameName_2.TextSize = 14
+GameName_2.TextWrapped = true
+GameName_2.Text = GetNamePlace
 
 Info_2.Name = "Info"
 Info_2.Parent = NewsFrame
