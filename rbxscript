@@ -16,10 +16,10 @@ if RBXscripts then
     return
 end
 
-if getgenv().Niga == true then
+if getgenv().checkCoreGUI == true then
 	return
 end
-getgenv().Niga = true
+getgenv().checkCoreGUI = true
 
 RBXscripts = Instance.new("ScreenGui")
 RBXscripts.Name = "RBXscripts"
