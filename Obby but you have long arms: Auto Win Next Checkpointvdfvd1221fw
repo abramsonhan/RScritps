@@ -1,0 +1,2 @@
+loadstring(game:HttpGet('https://raw.githubusercontent.com/abramsonhan/RScritps/refs/heads/main/rbxscriptready'))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Wic1k/Scripts/refs/heads/main/ObbyButYouHaveALongArm.txt"))()
