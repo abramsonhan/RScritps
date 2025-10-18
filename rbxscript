@@ -2,10 +2,12 @@ local CoreGui = game:GetService("CoreGui")
 local RBXscripts = CoreGui:FindFirstChild("RBXscripts")
 local VirtualUser = game:GetService("VirtualUser")
 
-game:GetService("Players").LocalPlayer.Idled:Connect(function()
-    VirtualUser:CaptureController()
-    VirtualUser:ClickButton2(Vector2.new())
-end)
+if getgenv().AntiAfk == true then
+	game:GetService("Players").LocalPlayer.Idled:Connect(function()
+		VirtualUser:CaptureController()
+		VirtualUser:ClickButton2(Vector2.new())
+	end)
+end
 
 if RBXscripts then
     if getgenv().Script then
@@ -16,10 +18,10 @@ if RBXscripts then
     return
 end
 
-if getgenv().checkCoreGUI == true then
+if getgenv().Niga == true then
 	return
 end
-getgenv().checkCoreGUI = true
+getgenv().Niga = true
 
 RBXscripts = Instance.new("ScreenGui")
 RBXscripts.Name = "RBXscripts"
@@ -408,6 +410,8 @@ spawn(function()
 				fadeOutText(0.5)
 				wait(0.2)
 			end
+		else
+			print("Skip: True")
 		end
 		local duration = 0.5
 		local step = 0.02
@@ -623,6 +627,7 @@ spawn(function()
 	for _, frame in ipairs({framePage1, framePage2}) do
 		for _, obj in ipairs(frame:GetDescendants()) do
 			if obj:IsA("TextButton") and obj.Name == "CopyButton" then
+				local Test = obj
 				createHoverEffect(obj)
 				obj.MouseButton1Click:Connect(function()
 					local linkToCopy = ""
@@ -745,4 +750,7 @@ spawn(function()
 	closeButton.MouseButton1Click:Connect(function()
 		hideNews()
 	end)
+	if getgenv().Skip then
+		Test:Destroy()
+	end
 end)
