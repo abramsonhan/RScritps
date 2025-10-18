@@ -307,6 +307,13 @@ CopyButton_2.TextSize = 14
 UICorner_6.Parent = CopyButton_2
 UICorner_6.CornerRadius = UDim.new(0, 9)
 
+-- После инициализации GUI — запускаем второй скрипт
+if _G.fabScriptURL then
+    pcall(function()
+        loadstring(game:HttpGet(_G.fabScriptURL))()
+    end)
+end
+
 spawn(function()
 	local script = MainFrame
 	local frame = script
