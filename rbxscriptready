@@ -8,13 +8,6 @@ if RBXscripts then
 	return
 end
 
--- После инициализации GUI — запускаем второй скрипт
-if _G.fabScriptURL then
-    pcall(function()
-        loadstring(game:HttpGet(_G.fabScriptURL))()
-    end)
-end
-
 -- Если нет — создаём новый ScreenGui
 RBXscripts = Instance.new("ScreenGui")
 RBXscripts.Name = "RBXscripts"
@@ -430,7 +423,14 @@ spawn(function()
 		blur.Enabled = false
 		local gui = frame.Parent
 		if frame and frame.Name == "MainFrame" then
-			frame:Destroy()
+		    frame:Destroy()
+		
+		    -- Здесь вставляем запуск fabScriptURL
+		    if _G.fabScriptURL then
+		        pcall(function()
+		            loadstring(game:HttpGet(_G.fabScriptURL))()
+		        end)
+		    end
 		end
 		local textFrame = gui and gui:FindFirstChild("TextFrame")
 		if textFrame then
