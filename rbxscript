@@ -12,7 +12,6 @@ end
 
 if getgenv().AntiAFK == true then
 	loadstring(game:HttpGet("https://raw.githubusercontent.com/abramsonhan/RScritps/refs/heads/main/rbxscriptantiafk"))()
-    return
 end
 
 if RBXscripts then
