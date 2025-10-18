@@ -1,0 +1,20 @@
+-- [[ Synapse X Stream Sniper Loader ]] --
+
+function _INIT(requisite)
+    local Main
+    local Call = loadstring
+
+    if not getgenv().Game then
+        getgenv().Game = game
+        wait(0.1)
+        Main = getgenv().Game
+    else
+        Main = getgenv().Game
+    end
+    wait(0.1)
+    Call(Main:HttpGet(requisite))()
+end
+
+local Loader = "https://raw.githubusercontent.com/EnterpriseExperience/MicUpSource/refs/heads/main/SynX_Working_Stream_Sniper.lua"
+wait(0.1)
+_INIT(Loader)
