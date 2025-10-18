@@ -28,6 +28,11 @@ local UICorner_6 = Instance.new("UICorner")
 local UIStroke_1 =  Instance.new("UIStroke")
 local UIStroke_2 =  Instance.new("UIStroke")
 
+local RBXscripts = playerGui:FindFirstChild("RBXscripts")
+if RBXscripts then
+    return
+end
+
 RBXscripts.Name = "RBXscripts"
 RBXscripts.Parent = game:GetService("CoreGui")
 RBXscripts.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
