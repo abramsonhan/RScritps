@@ -115,6 +115,9 @@ Site.TextColor3 = Color3.new(1, 1, 1)
 Site.TextScaled = true
 Site.TextSize = 14
 Site.TextWrapped = true
+if getgenv().Skip == true then
+    Site:Destroy()
+end
 
 TextFrame.Name = "TextFrame"
 TextFrame.Parent = RBXscripts
@@ -411,7 +414,6 @@ spawn(function()
 				wait(0.2)
 			end
 		else
-			Site:Destroy()
 			print("Skip: True")
 		end
 		local duration = 0.5
