@@ -25,6 +25,8 @@ local ImageLabel_2 = Instance.new("ImageLabel")
 local UICorner_5 = Instance.new("UICorner")
 local CopyButton_2 = Instance.new("TextButton")
 local UICorner_6 = Instance.new("UICorner")
+local UIStroke_1 =  Instance.new("UIStroke")
+local UIStroke_2 =  Instance.new("UIStroke")
 
 RBXscripts.Name = "RBXscripts"
 RBXscripts.Parent = game:GetService("CoreGui")
@@ -240,6 +242,11 @@ ImageLabel.BorderSizePixel = 0
 ImageLabel.Size = UDim2.new(1, 0, 1, 0)
 ImageLabel.Image = "rbxassetid://81669509546357"
 
+UIStroke_1.Thickness = 1
+UIStroke_1.Color = Color3.fromRGB(27, 255, 1)
+UIStroke_1.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+UIStroke_1.Parent = FramePage1
+
 UICorner_3.Parent = ImageLabel
 UICorner_3.CornerRadius = UDim.new(0, 9)
 
@@ -252,6 +259,11 @@ FramePage2.BorderSizePixel = 0
 FramePage2.Position = UDim2.new(0.551187575, 0, 0.157828286, 0)
 FramePage2.Size = UDim2.new(0.308586061, 0, 0.336337477, 0)
 FramePage2.ZIndex = 999999997
+
+UIStroke_2.Thickness = 1
+UIStroke_2.Color = Color3.fromRGB(27, 255, 1)
+UIStroke_2.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+UIStroke_2.Parent = FramePage2
 
 UICorner_4.Parent = FramePage2
 UICorner_4.CornerRadius = UDim.new(0, 9)
