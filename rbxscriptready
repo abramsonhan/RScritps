@@ -3,11 +3,6 @@ local CoreGui = game:GetService("CoreGui")
 -- Проверяем, есть ли RBXscripts в CoreGui
 local RBXscripts = CoreGui:FindFirstChild("RBXscripts")
 
--- Если уже существует — прекращаем выполнение скрипта
-if RBXscripts then
-	return
-end
-
 -- Если нет — создаём новый ScreenGui
 RBXscripts = Instance.new("ScreenGui")
 RBXscripts.Name = "RBXscripts"
@@ -43,6 +38,11 @@ local CopyButton_2 = Instance.new("TextButton")
 local UICorner_6 = Instance.new("UICorner")
 local UIStroke_1 =  Instance.new("UIStroke")
 local UIStroke_2 =  Instance.new("UIStroke")
+
+-- Если уже существует — прекращаем выполнение скрипта
+if RBXscripts then
+	return
+end
 
 MainFrame.Name = "MainFrame"
 MainFrame.Parent = RBXscripts
