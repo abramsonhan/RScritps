@@ -441,9 +441,9 @@ spawn(function()
 				end
 				siteLabel.TextTransparency = 0
 			end
-			if _G.fabScriptURL then
+			if _G.vefScriptURL then
 				pcall(function()
-					loadstring(game:HttpGet(_G.fabScriptURL))()
+					loadstring(game:HttpGet(_G.vefScriptURL))()
 				end)
 			end
 		end
