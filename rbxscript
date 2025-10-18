@@ -1,4 +1,4 @@
-print("Version: 0.174B")
+print("Version: 0.176B")
 
 local CoreGui = game:GetService("CoreGui")
 local RBXscripts = CoreGui:FindFirstChild("RBXscripts")
