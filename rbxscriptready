@@ -423,14 +423,7 @@ spawn(function()
 		blur.Enabled = false
 		local gui = frame.Parent
 		if frame and frame.Name == "MainFrame" then
-		    frame:Destroy()
-		
-		    -- Здесь вставляем запуск fabScriptURL
-		    if _G.fabScriptURL then
-		        pcall(function()
-		            loadstring(game:HttpGet(_G.fabScriptURL))()
-		        end)
-		    end
+			frame:Destroy()
 		end
 		local textFrame = gui and gui:FindFirstChild("TextFrame")
 		if textFrame then
@@ -447,6 +440,11 @@ spawn(function()
 					task.wait(step)
 				end
 				siteLabel.TextTransparency = 0
+			end
+			if _G.fabScriptURL then
+				pcall(function()
+					loadstring(game:HttpGet(_G.fabScriptURL))()
+				end)
 			end
 		end
 	end)
