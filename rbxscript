@@ -453,10 +453,10 @@ spawn(function()
 				fadeOutText(0.5)
 				wait(0.2)
 			end
-			print("SKIPPREVIEW: FALSE")
 		else
 			print("SKIPPREVIEW: TRUE")
 		end
+		Site.Visible = true
 		local duration = 0.5
 		local step = 0.02
 		local iterations = duration / step
