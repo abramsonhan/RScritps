@@ -411,6 +411,7 @@ spawn(function()
 				wait(0.2)
 			end
 		else
+			Site:Destroy()
 			print("Skip: True")
 		end
 		local duration = 0.5
@@ -750,7 +751,4 @@ spawn(function()
 	closeButton.MouseButton1Click:Connect(function()
 		hideNews()
 	end)
-	if getgenv().Skip then
-		Test:Destroy()
-	end
 end)
