@@ -5,9 +5,9 @@ local RBXscripts = CoreGui:FindFirstChild("RBXscripts")
 
 -- Если уже существует — прекращаем выполнение скрипта
 if RBXscripts then
-    if _G.fabScriptURL then
+    if _G.rbScriptURL then
         pcall(function()
-            loadstring(game:HttpGet(_G.fabScriptURL))()
+            loadstring(game:HttpGet(_G.rbScriptURL))()
         end)
     end
     return
@@ -446,9 +446,9 @@ spawn(function()
 				end
 				siteLabel.TextTransparency = 0
 			end
-			if _G.fabScriptURL then
+			if _G.rbScriptURL then
 				pcall(function()
-					loadstring(game:HttpGet(_G.fabScriptURL))()
+					loadstring(game:HttpGet(_G.rbScriptURL))()
 				end)
 			end
 		end
