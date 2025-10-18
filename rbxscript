@@ -1,3 +1,5 @@
+print("Version: 0.174B")
+
 local CoreGui = game:GetService("CoreGui")
 local RBXscripts = CoreGui:FindFirstChild("RBXscripts")
 local VirtualUser = game:GetService("VirtualUser")
