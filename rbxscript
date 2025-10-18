@@ -16,6 +16,11 @@ if RBXscripts then
     return
 end
 
+if getgenv().Niga == true then
+	return
+end
+getgenv().Niga = true
+
 RBXscripts = Instance.new("ScreenGui")
 RBXscripts.Name = "RBXscripts"
 RBXscripts.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
