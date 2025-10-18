@@ -1,4 +1,4 @@
-print("Version: 0.186B")
+print("Version: 0.189B")
 
 local CoreGui = game:GetService("CoreGui")
 local RBXscripts = CoreGui:FindFirstChild("RBXscripts")
@@ -62,6 +62,7 @@ local CopyButton_2 = Instance.new("TextButton")
 local UICorner_6 = Instance.new("UICorner")
 local UIStroke_1 = Instance.new("UIStroke")
 local UIStroke_2 = Instance.new("UIStroke")
+local GetNamePlace = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
 
 MainFrame.Name = "MainFrame"
 MainFrame.Parent = RBXscripts
