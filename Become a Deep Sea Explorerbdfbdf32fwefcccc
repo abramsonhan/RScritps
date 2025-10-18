@@ -1,0 +1,261 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local player = Players.LocalPlayer
+local playerGui = player:FindFirstChildOfClass("PlayerGui") or player:WaitForChild("PlayerGui")
+
+-- Clean old GUI if exists
+local existingGui = playerGui:FindFirstChild("FishCatcherGui")
+if existingGui then
+    existingGui:Destroy()
+end
+
+local fishFolder = ReplicatedStorage:WaitForChild("A__Assets"):WaitForChild("Fish")
+local addToInventoryRF = ReplicatedStorage:WaitForChild("Packages")
+    :WaitForChild("_Index")
+    :WaitForChild("sleitnick_knit@1.7.0")
+    :WaitForChild("knit")
+    :WaitForChild("Services")
+    :WaitForChild("FishService")
+    :WaitForChild("RF")
+    :WaitForChild("AddToInventory")
+
+-- Create ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "FishCatcherGui"
+screenGui.Parent = playerGui
+screenGui.ResetOnSpawn = false
+
+-- Main frame
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 320, 0, 210)
+frame.Position = UDim2.new(0.5, -160, 0.4, -105)
+frame.BackgroundColor3 = Color3.fromRGB(52, 52, 52)
+frame.BorderSizePixel = 0
+frame.AnchorPoint = Vector2.new(0, 0)
+frame.ZIndex = 10
+frame.Parent = screenGui
+
+local frameCorner = Instance.new("UICorner")
+frameCorner.CornerRadius = UDim.new(0, 12)
+frameCorner.Parent = frame
+
+-- Dragging functionality
+local dragging = false
+local dragInput, dragStart, startPos
+
+local function update(input)
+    local delta = input.Position - dragStart
+    local newPosition = UDim2.new(
+        startPos.X.Scale,
+        startPos.X.Offset + delta.X,
+        startPos.Y.Scale,
+        startPos.Y.Offset + delta.Y
+    )
+    frame.Position = newPosition
+end
+
+frame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = frame.Position
+
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+frame.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement then
+        dragInput = input
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if dragging and input == dragInput then
+        update(input)
+    end
+end)
+
+-- Title label
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, -20, 0, 40)
+title.Position = UDim2.new(0, 10, 0, 10)
+title.BackgroundTransparency = 1
+title.Text = "Fish Catcher"
+title.TextColor3 = Color3.new(1, 1, 1)
+title.Font = Enum.Font.SourceSansBold
+title.TextSize = 28
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.Parent = frame
+
+-- Select Fish Label
+local selectLabel = Instance.new("TextLabel")
+selectLabel.Size = UDim2.new(1, -20, 0, 25)
+selectLabel.Position = UDim2.new(0, 10, 0, 60)
+selectLabel.BackgroundTransparency = 1
+selectLabel.Text = "Select Fish:"
+selectLabel.TextColor3 = Color3.new(1, 1, 1)
+selectLabel.Font = Enum.Font.SourceSans
+selectLabel.TextSize = 20
+selectLabel.TextXAlignment = Enum.TextXAlignment.Left
+selectLabel.Parent = frame
+
+-- Dropdown button to show fish list
+local dropdownButton = Instance.new("TextButton")
+dropdownButton.Size = UDim2.new(1, -20, 0, 30)
+dropdownButton.Position = UDim2.new(0, 10, 0, 90)
+dropdownButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+dropdownButton.TextColor3 = Color3.new(1, 1, 1)
+dropdownButton.Font = Enum.Font.SourceSans
+dropdownButton.TextSize = 20
+dropdownButton.Text = "Select Fish"
+dropdownButton.AutoButtonColor = true
+dropdownButton.Parent = frame
+dropdownButton.ZIndex = 11
+
+-- Dropdown frame and layout
+local listFrame = Instance.new("ScrollingFrame")
+listFrame.Size = UDim2.new(1, -20, 0, 115)
+listFrame.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+listFrame.BorderSizePixel = 0
+listFrame.Position = UDim2.new(0, 10, 0, 120)
+listFrame.Visible = false
+listFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+listFrame.ScrollBarThickness = 8
+listFrame.Parent = frame
+listFrame.ZIndex = 11
+
+local listCorner = Instance.new("UICorner")
+listCorner.CornerRadius = UDim.new(0, 8)
+listCorner.Parent = listFrame
+
+local UIListLayout = Instance.new("UIListLayout")
+UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout.Padding = UDim.new(0, 4)
+UIListLayout.Parent = listFrame
+
+-- Get all fish names
+local fishNames = {}
+for _, fish in ipairs(fishFolder:GetChildren()) do
+    table.insert(fishNames, fish.Name)
+end
+
+local selectedFishName = nil
+
+local function closeDropdown()
+    listFrame.Visible = false
+end
+
+local function openDropdown()
+    listFrame.Visible = true
+    
+    -- Position listFrame above or below dropdownButton depending on space
+    local screenHeight = playerGui.AbsoluteSize.Y
+    local dropdownAbsoluteY = dropdownButton.AbsolutePosition.Y
+    local dropdownHeight = dropdownButton.AbsoluteSize.Y
+    local listHeight = listFrame.AbsoluteSize.Y > 0 and listFrame.AbsoluteSize.Y or 115
+
+    local spaceBelow = screenHeight - (dropdownAbsoluteY + dropdownHeight)
+    if spaceBelow < listHeight then
+        -- Open upwards
+        listFrame.Position = UDim2.new(0, 10, 0, dropdownButton.Position.Y.Offset - listHeight - 6)
+    else
+        -- Open downwards
+        listFrame.Position = UDim2.new(0, 10, 0, dropdownButton.Position.Y.Offset + dropdownHeight + 6)
+    end
+end
+
+-- Populate fish list buttons
+for i, fishName in ipairs(fishNames) do
+    local fishBtn = Instance.new("TextButton")
+    fishBtn.Size = UDim2.new(1, -10, 0, 28)
+    fishBtn.BackgroundColor3 = Color3.fromRGB(90, 90, 90)
+    fishBtn.TextColor3 = Color3.new(1, 1, 1)
+    fishBtn.Font = Enum.Font.SourceSans
+    fishBtn.TextSize = 18
+    fishBtn.Text = fishName
+    fishBtn.LayoutOrder = i
+    fishBtn.AutoButtonColor = true
+    fishBtn.Parent = listFrame
+    fishBtn.ZIndex = 12
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 6)
+    corner.Parent = fishBtn
+
+    fishBtn.MouseEnter:Connect(function()
+        fishBtn.BackgroundColor3 = Color3.fromRGB(115, 115, 115)
+    end)
+    fishBtn.MouseLeave:Connect(function()
+        fishBtn.BackgroundColor3 = Color3.fromRGB(90, 90, 90)
+    end)
+
+    fishBtn.MouseButton1Click:Connect(function()
+        selectedFishName = fishName
+        dropdownButton.Text = fishName
+        closeDropdown()
+    end)
+end
+
+UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+    listFrame.CanvasSize = UDim2.new(0, 0, 0, UIListLayout.AbsoluteContentSize.Y + 8)
+end)
+
+dropdownButton.MouseButton1Click:Connect(function()
+    if listFrame.Visible then
+        closeDropdown()
+    else
+        openDropdown()
+    end
+end)
+
+-- Get Fish button
+local getButton = Instance.new("TextButton")
+getButton.Size = UDim2.new(1, -20, 0, 40)
+getButton.Position = UDim2.new(0, 10, 1, -50)
+getButton.BackgroundColor3 = Color3.fromRGB(0, 145, 0)
+getButton.TextColor3 = Color3.new(1, 1, 1)
+getButton.Font = Enum.Font.SourceSansBold
+getButton.TextSize = 26
+getButton.Text = "Get Fish"
+getButton.AutoButtonColor = true
+getButton.Parent = frame
+getButton.ZIndex = 10
+
+local btnCorner = Instance.new("UICorner")
+btnCorner.CornerRadius = UDim.new(0, 10)
+btnCorner.Parent = getButton
+
+getButton.MouseEnter:Connect(function()
+    getButton.BackgroundColor3 = Color3.fromRGB(0, 180, 0)
+end)
+getButton.MouseLeave:Connect(function()
+    getButton.BackgroundColor3 = Color3.fromRGB(0, 145, 0)
+end)
+
+getButton.MouseButton1Click:Connect(function()
+    if not selectedFishName then
+        warn("[FishCatcher] Please select a fish first!")
+        return
+    end
+
+    local args = {
+        selectedFishName,
+        "Catch"
+    }
+
+    local success, err = pcall(function()
+        return addToInventoryRF:InvokeServer(unpack(args))
+    end)
+
+    if success then
+        print("[FishCatcher] Successfully added fish:", selectedFishName)
+    else
+        warn("[FishCatcher] Failed to add fish:", err)
+    end
+end)
