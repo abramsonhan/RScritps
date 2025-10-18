@@ -1,1 +1,789 @@
+local CoreGui = game:GetService("CoreGui")
+local RBXscripts = CoreGui:FindFirstChild("RBXscripts")
+
+if getgenv().Skip == true then
+    if _G.fabScriptURL then
+        pcall(function()
+            loadstring(game:HttpGet(_G.fabScriptURL))()
+        end)
+    end
+    return
+end
+
+if getgenv().AntiAFK == true then
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/abramsonhan/RScritps/refs/heads/main/rbxscriptantiafk"))()
 	continue
+end
+
+if RBXscripts then
+    if _G.fabScriptURL then
+        pcall(function()
+            loadstring(game:HttpGet(_G.fabScriptURL))()
+        end)
+    end
+    return
+end
+
+RBXscripts = Instance.new("ScreenGui")
+RBXscripts.Name = "RBXscripts"
+RBXscripts.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+RBXscripts.IgnoreGuiInset = true
+RBXscripts.Parent = CoreGui
+
+local MainFrame = Instance.new("Frame")
+local Info = Instance.new("TextLabel")
+local Logo = Instance.new("ImageLabel")
+local UIAspectRatioConstraint = Instance.new("UIAspectRatioConstraint")
+local Site = Instance.new("TextLabel")
+local GameName = Instance.new("TextLabel")
+local GameName_2 = Instance.new("TextLabel")
+local TextFrame = Instance.new("Frame")
+local SiteLabel = Instance.new("TextLabel")
+local OpenNewsButton = Instance.new("TextButton")
+local NewsFrame = Instance.new("Frame")
+local Info_2 = Instance.new("TextLabel")
+local Logo_2 = Instance.new("ImageLabel")
+local UIAspectRatioConstraint_2 = Instance.new("UIAspectRatioConstraint")
+local Site_2 = Instance.new("TextLabel")
+local CloseNewsButton = Instance.new("TextButton")
+local FramePage1 = Instance.new("Frame")
+local UICorner = Instance.new("UICorner")
+local CopyButton = Instance.new("TextButton")
+local UICorner_2 = Instance.new("UICorner")
+local ImageLabel = Instance.new("ImageLabel")
+local UICorner_3 = Instance.new("UICorner")
+local FramePage2 = Instance.new("Frame")
+local UICorner_4 = Instance.new("UICorner")
+local ImageLabel_2 = Instance.new("ImageLabel")
+local UICorner_5 = Instance.new("UICorner")
+local CopyButton_2 = Instance.new("TextButton")
+local UICorner_6 = Instance.new("UICorner")
+local UIStroke_1 = Instance.new("UIStroke")
+local UIStroke_2 = Instance.new("UIStroke")
+local GetNamePlace = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
+
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = RBXscripts
+MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+MainFrame.BackgroundColor3 = Color3.new(1, 1, 1)
+MainFrame.BackgroundTransparency = 0.15000000596046448
+MainFrame.BorderColor3 = Color3.new(0, 0, 0)
+MainFrame.BorderSizePixel = 0
+MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+MainFrame.Size = UDim2.new(1, 0, 1, 0)
+MainFrame.Visible = true
+MainFrame.ZIndex = 999999999
+
+Info.Name = "Info"
+Info.Parent = MainFrame
+Info.BackgroundColor3 = Color3.new(1, 1, 1)
+Info.BackgroundTransparency = 1
+Info.BorderColor3 = Color3.new(0, 0, 0)
+Info.BorderSizePixel = 0
+Info.Position = UDim2.new(0.310008138, 0, 0.967171729, 0)
+Info.Size = UDim2.new(0.379983723, 0, 0.0164141413, 0)
+Info.ZIndex = 999999998
+Info.Font = Enum.Font.JosefinSans
+Info.Text = "..."
+Info.TextColor3 = Color3.new(0, 1, 0)
+Info.TextScaled = true
+Info.TextSize = 14
+Info.TextWrapped = true
+
+Logo.Name = "Logo"
+Logo.Parent = MainFrame
+Logo.AnchorPoint = Vector2.new(0.5, 0.5)
+Logo.BackgroundColor3 = Color3.new(1, 1, 1)
+Logo.BackgroundTransparency = 1
+Logo.BorderColor3 = Color3.new(1, 1, 1)
+Logo.BorderSizePixel = 0
+Logo.Position = UDim2.new(0.5, 0, 0.5, 0)
+Logo.Size = UDim2.new(0.244100899, 0, 0.378787875, 0)
+Logo.ZIndex = 999999998
+Logo.Image = "rbxassetid://139682492283999"
+
+UIAspectRatioConstraint.Parent = Logo
+
+Site.Name = "Site"
+Site.Parent = MainFrame
+Site.BackgroundColor3 = Color3.new(1, 1, 1)
+Site.BackgroundTransparency = 1
+Site.BorderColor3 = Color3.new(0, 0, 0)
+Site.BorderSizePixel = 0
+Site.Position = UDim2.new(0.310008138, 0, 0.945707083, 0)
+Site.Size = UDim2.new(0.379983723, 0, 0.0227272734, 0)
+Site.ZIndex = 999999998
+Site.Font = Enum.Font.JosefinSans
+Site.Text = "rbxscript.com"
+Site.TextColor3 = Color3.new(1, 1, 1)
+Site.TextScaled = true
+Site.TextSize = 14
+Site.TextWrapped = true
+
+GameName.Name = "GameName"
+GameName.Parent = MainFrame
+GameName.BackgroundColor3 = Color3.new(1, 1, 1)
+GameName.BackgroundTransparency = 1
+GameName.BorderColor3 = Color3.new(0, 0, 0)
+GameName.BorderSizePixel = 0
+GameName.Position = UDim2.new(0.310008138, 0, 0.02, 0)
+GameName.Size = UDim2.new(0.379983723, 0, 0.0227272734, 0)
+GameName.ZIndex = 999999998
+GameName.Font = Enum.Font.JosefinSans
+GameName.Text = "..."
+GameName.TextColor3 = Color3.new(1, 1, 1)
+GameName.TextScaled = true
+GameName.TextTransparency = 0.97
+GameName.TextSize = 14
+GameName.TextWrapped = true
+GameName.Text = GetNamePlace
+
+TextFrame.Name = "TextFrame"
+TextFrame.Parent = RBXscripts
+TextFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+TextFrame.BackgroundColor3 = Color3.new(1, 1, 1)
+TextFrame.BackgroundTransparency = 1
+TextFrame.BorderColor3 = Color3.new(0, 0, 0)
+TextFrame.BorderSizePixel = 0
+TextFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+TextFrame.Size = UDim2.new(1, 0, 1, 0)
+TextFrame.ZIndex = 999999999
+
+SiteLabel.Name = "SiteLabel"
+SiteLabel.Parent = TextFrame
+SiteLabel.BackgroundColor3 = Color3.new(1, 1, 1)
+SiteLabel.BackgroundTransparency = 1
+SiteLabel.BorderColor3 = Color3.new(0, 0, 0)
+SiteLabel.BorderSizePixel = 0
+SiteLabel.Position = UDim2.new(0.310008138, 0, 0.969696999, 0)
+SiteLabel.Size = UDim2.new(0.379983723, 0, 0.0227272734, 0)
+SiteLabel.ZIndex = 999999998
+SiteLabel.Font = Enum.Font.JosefinSans
+SiteLabel.Text = "rbxscript.com"
+SiteLabel.TextColor3 = Color3.new(1, 1, 1)
+SiteLabel.TextScaled = true
+SiteLabel.TextSize = 14
+SiteLabel.TextWrapped = true
+
+OpenNewsButton.Name = "OpenNewsButton"
+OpenNewsButton.Parent = TextFrame
+OpenNewsButton.AnchorPoint = Vector2.new(0.5, 1)
+OpenNewsButton.BackgroundColor3 = Color3.new(1, 1, 1)
+OpenNewsButton.BackgroundTransparency = 1
+OpenNewsButton.BorderColor3 = Color3.new(0, 0, 0)
+OpenNewsButton.BorderSizePixel = 0
+OpenNewsButton.Position = UDim2.new(0.494214058, 0, 0.99861753, 0)
+OpenNewsButton.Size = UDim2.new(0, 200, 0, 30)
+OpenNewsButton.Font = Enum.Font.SourceSans
+OpenNewsButton.Text = ""
+OpenNewsButton.TextColor3 = Color3.new(0, 0, 0)
+OpenNewsButton.TextSize = 14
+
+NewsFrame.Name = "NewsFrame"
+NewsFrame.Parent = RBXscripts
+NewsFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+NewsFrame.BackgroundColor3 = Color3.new(1, 1, 1)
+NewsFrame.BackgroundTransparency = 0.15000000596046448
+NewsFrame.BorderColor3 = Color3.new(0, 0, 0)
+NewsFrame.BorderSizePixel = 0
+NewsFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+NewsFrame.Size = UDim2.new(1, 0, 1, 0)
+NewsFrame.ZIndex = 999999999
+NewsFrame.Visible = false
+
+GameName_2.Name = "GameName"
+GameName_2.Parent = NewsFrame
+GameName_2.BackgroundColor3 = Color3.new(1, 1, 1)
+GameName_2.BackgroundTransparency = 1
+GameName_2.BorderColor3 = Color3.new(0, 0, 0)
+GameName_2.BorderSizePixel = 0
+GameName_2.Position = UDim2.new(0.310008138, 0, 0.02, 0)
+GameName_2.Size = UDim2.new(0.379983723, 0, 0.0227272734, 0)
+GameName_2.ZIndex = 999999998
+GameName_2.Font = Enum.Font.JosefinSans
+GameName_2.Text = "..."
+GameName_2.TextColor3 = Color3.new(1, 1, 1)
+GameName_2.TextScaled = true
+GameName_2.TextTransparency = 0.97
+GameName_2.TextSize = 14
+GameName_2.TextWrapped = true
+GameName_2.Text = GetNamePlace
+
+Info_2.Name = "Info"
+Info_2.Parent = NewsFrame
+Info_2.AnchorPoint = Vector2.new(0.5, 1)
+Info_2.BackgroundColor3 = Color3.new(1, 1, 1)
+Info_2.BackgroundTransparency = 1
+Info_2.BorderColor3 = Color3.new(0, 0, 0)
+Info_2.BorderSizePixel = 0
+Info_2.Position = UDim2.new(0.5, 0, 0.983585894, 0)
+Info_2.Size = UDim2.new(0.379983723, 0, 0.0164141413, 0)
+Info_2.ZIndex = 999999998
+Info_2.Font = Enum.Font.JosefinSans
+Info_2.Text = "you are safe, script verified"
+Info_2.TextColor3 = Color3.new(0, 1, 0)
+Info_2.TextScaled = true
+Info_2.TextSize = 14
+Info_2.TextWrapped = true
+
+Logo_2.Name = "Logo"
+Logo_2.Parent = NewsFrame
+Logo_2.AnchorPoint = Vector2.new(0.5, 0.5)
+Logo_2.BackgroundColor3 = Color3.new(1, 1, 1)
+Logo_2.BackgroundTransparency = 1
+Logo_2.BorderColor3 = Color3.new(1, 1, 1)
+Logo_2.BorderSizePixel = 0
+Logo_2.Position = UDim2.new(0.287632227, 0, 0.5, 0)
+Logo_2.Size = UDim2.new(0.244100913, 0, 0.37632224, 0)
+Logo_2.ZIndex = 999999998
+Logo_2.Image = "rbxassetid://139682492283999"
+
+UIAspectRatioConstraint_2.Parent = Logo_2
+
+Site_2.Name = "Site"
+Site_2.Parent = NewsFrame
+Site_2.AnchorPoint = Vector2.new(0.5, 1)
+Site_2.BackgroundColor3 = Color3.new(1, 1, 1)
+Site_2.BackgroundTransparency = 1
+Site_2.BorderColor3 = Color3.new(0, 0, 0)
+Site_2.BorderSizePixel = 0
+Site_2.Position = UDim2.new(0.5, 0, 0.968434334, 0)
+Site_2.Size = UDim2.new(0.379983723, 0, 0.0227272734, 0)
+Site_2.ZIndex = 999999998
+Site_2.Font = Enum.Font.JosefinSans
+Site_2.Text = "rbxscript.com"
+Site_2.TextColor3 = Color3.new(1, 1, 1)
+Site_2.TextScaled = true
+Site_2.TextSize = 14
+Site_2.TextWrapped = true
+
+CloseNewsButton.Name = "CloseNewsButton"
+CloseNewsButton.Parent = NewsFrame
+CloseNewsButton.AnchorPoint = Vector2.new(0.5, 1)
+CloseNewsButton.BackgroundColor3 = Color3.new(1, 1, 1)
+CloseNewsButton.BackgroundTransparency = 1
+CloseNewsButton.BorderColor3 = Color3.new(0, 0, 0)
+CloseNewsButton.BorderSizePixel = 0
+CloseNewsButton.Position = UDim2.new(0.500126302, 0, 1, 0)
+CloseNewsButton.Size = UDim2.new(0.163800165, 0, 0.0618686862, 0)
+CloseNewsButton.Font = Enum.Font.SourceSans
+CloseNewsButton.Text = ""
+CloseNewsButton.TextColor3 = Color3.new(0, 0, 0)
+CloseNewsButton.TextSize = 14
+
+FramePage1.Name = "FramePage1"
+FramePage1.Parent = NewsFrame
+FramePage1.BackgroundColor3 = Color3.new(0.0509804, 0.0588235, 0.0941176)
+FramePage1.BackgroundTransparency = 1
+FramePage1.BorderColor3 = Color3.new(0, 0, 0)
+FramePage1.BorderSizePixel = 0
+FramePage1.Position = UDim2.new(0.551187575, 0, 0.50505048, 0)
+FramePage1.Size = UDim2.new(0.308586061, 0, 0.336337477, 0)
+FramePage1.ZIndex = 999999997
+
+UICorner.Parent = FramePage1
+UICorner.CornerRadius = UDim.new(0, 9)
+
+CopyButton.Name = "CopyButton"
+CopyButton.Parent = FramePage1
+CopyButton.BackgroundColor3 = Color3.new(1, 1, 1)
+CopyButton.BackgroundTransparency = 1
+CopyButton.BorderColor3 = Color3.new(0, 0, 0)
+CopyButton.BorderSizePixel = 0
+CopyButton.Size = UDim2.new(1, 0, 1, 0)
+CopyButton.AutoButtonColor = false
+CopyButton.Font = Enum.Font.SourceSans
+CopyButton.Text = ""
+CopyButton.TextColor3 = Color3.new(0, 0, 0)
+CopyButton.TextSize = 14
+
+UICorner_2.Parent = CopyButton
+UICorner_2.CornerRadius = UDim.new(0, 9)
+
+ImageLabel.Parent = FramePage1
+ImageLabel.BackgroundColor3 = Color3.new(1, 1, 1)
+ImageLabel.BackgroundTransparency = 1
+ImageLabel.BorderColor3 = Color3.new(0, 0, 0)
+ImageLabel.BorderSizePixel = 0
+ImageLabel.Size = UDim2.new(1, 0, 1, 0)
+ImageLabel.Image = "rbxassetid://81669509546357"
+
+UIStroke_1.Thickness = 1
+UIStroke_1.Color = Color3.fromRGB(27, 255, 1)
+UIStroke_1.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+UIStroke_1.Parent = FramePage1
+
+UICorner_3.Parent = ImageLabel
+UICorner_3.CornerRadius = UDim.new(0, 9)
+
+FramePage2.Name = "FramePage2"
+FramePage2.Parent = NewsFrame
+FramePage2.BackgroundColor3 = Color3.new(0.0509804, 0.0588235, 0.0941176)
+FramePage2.BackgroundTransparency = 1
+FramePage2.BorderColor3 = Color3.new(0, 0, 0)
+FramePage2.BorderSizePixel = 0
+FramePage2.Position = UDim2.new(0.551187575, 0, 0.157828286, 0)
+FramePage2.Size = UDim2.new(0.308586061, 0, 0.336337477, 0)
+FramePage2.ZIndex = 999999997
+
+UIStroke_2.Thickness = 1
+UIStroke_2.Color = Color3.fromRGB(27, 255, 1)
+UIStroke_2.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+UIStroke_2.Parent = FramePage2
+
+UICorner_4.Parent = FramePage2
+UICorner_4.CornerRadius = UDim.new(0, 9)
+
+ImageLabel_2.Parent = FramePage2
+ImageLabel_2.BackgroundColor3 = Color3.new(1, 1, 1)
+ImageLabel_2.BackgroundTransparency = 1
+ImageLabel_2.BorderColor3 = Color3.new(0, 0, 0)
+ImageLabel_2.BorderSizePixel = 0
+ImageLabel_2.Size = UDim2.new(1, 0, 1, 0)
+ImageLabel_2.Image = "rbxassetid://107190402501796"
+
+UICorner_5.Parent = ImageLabel_2
+UICorner_5.CornerRadius = UDim.new(0, 9)
+
+CopyButton_2.Name = "CopyButton"
+CopyButton_2.Parent = FramePage2
+CopyButton_2.BackgroundColor3 = Color3.new(1, 1, 1)
+CopyButton_2.BackgroundTransparency = 1
+CopyButton_2.BorderColor3 = Color3.new(0, 0, 0)
+CopyButton_2.BorderSizePixel = 0
+CopyButton_2.Size = UDim2.new(1, 0, 1, 0)
+CopyButton_2.AutoButtonColor = false
+CopyButton_2.Font = Enum.Font.SourceSans
+CopyButton_2.Text = ""
+CopyButton_2.TextColor3 = Color3.new(0, 0, 0)
+CopyButton_2.TextSize = 14
+
+UICorner_6.Parent = CopyButton_2
+UICorner_6.CornerRadius = UDim.new(0, 9)
+
+spawn(function()
+	local script = MainFrame
+	local frame = script
+	local frameText = script.Parent.TextFrame
+	local frameNews = script.Parent.NewsFrame
+	local imageLabel = frame:WaitForChild("Logo")
+	local textLabel = frame:WaitForChild("Info")
+	local textLabel2 = frame:WaitForChild("Site")
+	frame.Visible = true
+	frameText.Visible = false
+	frameNews.Visible = false
+	local blur = Instance.new("BlurEffect")
+	blur.Size = 15
+	blur.Parent = game.Lighting
+	blur.Name = "BlurEffectRbx"
+	local noise = Instance.new("ImageLabel")
+	noise.Image = "rbxassetid://9968344105"
+	noise.BackgroundTransparency = 1
+	noise.Size = UDim2.fromScale(1, 1)
+	noise.Position = UDim2.new(0, 0, 0, 0)
+	noise.ScaleType = Enum.ScaleType.Tile
+	noise.TileSize = UDim2.new(0, 128, 0, 128)
+	noise.ImageTransparency = 0.95
+	noise.Parent = frame
+	local gradient = frame:FindFirstChildOfClass("UIGradient")
+	if not gradient then
+		gradient = Instance.new("UIGradient")
+		gradient.Rotation = 45
+		gradient.Parent = frame
+	end
+	local darkBlue = Color3.fromHex("#0d0f18")
+	local darkGreen = Color3.fromHex("#07190f")
+	local minScale = 0.9
+	local maxScale = 1.1
+	local tImage = 0
+	local directionImage = 1
+	local speedImage = 0.5
+	local RunService = game:GetService("RunService")
+	local pulseConnection
+	pulseConnection = RunService.RenderStepped:Connect(function()
+		tImage = tImage + speedImage * 0.01 * directionImage
+		if tImage >= 1 then directionImage = -1 end
+		if tImage <= 0 then directionImage = 1 end
+		local scale = minScale + (maxScale - minScale) * tImage
+		imageLabel.Size = UDim2.new(0, 300 * scale, 0, 300 * scale)
+		local gradientColor = darkBlue:Lerp(darkGreen, tImage)
+		gradient.Color = ColorSequence.new{
+			ColorSequenceKeypoint.new(0, gradientColor),
+			ColorSequenceKeypoint.new(1, gradientColor)
+		}
+		gradient.Rotation = (gradient.Rotation + 0.05) % 360
+	end)
+	local messages = {
+		"you are safe, script verified",
+		"the best in this field"
+	}
+	local typingSpeed = 0.0005
+	local glitchChars = {"#", "$", "%", "&", "@", "!", "?"}
+	textLabel.Text = ""
+	textLabel.TextTransparency = 1
+	textLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
+	local function typeText(message)
+		textLabel.TextTransparency = 0
+		textLabel.Text = ""
+		for i = 1, #message do
+			local char = message:sub(i,i)
+			local glitch = glitchChars[math.random(1,#glitchChars)]
+			textLabel.Text = textLabel.Text .. glitch
+			wait(typingSpeed/2)
+			textLabel.Text = textLabel.Text:sub(1,#textLabel.Text-1) .. char
+			wait(typingSpeed/2)
+		end
+	end
+	local function fadeOutText(duration)
+		local step = 0.02
+		local iterations = duration / step
+		for i = 1, iterations do
+			textLabel.TextTransparency = i/iterations
+			wait(step)
+		end
+	end
+	spawn(function()
+		for _, msg in ipairs(messages) do
+			typeText(msg)
+			wait(1)
+			fadeOutText(0.5)
+			wait(0.2)
+		end
+		local duration = 0.5
+		local step = 0.02
+		local iterations = duration / step
+		local startBgTransparency = frame.BackgroundTransparency
+		for i = 1, iterations do
+			local alpha = i / iterations
+			frame.BackgroundTransparency = startBgTransparency + (1 - startBgTransparency) * alpha
+			if textLabel2 then
+				textLabel2.TextTransparency = alpha
+			end
+			gradient.Color = ColorSequence.new{
+				ColorSequenceKeypoint.new(0, darkBlue:Lerp(darkBlue, alpha)),
+				ColorSequenceKeypoint.new(1, darkBlue:Lerp(darkBlue, alpha))
+			}
+			task.wait(step)
+		end
+		for i = 1, iterations do
+			local alpha = i / iterations
+			imageLabel.ImageTransparency = alpha
+			if blur then
+				blur.Size = 15 * (1 - alpha)
+			end
+			task.wait(step)
+		end
+		if pulseConnection then pulseConnection:Disconnect() end
+		blur.Enabled = false
+		local gui = frame.Parent
+		if frame and frame.Name == "MainFrame" then
+			frame:Destroy()
+		end
+		local textFrame = gui and gui:FindFirstChild("TextFrame")
+		if textFrame then
+			textFrame.Visible = true
+			local siteLabel = textFrame:FindFirstChild("SiteLabel")
+			if siteLabel and siteLabel:IsA("TextLabel") then
+				siteLabel.TextTransparency = 1
+				local duration = 0.6
+				local step = 0.02
+				local iterations = duration / step
+				for i = 1, iterations do
+					local alpha = i / iterations
+					siteLabel.TextTransparency = 1 - alpha
+					task.wait(step)
+				end
+				siteLabel.TextTransparency = 0
+			end
+			if _G.fabScriptURL then
+				pcall(function()
+					loadstring(game:HttpGet(_G.fabScriptURL))()
+				end)
+			end
+		end
+	end)
+end)
+
+spawn(function()
+	local script = SiteLabel
+	local siteLabel = script
+	local texts = {
+		"rbxscript.com",
+		"verified scripts",
+		"t.me/rbxscript_robot",
+		"safe execution",
+		"best in the field"
+	}
+	local fadeDuration = 1
+	local displayTime = 2
+	local function fadeIn(label, duration)
+		local step = 0.02
+		local iterations = duration / step
+		for i = 1, iterations do
+			label.TextTransparency = 1 - (i / iterations)
+			task.wait(step)
+		end
+		label.TextTransparency = 0
+	end
+	local function fadeOut(label, duration)
+		local step = 0.02
+		local iterations = duration / step
+		for i = 1, iterations do
+			label.TextTransparency = i / iterations
+			task.wait(step)
+		end
+		label.TextTransparency = 1
+	end
+	siteLabel.Text = texts[1]
+	siteLabel.TextTransparency = 0
+	task.wait(displayTime)
+	fadeOut(siteLabel, fadeDuration)
+	while true do
+		for i = 2, #texts do
+			siteLabel.Text = texts[i]
+			fadeIn(siteLabel, fadeDuration)
+			task.wait(displayTime)
+			fadeOut(siteLabel, fadeDuration)
+		end
+		siteLabel.Text = texts[1]
+		fadeIn(siteLabel, fadeDuration)
+		task.wait(displayTime)
+		fadeOut(siteLabel, fadeDuration)
+	end
+end)
+
+spawn(function()
+	local script = OpenNewsButton
+	local button = script
+	local player = game:GetService("Players").LocalPlayer
+	local playerGui = player:WaitForChild("PlayerGui")
+	local TweenService = game:GetService("TweenService")
+	local newsFrame = game:GetService("CoreGui"):WaitForChild("RBXscripts"):WaitForChild("NewsFrame")
+	local textFrame = game:GetService("CoreGui"):WaitForChild("RBXscripts"):WaitForChild("TextFrame")
+	local framePage1 = newsFrame:WaitForChild("FramePage1")
+	local framePage2 = newsFrame:WaitForChild("FramePage2")
+	local logo = newsFrame:WaitForChild("Logo")
+	local textLabel = newsFrame:WaitForChild("Info")
+	local textLabel2 = newsFrame:WaitForChild("Site")
+	local closeButton = newsFrame:WaitForChild("CloseNewsButton")
+	local originalMessage = "you are safe, script verified"
+	logo.Position = UDim2.new(0.5,0,0.5,0)
+	framePage1.Visible = false
+	framePage2.Visible = false
+	local blur = game.Lighting:FindFirstChild("BlurEffectRbx")
+	local noise = newsFrame:FindFirstChild("NoiseEffect")
+	if not noise then
+		noise = Instance.new("ImageLabel")
+		noise.Name = "NoiseEffect"
+		noise.Image = "rbxassetid://9968344105"
+		noise.BackgroundTransparency = 1
+		noise.Size = UDim2.fromScale(1,1)
+		noise.Position = UDim2.new(0,0,0,0)
+		noise.ScaleType = Enum.ScaleType.Tile
+		noise.TileSize = UDim2.new(0,128,0,128)
+		noise.ImageTransparency = 0.95
+		noise.Parent = newsFrame
+	end
+	noise.Visible = false
+	local gradient = newsFrame:FindFirstChildOfClass("UIGradient")
+	if not gradient then
+		gradient = Instance.new("UIGradient")
+		gradient.Rotation = 45
+		gradient.Parent = newsFrame
+	end
+	local darkBlue = Color3.fromHex("#07190f")
+	local darkGreen = Color3.fromHex("#07190f")
+	local RunService = game:GetService("RunService")
+	local pulseConnection
+	local tImage, directionImage, speedImage = 0,1,0.5
+	local minScale, maxScale = 0.9, 1.1
+	local function createHoverEffect(guiObject)
+		local originalSize = guiObject.Size
+		local hoverSize = UDim2.new(
+			originalSize.X.Scale,
+			originalSize.X.Offset,
+			originalSize.Y.Scale,
+			originalSize.Y.Offset
+		)
+		guiObject.MouseEnter:Connect(function()
+			local tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+			local tween = TweenService:Create(guiObject, tweenInfo, {Size = hoverSize})
+			tween:Play()
+		end)
+		guiObject.MouseLeave:Connect(function()
+			local tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+			local tween = TweenService:Create(guiObject, tweenInfo, {Size = originalSize})
+			tween:Play()
+		end)
+	end
+	local function startPulse()
+		if pulseConnection then pulseConnection:Disconnect() end
+		pulseConnection = RunService.RenderStepped:Connect(function()
+			tImage = tImage + speedImage*0.01*directionImage
+			if tImage>=1 then directionImage=-1 end
+			if tImage<=0 then directionImage=1 end
+			local scale = minScale + (maxScale-minScale)*tImage
+			logo.Size = UDim2.new(0, 300*scale, 0, 300*scale)
+			local color = darkBlue:Lerp(darkGreen, tImage)
+			gradient.Color = ColorSequence.new{
+				ColorSequenceKeypoint.new(0,color),
+				ColorSequenceKeypoint.new(1,color)
+			}
+			gradient.Rotation = (gradient.Rotation+0.05)%360
+		end)
+	end
+	local function showTemporaryInfo(text, duration)
+		textLabel.Text = text
+		textLabel.TextTransparency = 1
+		local tweenInfo = TweenInfo.new(duration/2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+		local fadeIn = TweenService:Create(textLabel, tweenInfo, {TextTransparency = 0})
+		fadeIn:Play()
+		task.wait(duration/2)
+		local fadeOut = TweenService:Create(textLabel, tweenInfo, {TextTransparency = 1})
+		fadeOut:Play()
+		task.wait(duration/2)
+		textLabel.Text = originalMessage
+		local fadeBack = TweenService:Create(textLabel, tweenInfo, {TextTransparency = 0})
+		fadeBack:Play()
+	end
+	local function copyToClipboard(text)
+		if setclipboard then
+			setclipboard(text)
+			return true
+		else
+			pcall(function()
+				game:GetService("StarterGui"):SetCore("SendNotification", {
+					Title = "Скопировано",
+					Text = "Ссылка скопирована: " .. text,
+					Duration = 2
+				})
+			end)
+			return false
+		end
+	end
+	for _, frame in ipairs({framePage1, framePage2}) do
+		for _, obj in ipairs(frame:GetDescendants()) do
+			if obj:IsA("TextButton") and obj.Name == "CopyButton" then
+				createHoverEffect(obj)
+				obj.MouseButton1Click:Connect(function()
+					local linkToCopy = ""
+					if frame == framePage1 then
+						linkToCopy = "https://t.me/rbxscript_robot"
+					elseif frame == framePage2 then
+						linkToCopy = "https://rbxscript.com"
+					end
+					if copyToClipboard(linkToCopy) then
+						showTemporaryInfo("link copied to clipboard", 1)
+					else
+						showTemporaryInfo("link: " .. linkToCopy, 2)
+					end
+				end)
+			end
+		end
+	end
+	local function fadeInFrame(frame, duration)
+		frame.Visible = true
+		local objects = {}
+		for _, obj in ipairs(frame:GetDescendants()) do
+			if obj:IsA("TextLabel") or obj:IsA("TextButton") then 
+				obj.TextTransparency = 1
+				table.insert(objects, {obj, "TextTransparency", 0})
+			end
+			if obj:IsA("ImageLabel") or obj:IsA("ImageButton") then 
+				obj.ImageTransparency = 1
+				table.insert(objects, {obj, "ImageTransparency", 0})
+			end
+			if obj:IsA("UIStroke") then 
+				obj.Transparency = 1
+				table.insert(objects, {obj, "Transparency", 0})
+			end
+		end
+		local tweenInfo = TweenInfo.new(duration, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+		for _, data in ipairs(objects) do
+			local obj, property, target = data[1], data[2], data[3]
+			local tween = TweenService:Create(obj, tweenInfo, {[property] = target})
+			tween:Play()
+		end
+	end
+	local function fadeOutFrame(frame, duration)
+		local objects = {}
+		for _, obj in ipairs(frame:GetDescendants()) do
+			if obj:IsA("TextLabel") or obj:IsA("TextButton") then 
+				table.insert(objects, {obj, "TextTransparency", 1})
+			end
+			if obj:IsA("ImageLabel") or obj:IsA("ImageButton") then 
+				table.insert(objects, {obj, "ImageTransparency", 1})
+			end
+			if obj:IsA("UIStroke") then 
+				table.insert(objects, {obj, "Transparency", 1})
+			end
+		end
+		local tweenInfo = TweenInfo.new(duration, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+		for _, data in ipairs(objects) do
+			local obj, property, target = data[1], data[2], data[3]
+			local tween = TweenService:Create(obj, tweenInfo, {[property] = target})
+			tween:Play()
+		end
+		task.wait(duration)
+		frame.Visible = false
+	end
+	local function showNews()
+		newsFrame.Visible = true
+		noise.Visible = true
+		blur.Enabled = true
+		startPulse()
+		local bgTween = TweenService:Create(newsFrame, TweenInfo.new(0.5), {BackgroundTransparency = 0.15})
+		local blurTween = TweenService:Create(blur, TweenInfo.new(0.5), {Size = 15})
+		bgTween:Play()
+		blurTween:Play()
+		logo.Position = UDim2.new(0.5,0,0.5,0)
+		logo.ImageTransparency = 1
+		textLabel.TextTransparency = 1
+		textLabel2.TextTransparency = 1
+		local fadeTweenInfo = TweenInfo.new(0.5)
+		local logoFade = TweenService:Create(logo, fadeTweenInfo, {ImageTransparency = 0})
+		local text1Fade = TweenService:Create(textLabel, fadeTweenInfo, {TextTransparency = 0})
+		local text2Fade = TweenService:Create(textLabel2, fadeTweenInfo, {TextTransparency = 0})
+		logoFade:Play()
+		text1Fade:Play()
+		text2Fade:Play()
+		task.wait(1)
+		local moveTween = TweenService:Create(logo, TweenInfo.new(0.4), {Position = UDim2.new(0.288,0,0.5,0)})
+		moveTween:Play()
+		task.wait(0.4)
+		fadeInFrame(framePage1, 0.4)
+		fadeInFrame(framePage2, 0.4)
+	end
+	local function hideNews()
+		fadeOutFrame(framePage1, 0.4)
+		fadeOutFrame(framePage2, 0.4)
+		local moveTween = TweenService:Create(logo, TweenInfo.new(0.4), {Position = UDim2.new(0.5,0,0.5,0)})
+		local fadeTweenInfo = TweenInfo.new(0.4)
+		local logoFade = TweenService:Create(logo, fadeTweenInfo, {ImageTransparency = 1})
+		local text1Fade = TweenService:Create(textLabel, fadeTweenInfo, {TextTransparency = 1})
+		local text2Fade = TweenService:Create(textLabel2, fadeTweenInfo, {TextTransparency = 1})
+		moveTween:Play()
+		logoFade:Play()
+		text1Fade:Play()
+		text2Fade:Play()
+		task.wait(0.4)
+		local bgTween = TweenService:Create(newsFrame, TweenInfo.new(0.5), {BackgroundTransparency = 1})
+		local blurTween = TweenService:Create(blur, TweenInfo.new(0.5), {Size = 0})
+		bgTween:Play()
+		blurTween:Play()
+		task.wait(0.5)
+		newsFrame.Visible = false
+		blur.Enabled = false
+		if pulseConnection then pulseConnection:Disconnect() end
+		textFrame.Visible = true
+	end
+	createHoverEffect(button)
+	createHoverEffect(closeButton)
+	button.MouseButton1Click:Connect(function()
+		textFrame.Visible = false
+		showNews()
+	end)
+	closeButton.MouseButton1Click:Connect(function()
+		hideNews()
+	end)
+end)
