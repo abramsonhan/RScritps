@@ -1,4 +1,4 @@
-print("Version: 0.183B")
+print("Version: 0.186B")
 
 local CoreGui = game:GetService("CoreGui")
 local RBXscripts = CoreGui:FindFirstChild("RBXscripts")
@@ -414,7 +414,7 @@ spawn(function()
 				fadeOutText(0.5)
 				wait(0.2)
 			end
-		Site.Visible = true
+			print("SKIPPREVIEW: FALSE")
 		else
 			print("SKIPPREVIEW: TRUE")
 		end
