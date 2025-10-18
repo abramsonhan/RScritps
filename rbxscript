@@ -1,4 +1,4 @@
-print("Version: 0.189B")
+print("Version: 0.194B")
 
 local CoreGui = game:GetService("CoreGui")
 local RBXscripts = CoreGui:FindFirstChild("RBXscripts")
@@ -372,6 +372,13 @@ spawn(function()
 	local imageLabel = frame:WaitForChild("Logo")
 	local textLabel = frame:WaitForChild("Info")
 	local textLabel2 = frame:WaitForChild("Site")
+
+	if getgenv().Skip == true then
+		Site.Visible = false
+	else
+		Site.Visible = true
+	end
+
 	frame.Visible = true
 	frameText.Visible = false
 	frameNews.Visible = false
@@ -456,7 +463,6 @@ spawn(function()
 		else
 			print("SKIPPREVIEW: TRUE")
 		end
-		Site.Visible = true
 		local duration = 0.5
 		local step = 0.02
 		local iterations = duration / step
