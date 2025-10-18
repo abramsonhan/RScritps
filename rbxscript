@@ -1,4 +1,4 @@
-print("Version: 0.178B")
+print("Version: 0.181B")
 
 local CoreGui = game:GetService("CoreGui")
 local RBXscripts = CoreGui:FindFirstChild("RBXscripts")
@@ -9,6 +9,7 @@ if getgenv().AntiAfk == true then
 		VirtualUser:CaptureController()
 		VirtualUser:ClickButton2(Vector2.new())
 	end)
+	print("ANTIAFK: TRUE")
 end
 
 if RBXscripts then
@@ -414,7 +415,7 @@ spawn(function()
 				wait(0.2)
 			end
 		else
-			print("Skip: True")
+			print("SKIPPREVIEW: TRUE")
 		end
 		local duration = 0.5
 		local step = 0.02
