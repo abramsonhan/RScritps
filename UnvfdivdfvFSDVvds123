@@ -1,0 +1,102 @@
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local Camera = workspace.CurrentCamera
+local LocalPlayer = Players.LocalPlayer
+
+local FOVRadius = 200
+local AimSpeed = 2 -- lower = faster
+
+local circle
+if Drawing then
+	circle = Drawing.new("Circle")
+	circle.Visible = true
+	circle.Color = Color3.fromRGB(255, 0, 0)
+	circle.Thickness = 2
+	circle.Filled = false
+	circle.Radius = FOVRadius
+end
+
+local function hasLineOfSight(origin, targetPart)
+	local rayParams = RaycastParams.new()
+	rayParams.FilterDescendantsInstances = {LocalPlayer.Character, targetPart.Parent}
+	rayParams.FilterType = Enum.RaycastFilterType.Blacklist
+
+	local direction = (targetPart.Position - origin)
+	local result = workspace:Raycast(origin, direction, rayParams)
+	if result and result.Instance then
+		if not targetPart:IsDescendantOf(result.Instance) then
+			return false
+		end
+	end
+	return true
+end
+
+local function getClosestPlayer()
+	local mousePos = Camera.ViewportSize / 2
+	local closestPlayer, closestDist = nil, math.huge
+
+	for _, player in ipairs(Players:GetPlayers()) do
+		if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("Head") then
+			local head = player.Character.Head
+			local screenPos, onScreen = Camera:WorldToViewportPoint(head.Position)
+
+			if onScreen then
+				local dist = (Vector2.new(screenPos.X, screenPos.Y) - mousePos).Magnitude
+
+				if dist < FOVRadius then
+					if hasLineOfSight(Camera.CFrame.Position, head) then
+						if dist < closestDist then
+							closestDist = dist
+							closestPlayer = player
+						end
+					end
+				end
+			end
+		end
+	end
+
+	return closestPlayer
+end
+
+local holdingRMB = false
+
+UserInputService.InputBegan:Connect(function(input, gp)
+	if gp then return end
+	if input.UserInputType == Enum.UserInputType.MouseButton2 then
+		holdingRMB = true
+	end
+end)
+
+UserInputService.InputEnded:Connect(function(input, gp)
+	if input.UserInputType == Enum.UserInputType.MouseButton2 then
+		holdingRMB = false
+	end
+end)
+
+local function aimAt(targetPos)
+	local mousePos = Camera.ViewportSize / 2
+	local screenPos, onScreen = Camera:WorldToViewportPoint(targetPos)
+	if not onScreen then return end
+
+	local delta = Vector2.new(screenPos.X, screenPos.Y) - mousePos
+	local moveX = delta.X / AimSpeed
+	local moveY = delta.Y / AimSpeed
+
+	mousemoverel(moveX, moveY)
+end
+
+RunService.RenderStepped:Connect(function()
+	local mousePos = Camera.ViewportSize / 2 --dont want to actually get mouse pos yk and most shooters are first person
+
+	if circle then
+		circle.Position = Vector2.new(mousePos.X, mousePos.Y)
+	end
+
+	if holdingRMB then
+		local target = getClosestPlayer()
+		if target and target.Character and target.Character:FindFirstChild("Head") then
+			aimAt(target.Character.Head.Position)
+		end
+	end
+end)
