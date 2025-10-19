@@ -1,0 +1,149 @@
+local engine = loadstring(game:HttpGet("https://raw.githubusercontent.com/Singularity5490/rbimgui-2/main/rbimgui-2.lua"))()
+-- Services
+local cloneref = cloneref or function(o) return o end
+COREGUI = cloneref(game:GetService("CoreGui"))
+Players = cloneref(game:GetService("Players"))
+PlayerGui = Players.LocalPlayer:FindFirstChildWhichIsA("PlayerGui")
+UserInputService = cloneref(game:GetService("UserInputService"))
+RunService = cloneref(game:GetService("RunService"))
+ReplicatedStorage = cloneref(game:GetService("ReplicatedStorage"))
+
+local universalwindow = engine.new({
+    text = "Universal Script",
+    size = UDim2.new(600, 400),
+})
+universalwindow.open()
+
+local tab1 = universalwindow.new({
+    text = "Char",
+})
+
+local walkSpeedSlider = tab1.new("slider", {
+    text = "Walk Speed",
+    color = Color3.new(0.8, 0.5, 0),
+    min = 16,
+    max = 500,
+    value = 50,
+    rounding = 1,
+})
+walkSpeedSlider.event:Connect(function(value)
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoid = character:WaitForChild("Humanoid")
+    humanoid.WalkSpeed = value
+    print("Walk Speed: " .. value)
+end)
+
+local jumpPowerSlider = tab1.new("slider", {
+    text = "Jump Power",
+    color = Color3.new(0.8, 0.5, 0),
+    min = 50,
+    max = 500,
+    value = 100,
+    rounding = 1,
+})
+
+jumpPowerSlider.event:Connect(function(value)
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoid = character:WaitForChild("Humanoid")
+    humanoid.JumpPower = value
+    print("Jump Power: " .. value)
+end)
+
+local infiniteJumpSwitch = tab1.new("switch", {
+    text = "Infinite Jump",
+})
+infiniteJumpSwitch.set(false)
+local infJump
+local infJumpDebounce = false
+infiniteJumpSwitch.event:Connect(function(bool)
+    if infJump then infJump:Disconnect() end
+    infJumpDebounce = false
+    infJump = UserInputService.JumpRequest:Connect(function()
+        if not infJumpDebounce then
+            infJumpDebounce = true
+            local player = game.Players.LocalPlayer
+            local character = player.Character or player.CharacterAdded:Wait()
+            character:FindFirstChildWhichIsA("Humanoid"):ChangeState(Enum.HumanoidStateType.Jumping)
+            wait()
+            infJumpDebounce = false
+        end
+    end)
+    print("Infinite Jump toggled: ", bool)
+end)
+
+local noclipSwitch = tab1.new("switch", {
+    text = "Noclip",
+})
+noclipSwitch.set(false)
+local Noclipping = nil
+local Clip = true -- default clip status
+noclipSwitch.event:Connect(function(bool)
+    Clip = not bool
+    if not Clip then
+        local function NoclipLoop()
+            if not Clip and game.Players.LocalPlayer.Character then
+                for _, child in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
+                    if child:IsA("BasePart") and child.CanCollide then
+                        child.CanCollide = false
+                    end
+                end
+            end
+        end
+        Noclipping = game:GetService("RunService").Stepped:Connect(NoclipLoop)
+        print("Noclip Enabled")
+    else
+        if Noclipping then
+            Noclipping:Disconnect()
+        end
+        Clip = true
+        print("Noclip Disabled")
+    end
+end)
+
+local tab2 = universalwindow.new({
+    text = "Misc",
+})
+
+local espwarning = tab2.new("label", {
+    text = "Re-execute to access this menu after ESP",
+    color = Color3.new(0, 1, 0),
+})
+-- simpleESP (Button)
+local simpleESPButton = tab2.new("button", {
+    text = "Simple ESP (will close this window)",
+})
+simpleESPButton.event:Connect(function()
+    loadstring(game:HttpGet("https://rscripts.net/raw/universal-simple-esp_1734455692438_07AqW8a3aV.txt"))()
+    print("Simple ESP executed!")
+end)
+
+-- InfYiff (Button)
+local infYiffButton = tab2.new("button", {
+    text = "Infinite Yield FE",
+})
+infYiffButton.event:Connect(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
+    print("InfYiff executed!")
+end)
+
+-- SystemBroken (Button)
+local systembrokenButton = tab2.new("button", {
+    text = "SystemBroken",
+})
+systembrokenButton.event:Connect(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/H20CalibreYT/SystemBroken/main/script"))()
+    print("SystemBroken executed!")
+end)
+
+local tab3 = universalwindow.new({
+    text = "Credits",
+})
+
+local creditsLabel = tab3.new("label", {
+    text = "Universal Script by s1nux (now Ondry), don't skid this\nGUI Framework by Singularity 5490\nSpecial Thanks to the Rscripts.net",
+    color = Color3.new(1, 1, 1),
+})
+
+universalwindow.selectTab(tab1)
