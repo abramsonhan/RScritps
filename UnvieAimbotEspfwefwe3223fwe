@@ -1,0 +1,212 @@
+-- Aimbot with Toggle, FOV Slider (moved to top), TeamCheck, ESP with Box Outline, and Circular FOV Visual (Improved)
+-- Services
+local Players = game:GetService("Players")
+local UIS = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local Camera = workspace.CurrentCamera
+local Workspace = game:GetService("Workspace")
+local LocalPlayer = Players.LocalPlayer
+
+-- Settings
+local aimbotEnabled = false
+local fovRadius = 100
+local targetPart = "Head"
+local espEnabled = true
+local espObjects = {}
+
+-- UI Setup
+local function createUI()
+    local existingGui = LocalPlayer:FindFirstChild("PlayerGui"):FindFirstChild("AimbotUI")
+    if existingGui then existingGui:Destroy() end
+
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "AimbotUI"
+    ScreenGui.ResetOnSpawn = false
+    ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+    -- Move FOV slider to top
+    local sliderLabel = Instance.new("TextLabel")
+    sliderLabel.Text = "FOV Radius: " .. fovRadius
+    sliderLabel.Size = UDim2.new(0, 200, 0, 30)
+    sliderLabel.Position = UDim2.new(0, 20, 0, 20)  -- Moved up here
+    sliderLabel.BackgroundTransparency = 1
+    sliderLabel.TextColor3 = Color3.new(1, 1, 1)
+    sliderLabel.TextScaled = true
+    sliderLabel.Parent = ScreenGui
+
+    local sliderFrame = Instance.new("Frame")
+    sliderFrame.Size = UDim2.new(0, 200, 0, 20)
+    sliderFrame.Position = UDim2.new(0, 20, 0, 55)  -- Moved up here
+    sliderFrame.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    sliderFrame.Parent = ScreenGui
+
+    local sliderFill = Instance.new("Frame")
+    sliderFill.Size = UDim2.new(fovRadius / 300, 0, 1, 0)
+    sliderFill.BackgroundColor3 = Color3.fromRGB(150, 150, 255)
+    sliderFill.Parent = sliderFrame
+
+    local function updateFOV(pos)
+        local relativeX = math.clamp(pos.X - sliderFrame.AbsolutePosition.X, 0, sliderFrame.AbsoluteSize.X)
+        local ratio = relativeX / sliderFrame.AbsoluteSize.X
+        fovRadius = math.floor(ratio * 300)
+        sliderFill.Size = UDim2.new(ratio, 0, 1, 0)
+        sliderLabel.Text = "FOV Radius: " .. fovRadius
+        if fovCircle then fovCircle.Radius = fovRadius end
+    end
+
+    sliderFrame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
+            updateFOV(input.Position)
+            local conn
+            conn = UIS.InputChanged:Connect(function(moveInput)
+                if moveInput.UserInputType == input.UserInputType then
+                    updateFOV(moveInput.Position)
+                end
+            end)
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    conn:Disconnect()
+                end
+            end)
+        end
+    end)
+
+    local toggleButton = Instance.new("TextButton")
+    toggleButton.Size = UDim2.new(0, 150, 0, 40)
+    toggleButton.Position = UDim2.new(0, 20, 0, 100)  -- Moved down below slider
+    toggleButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    toggleButton.TextColor3 = Color3.new(1, 1, 1)
+    toggleButton.Font = Enum.Font.SourceSansBold
+    toggleButton.TextSize = 20
+    toggleButton.Text = "Aimbot: OFF"
+    toggleButton.Parent = ScreenGui
+
+    toggleButton.MouseButton1Click:Connect(function()
+        aimbotEnabled = not aimbotEnabled
+        toggleButton.Text = "Aimbot: " .. (aimbotEnabled and "ON" or "OFF")
+    end)
+end
+
+createUI()
+
+-- Respawn UI Persistence
+LocalPlayer.CharacterAdded:Connect(function()
+    wait(1)
+    createUI()
+end)
+
+-- ESP Function
+local function createESP(player)
+    if espObjects[player] then return end
+    local function addESP()
+        if not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then return end
+        local box = Instance.new("BoxHandleAdornment")
+        box.Size = Vector3.new(4, 6, 2)
+        box.Adornee = player.Character:FindFirstChild("HumanoidRootPart")
+        box.AlwaysOnTop = true
+        box.ZIndex = 5
+        box.Color3 = Color3.fromRGB(255, 80, 80)
+        box.Transparency = 0.25
+        box.Parent = player.Character:FindFirstChild("HumanoidRootPart")
+        espObjects[player] = box
+    end
+    player.CharacterAdded:Connect(function()
+        wait(1)
+        if espObjects[player] then espObjects[player]:Destroy() end
+        espObjects[player] = nil
+        addESP()
+    end)
+    if player.Character then
+        addESP()
+    end
+end
+
+Players.PlayerAdded:Connect(function(player)
+    if player ~= LocalPlayer then
+        createESP(player)
+    end
+end)
+
+Players.PlayerRemoving:Connect(function(player)
+    if espObjects[player] then
+        espObjects[player]:Destroy()
+        espObjects[player] = nil
+    end
+end)
+
+-- Check for Line of Sight
+local function isVisible(part)
+    local origin = Camera.CFrame.Position
+    local direction = (part.Position - origin).Unit * 1000
+    local ray = RaycastParams.new()
+    ray.FilterDescendantsInstances = {LocalPlayer.Character}
+    ray.FilterType = Enum.RaycastFilterType.Blacklist
+    local result = Workspace:Raycast(origin, direction, ray)
+    return result and result.Instance and part:IsDescendantOf(result.Instance.Parent)
+end
+
+-- Check if player is on same team
+local function isTeammate(player)
+    return LocalPlayer.Team and player.Team == LocalPlayer.Team
+end
+
+-- Aimbot Targeting with Team Check
+local function getClosestTarget()
+    local closestPlayer = nil
+    local shortestDistance = math.huge
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild(targetPart) then
+            if isTeammate(player) then
+                -- skip teammates
+            else
+                local part = player.Character[targetPart]
+                local screenPos, onScreen = Camera:WorldToViewportPoint(part.Position)
+                if onScreen then
+                    local dist = (Vector2.new(screenPos.X, screenPos.Y) - Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2)).Magnitude
+                    if dist < shortestDistance and dist <= fovRadius then
+                        if isVisible(part) then
+                            closestPlayer = player
+                            shortestDistance = dist
+                        end
+                    end
+                end
+            end
+        end
+    end
+    return closestPlayer
+end
+
+-- FOV Circle Drawing
+local fovCircle = Drawing and Drawing.new("Circle") or nil
+if fovCircle then
+    fovCircle.Thickness = 1
+    fovCircle.NumSides = 64
+    fovCircle.Radius = fovRadius
+    fovCircle.Filled = false
+    fovCircle.Visible = true
+    fovCircle.Color = Color3.fromRGB(255, 255, 0)
+end
+
+-- Render Loop
+RunService.RenderStepped:Connect(function()
+    if fovCircle then
+        local screenSize = Camera.ViewportSize
+        fovCircle.Position = Vector2.new(screenSize.X / 2, screenSize.Y / 2)
+        fovCircle.Radius = fovRadius
+    end
+    if espEnabled then
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer and not espObjects[player] then
+                createESP(player)
+            end
+        end
+    end
+    if aimbotEnabled then
+        local target = getClosestTarget()
+        if target and target.Character and target.Character:FindFirstChild(targetPart) then
+            Camera.CFrame = CFrame.new(Camera.CFrame.Position, target.Character[targetPart].Position)
+        end
+    end
+end)
+
+-- End of script
