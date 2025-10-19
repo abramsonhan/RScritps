@@ -1,0 +1,5 @@
+while true do
+    for i = 1, 100 do  game:GetService("ReplicatedStorage")["Remote"]["Event"]["Game"]["[C-S]FriendAddCash"]:FireServer()
+    end
+    task.wait() 
+end
