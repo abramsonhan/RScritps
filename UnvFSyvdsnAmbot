@@ -1,0 +1,210 @@
+--[[
+    Script created by korpsebunny!
+    🌸 Please do not re-upload or redistribute without credit. 🌸
+]]
+
+local teamCheck = false
+local fov = 120
+local lockPart = "HumanoidRootPart"
+local aimbotEnabled = false
+local espEnabled = true
+local headAimEnabled = false
+local currentTarget = nil
+local currentTargetDistance = "N/A"
+local themeColor = Color3.fromRGB(255, 182, 193) -- pastel pink
+
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local Camera = workspace.CurrentCamera
+
+-- **ESP Variables**
+local highlightedPlayers = {}
+
+-- **Create Highlight Function**
+local function createHighlight(player)
+    local function setupHighlight(character)
+        if character:FindFirstChild("HumanoidRootPart") then
+            local highlight = Instance.new("Highlight")
+            highlight.Adornee = character
+            highlight.FillColor = themeColor
+            highlight.FillTransparency = 0.5
+            highlight.OutlineColor = Color3.new(1, 1, 1)
+            highlight.OutlineTransparency = 0.3
+            highlight.Enabled = espEnabled
+            highlight.Parent = character
+
+            highlightedPlayers[player] = highlight
+        else
+            task.delay(1, function()
+                if character and character:FindFirstChild("HumanoidRootPart") then
+                    setupHighlight(character)
+                end
+            end)
+        end
+    end
+
+    if player.Character then
+        setupHighlight(player.Character)
+    end
+
+    player.CharacterAdded:Connect(function(character)
+        wait(0.5)
+        setupHighlight(character)
+    end)
+end
+
+local function removeHighlight(player)
+    if highlightedPlayers[player] then
+        highlightedPlayers[player]:Destroy()
+        highlightedPlayers[player] = nil
+    end
+end
+
+RunService.RenderStepped:Connect(function()
+    if espEnabled then
+        for _, player in pairs(Players:GetPlayers()) do
+            if not highlightedPlayers[player] and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                createHighlight(player)
+            elseif highlightedPlayers[player] then
+                highlightedPlayers[player].Enabled = espEnabled
+            end
+        end
+    end
+end)
+
+local function getClosestTarget()
+    local closestTarget = nil
+    local shortestDistance = math.huge
+    local screenCenter = Camera.ViewportSize / 2
+    local playerPosition = Players.LocalPlayer.Character and Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and Players.LocalPlayer.Character["HumanoidRootPart"].Position or Vector3.new(0, 0, 0)
+
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= Players.LocalPlayer and player.Character then
+            local targetPart = headAimEnabled and player.Character:FindFirstChild("Head") or player.Character:FindFirstChild("HumanoidRootPart")
+            local humanoid = player.Character:FindFirstChild("Humanoid")
+            if targetPart and humanoid and humanoid.Health > 0 then
+                local distanceFromPlayer = (playerPosition - targetPart.Position).Magnitude
+                local screenPoint, onScreen = Camera:WorldToViewportPoint(targetPart.Position)
+                local distanceOnScreen = (Vector2.new(screenPoint.X, screenPoint.Y) - screenCenter).Magnitude
+
+                if onScreen and distanceOnScreen < shortestDistance and distanceOnScreen <= fov then
+                    if not teamCheck or player.Team ~= Players.LocalPlayer.Team then
+                        closestTarget = player
+                        shortestDistance = distanceOnScreen
+                        currentTargetDistance = math.floor(distanceFromPlayer)
+                    end
+                end
+            end
+        end
+    end
+    return closestTarget
+end
+
+local function lockOnTarget()
+    if currentTarget and currentTarget.Character then
+        local targetPart = headAimEnabled and currentTarget.Character:FindFirstChild("Head") or currentTarget.Character:FindFirstChild("HumanoidRootPart")
+        if targetPart then
+            local targetVelocity = targetPart.Velocity or Vector3.new(0, 0, 0)
+            local predictionFactor = math.clamp(0.05 + (currentTargetDistance / 2000), 0.02, 0.1)
+            local predictedPosition = targetPart.Position + (targetVelocity * predictionFactor)
+            Camera.CFrame = Camera.CFrame:Lerp(CFrame.new(Camera.CFrame.Position, predictedPosition), 0.2)
+        else
+            currentTarget = nil
+        end
+    end
+end
+
+RunService.RenderStepped:Connect(function()
+    if aimbotEnabled then
+        if UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton2) then
+            if not currentTarget then
+                currentTarget = getClosestTarget()
+            end
+            if currentTarget then
+                lockOnTarget()
+            end
+        else
+            currentTarget = nil
+        end
+    end
+end)
+
+local function createGUI()
+    if game.CoreGui:FindFirstChild("Aimlock_GUI") then
+        game.CoreGui.Aimlock_GUI:Destroy()
+    end
+
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "Aimlock_GUI"
+    ScreenGui.Parent = game.CoreGui
+
+    local Frame = Instance.new("Frame", ScreenGui)
+    Frame.Size = UDim2.new(0, 200, 0, 190)
+    Frame.Position = UDim2.new(1, -220, 0, 50)
+    Frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    Frame.BorderSizePixel = 2
+    Frame.BorderColor3 = themeColor
+    Frame.Active = true
+    Frame.Draggable = true -- 💖 makes it movable!
+
+    local creditLabel = Instance.new("TextLabel", Frame)
+    creditLabel.Size = UDim2.new(0, 180, 0, 20)
+    creditLabel.Position = UDim2.new(0, 10, 0, 0)
+    creditLabel.BackgroundTransparency = 1
+    creditLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    creditLabel.TextScaled = true
+    creditLabel.Text = "made by korpsebunny! 🌸"
+    creditLabel.Name = "CreditLabel"
+
+    local function createButton(name, position, text, callback)
+        local button = Instance.new("TextButton", Frame)
+        button.Size = UDim2.new(0, 180, 0, 22)
+        button.Position = UDim2.new(0, 10, 0, position)
+        button.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+        button.BorderSizePixel = 2
+        button.BorderColor3 = themeColor
+        button.Text = text
+        button.TextColor3 = Color3.fromRGB(255, 255, 255)
+        button.TextScaled = true
+
+        button.MouseButton1Click:Connect(function()
+            callback(button)
+        end)
+        return button
+    end
+
+    createButton("Aimlock", 30, "Aimlock: OFF", function(button)
+        aimbotEnabled = not aimbotEnabled
+        button.Text = aimbotEnabled and "Aimlock: ON" or "Aimlock: OFF"
+    end)
+
+    createButton("Head Aim", 60, "Head Aim: OFF", function(button)
+        headAimEnabled = not headAimEnabled
+        button.Text = headAimEnabled and "Head Aim: ON" or "Head Aim: OFF"
+    end)
+
+    createButton("ESP", 90, "ESP: ON", function(button)
+        espEnabled = not espEnabled
+        button.Text = espEnabled and "ESP: ON" or "ESP: OFF"
+    end)
+
+    createButton("Theme Color", 120, "Change Theme", function(button)
+        themeColor = themeColor == Color3.fromRGB(255, 182, 193) and Color3.fromRGB(255, 165, 0) or Color3.fromRGB(255, 182, 193)
+        Frame.BorderColor3 = themeColor
+    end)
+
+    local distanceLabel = Instance.new("TextLabel", Frame)
+    distanceLabel.Size = UDim2.new(0, 180, 0, 20)
+    distanceLabel.Position = UDim2.new(0, 10, 0, 150)
+    distanceLabel.BackgroundTransparency = 1
+    distanceLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    distanceLabel.TextScaled = true
+    distanceLabel.Text = "Distance: N/A"
+
+    RunService.RenderStepped:Connect(function()
+        distanceLabel.Text = "Distance: " .. tostring(currentTargetDistance) .. "m"
+    end)
+end
+
+createGUI()
