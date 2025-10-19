@@ -1,0 +1,161 @@
+local engine = loadstring(game:HttpGet("https://raw.githubusercontent.com/Singularity5490/rbimgui-2/main/rbimgui-2.lua"))()
+
+local window1 = engine.new({
+    text = "Simple ESP",
+    size = UDim2.new(300, 400),
+})
+
+window1.open()
+
+local espTab = window1.new({
+    text = "ESP Settings",
+})
+
+local label1 = espTab.new("label", {
+    text = "Toggle ESP for Players",
+    color = Color3.new(1, 0, 0),
+})
+
+local espEnabled = false
+local highlightColor = Color3.new(1, 0, 0) -- Default to red
+local textSize = 14 -- Default text size
+
+local function createESP(player)
+    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        local highlight = Instance.new("Highlight")
+        highlight.Parent = player.Character
+        highlight.FillColor = highlightColor
+        highlight.FillTransparency = 0.5
+        highlight.OutlineColor = Color3.new(1, 1, 1)
+        highlight.OutlineTransparency = 0
+
+        local billboardGui = Instance.new("BillboardGui")
+        billboardGui.Adornee = player.Character.HumanoidRootPart
+        billboardGui.Size = UDim2.new(0, 100, 0, 50)
+        billboardGui.StudsOffset = Vector3.new(0, 3, 0) -- Offset above the player
+        billboardGui.AlwaysOnTop = true -- Always on top
+
+        local textLabel = Instance.new("TextLabel")
+        textLabel.Parent = billboardGui
+        textLabel.Size = UDim2.new(1, 0, 1, 0)
+        textLabel.BackgroundTransparency = 1
+        textLabel.TextColor3 = Color3.new(1, 1, 1)
+        textLabel.TextStrokeTransparency = 0.5
+        textLabel.TextSize = textSize
+        textLabel.Text = player.Name .. " (" .. math.floor((player.Character.HumanoidRootPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).magnitude) .. "m)"
+
+        billboardGui.Parent = player.Character
+    end
+end
+
+local function removeESP(player)
+    if player.Character then
+        if player.Character:FindFirstChild("Highlight") then
+            player.Character.Highlight:Destroy()
+        end
+        if player.Character:FindFirstChild("BillboardGui") then
+            player.Character.BillboardGui:Destroy()
+        end
+    end
+end
+
+local function toggleESP(bool)
+    espEnabled = bool
+    for _, player in pairs(game.Players:GetPlayers()) do
+        if player ~= game.Players.LocalPlayer then
+            if espEnabled then
+                createESP(player)
+            else
+                removeESP(player)
+            end
+        end
+    end
+end
+
+local espSwitch = espTab.new("switch", {
+    text = "Enable ESP",
+})
+espSwitch.set(false)
+espSwitch.event:Connect(function(bool)
+    toggleESP(bool)
+    print("ESP toggled: " .. tostring(bool))
+end)
+
+local colorPicker = espTab.new("color", {
+    color = highlightColor,
+    text = "Highlight Color",
+})
+colorPicker.event:Connect(function(color)
+    highlightColor = color
+    if espEnabled then
+        for _, player in pairs(game.Players:GetPlayers()) do
+            if player ~= game.Players.LocalPlayer then
+                removeESP(player)
+                createESP(player)
+            end
+        end
+    end
+end)
+
+local textSizeSlider = espTab.new("slider", {
+    text = "Text Size",
+    min = 10,
+    max = 30,
+    value = textSize,
+})
+textSizeSlider.event:Connect(function(size)
+    textSize = size
+    if espEnabled then
+        for _, player in pairs(game.Players:GetPlayers()) do
+            if player ~= game.Players.LocalPlayer then
+                removeESP(player)
+                createESP(player)
+            end
+        end
+    end
+end)
+
+-- Credits Tab
+local creditsTab = window1.new({
+    text = "Credits",
+})
+
+local creditsLabel = creditsTab.new("label", {
+    text = "ESP Script by s1nux, dont skid this\nGUI Framework by Singularity 5490\nSpecial Thanks to the Rscripts.net",
+    color = Color3.new(1, 1, 1),
+})
+
+-- Misc Tab
+local miscTab = window1.new({
+    text = "Misc",
+})
+
+local unhookButton = miscTab.new("button", {
+    text = "Unhook GUI (just closes the UI for now)",
+})
+unhookButton.event:Connect(function()
+    window1.close()
+    print("GUI unhooked.")
+end)
+
+-- Update ESP for existing players when the script runs
+for _, player in pairs(game.Players:GetPlayers()) do
+    if player ~= game.Players.LocalPlayer and espEnabled then
+        createESP(player)
+    end
+end
+
+-- Listen for new players joining
+game.Players.PlayerAdded:Connect(function(player)
+    player.CharacterAdded:Connect(function(character)
+        if espEnabled then
+            createESP(player)
+        end
+    end)
+end)
+
+game.Players.PlayerRemoving:Connect(function(player)
+    removeESP(player)
+end)
+
+espTab.open()
