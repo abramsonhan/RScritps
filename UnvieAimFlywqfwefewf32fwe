@@ -1,0 +1,378 @@
+-- Universal Zick | LocalScript (StarterPlayerScripts)
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+local Mouse = LocalPlayer:GetMouse()
+local Camera = workspace.CurrentCamera
+
+-- Estados das opções
+local states = {
+    AimLock = false,
+    ESP = false,
+    Fly = false,
+    Noclip = false,
+    InfiniteJump = false,
+    GodMode = false,
+    Invisible = false,
+}
+
+-- Estado da GUI
+local guiMinimized = false
+
+-- Funções auxiliares de cor
+local function green() return Color3.fromRGB(40, 167, 69) end
+local function red() return Color3.fromRGB(220, 53, 69) end
+
+-- GUI
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "UniversalZickGui"
+ScreenGui.ResetOnSpawn = false  -- Impede que a GUI seja resetada quando o personagem morre
+ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+local Frame = Instance.new("Frame")
+Frame.Size = UDim2.new(0, 260, 0, 410)  -- Aumentado para caber os novos botões
+Frame.Position = UDim2.new(0, 180, 0, 120)
+Frame.BackgroundColor3 = Color3.fromRGB(32,32,36)
+Frame.Active = true
+Frame.Draggable = true
+Frame.Parent = ScreenGui
+
+local FrameCorner = Instance.new("UICorner", Frame)
+FrameCorner.CornerRadius = UDim.new(0,15)
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1,0,0,40)
+Title.BackgroundColor3 = Color3.fromRGB(40, 40, 44)
+Title.TextColor3 = Color3.new(1,1,1)
+Title.Text = "Universal Zick V3"  -- Modificado
+Title.Font = Enum.Font.GothamBlack
+Title.TextSize = 24
+Title.Parent = Frame
+local TitleCorner = Instance.new("UICorner", Title)
+TitleCorner.CornerRadius = UDim.new(0,15)
+
+-- Botão de minimizar/maximizar
+local ToggleButton = Instance.new("TextButton")
+ToggleButton.Size = UDim2.new(0, 30, 0, 30)
+ToggleButton.Position = UDim2.new(1, -35, 0, 5)
+ToggleButton.BackgroundColor3 = Color3.fromRGB(60, 60, 64)
+ToggleButton.TextColor3 = Color3.new(1,1,1)
+ToggleButton.Text = "-"
+ToggleButton.Font = Enum.Font.GothamBold
+ToggleButton.TextSize = 20
+ToggleButton.Parent = Title
+ToggleButton.AutoButtonColor = false
+local ToggleCorner = Instance.new("UICorner", ToggleButton)
+ToggleCorner.CornerRadius = UDim.new(0,8)
+
+-- Container para os botões (tudo que não é o título)
+local ContentFrame = Instance.new("Frame")
+ContentFrame.Size = UDim2.new(1, 0, 1, -40)
+ContentFrame.Position = UDim2.new(0, 0, 0, 40)
+ContentFrame.BackgroundTransparency = 1
+ContentFrame.Parent = Frame
+
+local function NewButton(text, y)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0.9,0,0,35)
+    btn.Position = UDim2.new(0.05,0,0,y)
+    btn.BackgroundColor3 = red()
+    btn.TextColor3 = Color3.new(1,1,1)
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 16
+    btn.Text = text..": OFF"
+    btn.Parent = ContentFrame
+    btn.AutoButtonColor = false
+    local c = Instance.new("UICorner",btn)
+    c.CornerRadius = UDim.new(0,8)
+    return btn
+end
+
+local Yoff = 13
+local espBtn = NewButton("ESP", Yoff); Yoff = Yoff+40
+local aimBtn = NewButton("AimLock",Yoff); Yoff = Yoff+40
+local flyBtn = NewButton("Fly",Yoff); Yoff = Yoff+40
+local noclipBtn = NewButton("Noclip",Yoff); Yoff = Yoff+40
+local jumpBtn = NewButton("Infinite Jump",Yoff); Yoff = Yoff+40
+local godBtn = NewButton("God Mode",Yoff); Yoff = Yoff+40  -- Novo botão
+local invisBtn = NewButton("Invisible",Yoff)  -- Novo botão
+
+local Footer = Instance.new("TextLabel")
+Footer.Size = UDim2.new(0.9,0,0,35)
+Footer.Position = UDim2.new(0.05,0,1,-45)
+Footer.BackgroundTransparency = 1
+Footer.TextColor3 = Color3.fromRGB(180,180,180)
+Footer.Text = "Arraste o menu — Zick Scripts 2025"  -- Modificado
+Footer.Font = Enum.Font.SourceSans
+Footer.TextSize = 13
+Footer.TextWrapped = true
+Footer.Parent = ContentFrame
+
+-- Função para minimizar/maximizar
+local function toggleGUI()
+    guiMinimized = not guiMinimized
+    if guiMinimized then
+        -- Minimizar: mostrar apenas o título
+        ContentFrame.Visible = false
+        Frame.Size = UDim2.new(0, 260, 0, 40)
+        ToggleButton.Text = "+"
+    else
+        -- Maximizar: mostrar tudo
+        ContentFrame.Visible = true
+        Frame.Size = UDim2.new(0, 260, 0, 410)  -- Tamanho aumentado
+        ToggleButton.Text = "-"
+    end
+end
+
+-- Conectar o botão de toggle
+ToggleButton.MouseButton1Click:Connect(toggleGUI)
+
+-- Botão hover visual
+for _, btn in pairs({espBtn, aimBtn, flyBtn, noclipBtn, jumpBtn, godBtn, invisBtn}) do  -- Adicionados novos botões
+    btn.MouseEnter:Connect(function() btn.BackgroundTransparency = 0.23 end)
+    btn.MouseLeave:Connect(function() btn.BackgroundTransparency = 0 end)
+end
+
+-- Hover para o botão de toggle
+ToggleButton.MouseEnter:Connect(function() ToggleButton.BackgroundTransparency = 0.23 end)
+ToggleButton.MouseLeave:Connect(function() ToggleButton.BackgroundTransparency = 0 end)
+
+local function updateBtn(btn, state, label)
+    btn.BackgroundColor3 = state and green() or red()
+    btn.Text = ("%s: %s"):format(label, state and "ON" or "OFF")
+end
+
+-- --- ESP
+local function createBillboardGui(part)
+    local gui = Instance.new("BillboardGui")
+    gui.Adornee = part
+    gui.Size = UDim2.new(0, 78, 0, 22)
+    gui.AlwaysOnTop = true
+    local fr = Instance.new("Frame", gui)
+    fr.Size = UDim2.new(1,0,1,0)
+    fr.BackgroundColor3 = Color3.new(1,0,0)
+    fr.BackgroundTransparency = 0.32
+    fr.BorderSizePixel = 0
+    Instance.new("UICorner",fr).CornerRadius = UDim.new(0,7)
+    local lbl = Instance.new("TextLabel", fr)
+    lbl.Size = UDim2.new(1,0,1,0)
+    lbl.Text = "INIMIGO"
+    lbl.TextColor3 = Color3.new(1,1,1)
+    lbl.BackgroundTransparency = 1
+    lbl.Font = Enum.Font.GothamBold
+    lbl.TextSize = 13
+    return gui
+end
+
+local espMarks = {}
+local function updateESP(state)
+    for _,v in pairs(espMarks) do if v then v:Destroy() end end
+    espMarks = {}
+    if state then
+        for _,plr in pairs(Players:GetPlayers()) do
+            if plr ~= LocalPlayer and plr.Character and plr.Character:FindFirstChild("Head") and plr.Character:FindFirstChild("Humanoid") and plr.Character.Humanoid.Health > 0 then
+                local mk = createBillboardGui(plr.Character.Head)
+                mk.Parent = plr.Character.Head
+                espMarks[plr]=mk
+            end
+        end
+    end
+end
+Players.PlayerAdded:Connect(function()
+    if states.ESP then updateESP(true) end
+end)
+Players.PlayerRemoving:Connect(function(plr)
+    if espMarks[plr] then espMarks[plr]:Destroy() espMarks[plr]=nil end
+end)
+
+-- --- AimLock
+local function getNearestEnemy()
+    local target, minDist = nil, math.huge
+    for _,p in ipairs(Players:GetPlayers()) do
+        if p~=LocalPlayer and p.Character and p.Character:FindFirstChild("Head") and p.Character:FindFirstChild("Humanoid") and p.Character.Humanoid.Health>0 then
+            local hpos, onscreen = Camera:WorldToViewportPoint(p.Character.Head.Position)
+            if onscreen then
+                local mpos = Vector2.new(Mouse.X,Mouse.Y)
+                local dist = (Vector2.new(hpos.X,hpos.Y)-mpos).Magnitude
+                if dist<minDist then
+                    target, minDist = p,dist
+                end
+            end
+        end
+    end
+    return target
+end
+
+-- --- Fly
+local flyConn
+local function toggleFly(state)
+    if state then
+        local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+        if not char:FindFirstChild("HumanoidRootPart") then return end
+        local root = char.HumanoidRootPart
+        local bv = Instance.new("BodyVelocity",root)
+        bv.Name = "UZFly"
+        bv.MaxForce = Vector3.new(1e5,1e5,1e5)
+        bv.Velocity = Vector3.new()
+        flyConn = RunService.RenderStepped:Connect(function()
+            local move = Vector3.new()
+            if UserInputService:IsKeyDown(Enum.KeyCode.W) then move = move + Camera.CFrame.LookVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.S) then move = move - Camera.CFrame.LookVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.A) then move = move - Camera.CFrame.RightVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.D) then move = move + Camera.CFrame.RightVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.Space) then move = move + Vector3.new(0,1,0) end
+            if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then move = move - Vector3.new(0,1,0) end
+            if move.Magnitude>0 then
+                bv.Velocity = move.Unit*50
+            else
+                bv.Velocity=Vector3.new()
+            end
+        end)
+        char.Humanoid.PlatformStand = true
+    else
+        if flyConn then flyConn:Disconnect() flyConn=nil end
+        local char = LocalPlayer.Character
+        if char then
+            if char:FindFirstChild("HumanoidRootPart") and char.HumanoidRootPart:FindFirstChild("UZFly") then
+                char.HumanoidRootPart.UZFly:Destroy()
+            end
+            if char:FindFirstChildOfClass("Humanoid") then
+                char:FindFirstChildOfClass("Humanoid").PlatformStand = false
+            end
+        end
+    end
+end
+
+-- --- Noclip
+local noclipConn
+local function toggleNoclip(state)
+    if state then
+        noclipConn = RunService.Stepped:Connect(function()
+            local char = LocalPlayer.Character
+            if char then
+                for _,part in pairs(char:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                        part.CanCollide = false
+                    end
+                end
+            end
+        end)
+    else
+        if noclipConn then noclipConn:Disconnect() noclipConn=nil end
+        local char = LocalPlayer.Character
+        if char then
+            for _,part in pairs(char:GetDescendants()) do
+                if part:IsA("BasePart") then part.CanCollide = true end
+            end
+        end
+    end
+end
+
+-- --- Infinite Jump
+local jumpConn
+local function toggleJump(state)
+    if state then
+        jumpConn = UserInputService.JumpRequest:Connect(function()
+            local char = LocalPlayer.Character
+            if char and char:FindFirstChildOfClass("Humanoid") then
+                char:FindFirstChildOfClass("Humanoid"):ChangeState(Enum.HumanoidStateType.Jumping)
+            end
+        end)
+    else
+        if jumpConn then jumpConn:Disconnect() jumpConn=nil end
+    end
+end
+
+-- --- God Mode (NOVO)
+local godConn
+local function toggleGodMode(state)
+    if state then
+        godConn = RunService.Heartbeat:Connect(function()
+            local char = LocalPlayer.Character
+            if char and char:FindFirstChild("Humanoid") then
+                char.Humanoid.Health = char.Humanoid.MaxHealth
+            end
+        end)
+    else
+        if godConn then godConn:Disconnect() godConn=nil end
+    end
+end
+
+-- --- Invisible (NOVO)
+local function toggleInvisible(state)
+    local char = LocalPlayer.Character
+    if char then
+        for _,part in pairs(char:GetDescendants()) do
+            if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
+                part.Transparency = state and 1 or 0
+            elseif part:IsA("Accessory") then
+                part.Handle.Transparency = state and 1 or 0
+            elseif part:IsA("Decal") then
+                part.Transparency = state and 1 or 0
+            end
+        end
+    end
+end
+
+-- --- Botões
+espBtn.MouseButton1Click:Connect(function()
+    states.ESP = not states.ESP
+    updateBtn(espBtn, states.ESP, "ESP")
+    updateESP(states.ESP)
+end)
+
+aimBtn.MouseButton1Click:Connect(function()
+    states.AimLock = not states.AimLock
+    updateBtn(aimBtn, states.AimLock, "AimLock")
+end)
+
+flyBtn.MouseButton1Click:Connect(function()
+    states.Fly = not states.Fly
+    updateBtn(flyBtn, states.Fly, "Fly")
+    toggleFly(states.Fly)
+end)
+
+noclipBtn.MouseButton1Click:Connect(function()
+    states.Noclip = not states.Noclip
+    updateBtn(noclipBtn, states.Noclip, "Noclip")
+    toggleNoclip(states.Noclip)
+end)
+
+jumpBtn.MouseButton1Click:Connect(function()
+    states.InfiniteJump = not states.InfiniteJump
+    updateBtn(jumpBtn, states.InfiniteJump, "Infinite Jump")
+    toggleJump(states.InfiniteJump)
+end)
+
+-- NOVOS BOTÕES
+godBtn.MouseButton1Click:Connect(function()
+    states.GodMode = not states.GodMode
+    updateBtn(godBtn, states.GodMode, "God Mode")
+    toggleGodMode(states.GodMode)
+end)
+
+invisBtn.MouseButton1Click:Connect(function()
+    states.Invisible = not states.Invisible
+    updateBtn(invisBtn, states.Invisible, "Invisible")
+    toggleInvisible(states.Invisible)
+end)
+
+-- --- AimLock: trava mira
+RunService.RenderStepped:Connect(function()
+    if states.AimLock then
+        local target = getNearestEnemy()
+        if target and target.Character and target.Character:FindFirstChild("Head") then
+            local hpos = target.Character.Head.Position
+            Camera.CFrame = CFrame.new(Camera.CFrame.Position, hpos)
+        end
+    end
+end)
+
+-- --- Atualizar após respawn
+LocalPlayer.CharacterAdded:Connect(function()
+    if states.Fly then toggleFly(true) end
+    if states.Noclip then toggleNoclip(true) end
+    if states.GodMode then toggleGodMode(true) end
+    if states.Invisible then toggleInvisible(true) end
+end)
