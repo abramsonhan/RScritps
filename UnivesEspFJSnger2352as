@@ -1,0 +1,217 @@
+if not game:IsLoaded() then
+    game.Loaded:Wait()
+end
+
+-- Services
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+
+-- ESP Settings
+local settings = {
+    Enabled = true,
+    ShowNames = true,
+    ShowOutline = true,
+    ShowFill = false,
+    ShowLines = false,
+    TeamColor = false,
+    Font = 2
+}
+
+-- ESP Storage
+local ESPCache = {}
+
+-- Create UI
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = game.CoreGui
+screenGui.Name = "ESPConfig"
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 200, 0, 250) -- Increased height for instructions
+frame.Position = UDim2.new(0.8, 0, 0.5, -110)
+frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+frame.BorderSizePixel = 0
+frame.Active = true
+frame.Draggable = true
+frame.Parent = screenGui
+
+-- Add drag handle
+local dragHandle = Instance.new("TextLabel")
+dragHandle.Size = UDim2.new(1, 0, 0, 20)
+dragHandle.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+dragHandle.Text = "ESP Settings (Drag)"
+dragHandle.TextColor3 = Color3.new(1, 1, 1)
+dragHandle.Font = Enum.Font.Gotham
+dragHandle.TextSize = 12
+dragHandle.Parent = frame
+
+-- Add instructions
+local instructions = Instance.new("TextLabel")
+instructions.Size = UDim2.new(1, -10, 0, 30)
+instructions.Position = UDim2.new(0, 5, 1, -35)
+instructions.BackgroundTransparency = 1
+instructions.Text = "Press K to toggle\nDrag top bar to move"
+instructions.TextColor3 = Color3.new(0.8, 0.8, 0.8)
+instructions.Font = Enum.Font.Gotham
+instructions.TextSize = 12
+instructions.TextWrapped = true
+instructions.Parent = frame
+
+local function CreateToggle(text, ypos, flag)
+    local toggleFrame = Instance.new("Frame")
+    toggleFrame.Size = UDim2.new(1, 0, 0, 30)
+    toggleFrame.Position = UDim2.new(0, 0, 0, ypos)
+    toggleFrame.BackgroundTransparency = 1
+    toggleFrame.Parent = frame
+
+    local toggleButton = Instance.new("TextButton")
+    toggleButton.Size = UDim2.new(0, 120, 0, 25)
+    toggleButton.Position = UDim2.new(0, 10, 0, 2)
+    toggleButton.Text = text
+    toggleButton.TextColor3 = Color3.new(1, 1, 1)
+    toggleButton.Font = Enum.Font.Gotham
+    toggleButton.TextSize = 14
+    toggleButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    toggleButton.BorderSizePixel = 0
+    toggleButton.Parent = toggleFrame
+
+    local stateIndicator = Instance.new("Frame")
+    stateIndicator.Size = UDim2.new(0, 20, 0, 20)
+    stateIndicator.Position = UDim2.new(1, -30, 0, 5)
+    stateIndicator.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+    stateIndicator.BorderSizePixel = 0
+    stateIndicator.Parent = toggleFrame
+
+    toggleButton.MouseButton1Click:Connect(function()
+        settings[flag] = not settings[flag]
+        stateIndicator.BackgroundColor3 = settings[flag] and Color3.new(0, 1, 0) or Color3.new(0.2, 0.2, 0.2)
+        UpdateAllESP()
+    end)
+    
+    stateIndicator.BackgroundColor3 = settings[flag] and Color3.new(0, 1, 0) or Color3.new(0.2, 0.2, 0.2)
+end
+
+-- Create Toggles
+CreateToggle("Enable ESP", 25, "Enabled")
+CreateToggle("Show Names", 55, "ShowNames")
+CreateToggle("Show Outline", 85, "ShowOutline")
+CreateToggle("Show Fill", 115, "ShowFill")
+CreateToggle("Show Lines", 145, "ShowLines")
+CreateToggle("Team Colors", 175, "TeamColor")
+
+-- ESP Functions
+local function CreateESP(player)
+    if ESPCache[player] then return end
+    
+    local esp = {
+        Highlight = Instance.new("Highlight"),
+        NameLabel = Drawing.new("Text"),
+        Line = Drawing.new("Line"),
+        Connection = nil
+    }
+    
+    esp.Highlight.FillTransparency = 1
+    esp.Highlight.OutlineTransparency = 1
+    esp.Highlight.Parent = player.Character or player.CharacterAdded:Wait()
+    
+    esp.NameLabel.Visible = false
+    esp.NameLabel.Center = true
+    esp.NameLabel.Outline = true
+    esp.NameLabel.Font = settings.Font
+    
+    esp.Line.Visible = false
+    esp.Line.Thickness = 1
+    
+    ESPCache[player] = esp
+    
+    esp.Connection = RunService.RenderStepped:Connect(function()
+        if not player.Character then return end
+        local humanoid = player.Character:FindFirstChild("Humanoid")
+        local rootPart = player.Character:FindFirstChild("HumanoidRootPart")
+        
+        if humanoid and rootPart then
+            -- Calculate view parameters
+            local headPos, headOnScreen = Camera:WorldToScreenPoint(player.Character.Head.Position)
+            local rootPos, rootOnScreen = Camera:WorldToViewportPoint(rootPart.Position)
+            
+            -- Update Highlight
+            esp.Highlight.Enabled = settings.Enabled
+            esp.Highlight.FillTransparency = settings.ShowFill and 0.5 or 1
+            esp.Highlight.OutlineTransparency = settings.ShowOutline and 0 or 1
+            
+            -- Update Colors
+            local color = settings.TeamColor and player.TeamColor.Color or Color3.fromHSV(
+                math.clamp((rootPart.Position - Camera.CFrame.Position).Magnitude / 500, 0, 1),
+                0.75,
+                1
+            )
+            esp.Highlight.FillColor = color
+            esp.Highlight.OutlineColor = color
+            
+            -- Update Name
+            esp.NameLabel.Visible = settings.Enabled and settings.ShowNames and headOnScreen
+            if esp.NameLabel.Visible then
+                esp.NameLabel.Position = Vector2.new(headPos.X, headPos.Y + 30)
+                esp.NameLabel.Text = player.Name
+                esp.NameLabel.Color = color
+                esp.NameLabel.Size = 18
+            end
+            
+            -- Update Line (only if player is in front of camera)
+            local lineVisible = settings.Enabled and settings.ShowLines and rootPos.Z > 0
+            esp.Line.Visible = lineVisible
+            if lineVisible then
+                esp.Line.From = Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y)
+                esp.Line.To = Vector2.new(rootPos.X, rootPos.Y)
+                esp.Line.Color = color
+            else
+                esp.Line.Visible = false
+            end
+        end
+    end)
+end
+
+function UpdateAllESP()
+    for player, esp in pairs(ESPCache) do
+        esp.Highlight.Enabled = settings.Enabled
+        esp.NameLabel.Visible = settings.Enabled and settings.ShowNames
+        esp.Line.Visible = settings.Enabled and settings.ShowLines
+    end
+end
+
+-- Player Handling
+Players.PlayerAdded:Connect(function(player)
+    player.CharacterAdded:Connect(function()
+        CreateESP(player)
+    end)
+    if player.Character then
+        CreateESP(player)
+    end
+end)
+
+Players.PlayerRemoving:Connect(function(player)
+    if ESPCache[player] then
+        ESPCache[player].Connection:Disconnect()
+        ESPCache[player].Highlight:Destroy()
+        ESPCache[player].NameLabel:Remove()
+        ESPCache[player].Line:Remove()
+        ESPCache[player] = nil
+    end
+end)
+
+-- Initialize
+for _, player in ipairs(Players:GetPlayers()) do
+    if player ~= Player then
+        CreateESP(player)
+    end
+end
+
+-- Toggle UI Visibility with K key
+UserInputService.InputBegan:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.K then
+        frame.Visible = not frame.Visible
+    end
+end)
