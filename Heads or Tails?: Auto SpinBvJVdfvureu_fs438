@@ -1,0 +1,42 @@
+local gui = Instance.new("ScreenGui")
+gui.Parent = game:GetService("CoreGui")
+
+local button = Instance.new("TextButton")
+button.Size = UDim2.new(0, 150, 0, 50)
+button.Position = UDim2.new(0.5, -75, 0.8, 0)
+button.Text = "Spin: OFF"
+button.BackgroundColor3 = Color3.fromRGB(255, 100, 100)
+button.TextColor3 = Color3.fromRGB(255, 255, 255)
+button.Font = Enum.Font.SourceSansBold
+button.TextSize = 22
+button.Parent = gui
+
+local spinning = false
+
+button.MouseButton1Click:Connect(function()
+	spinning = not spinning
+	if spinning then
+		button.Text = "Spin: ON"
+		button.BackgroundColor3 = Color3.fromRGB(100, 255, 100)
+
+		task.spawn(function()
+			while spinning do
+				local args = {"Tails"}
+				game:GetService("ReplicatedStorage")
+					:WaitForChild("src")
+					:WaitForChild("Modules")
+					:WaitForChild("KnitClient")
+					:WaitForChild("Services")
+					:WaitForChild("SpinService")
+					:WaitForChild("RE")
+					:WaitForChild("Spin")
+					:FireServer(unpack(args))
+				task.wait()
+			end
+		end)
+
+	else
+		button.Text = "Spin: OFF"
+		button.BackgroundColor3 = Color3.fromRGB(255, 100, 100)
+	end
+end)
