@@ -1,0 +1,14 @@
+-- Please don't remove discord invite, it is for supporting devs
+local NotificationLibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/IceMinisterq/Notification-Library/Main/Library.lua"))()
+local Event = game:GetService("ReplicatedStorage").Packages._Index["sleitnick_knit@1.5.1"].knit.Services.EventService.RF.ClaimBlueprint
+while true do
+    NotificationLibrary:SendNotification("Info", "Collecting...", 3)
+    for i = 1, 25 do
+        Event:InvokeServer(
+            "October18_Part"..i
+        )
+    end
+    NotificationLibrary:SendNotification("Success", "Completed!", 3)
+    NotificationLibrary:SendNotification("Info", "Next time in 12 minutes", 3)
+    wait(12*60)
+end
