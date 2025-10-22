@@ -1,0 +1,214 @@
+loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
+
+-- LocalScript (StarterPlayerScripts or StarterGui)
+local Players          = game:GetService("Players")
+local ReplicatedStore  = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
+local player           = Players.LocalPlayer
+local playerGui        = player:WaitForChild("PlayerGui")
+
+-- Remote reference
+local getItemRemote = ReplicatedStore
+    :WaitForChild("Remotes")
+    :WaitForChild("ItemRemotes")
+    :WaitForChild("GetItem")
+
+-- Ensure coins_total exists under player
+local coinsValue = player:WaitForChild("coins_total")
+
+-- ScreenGui & mainFrame
+local screenGui = Instance.new("ScreenGui", playerGui)
+screenGui.Name = "ItemAndCoinsGui"
+
+local mainFrame = Instance.new("Frame", screenGui)
+mainFrame.Name              = "Main"
+mainFrame.Size              = UDim2.new(0, 320, 0, 440)
+mainFrame.Position          = UDim2.new(1, -20, 0, 20)
+mainFrame.AnchorPoint       = Vector2.new(1, 0)
+mainFrame.BackgroundColor3  = Color3.fromRGB(30, 30, 30)
+Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 12)
+
+-- Tab Buttons (Items / Coins)
+local tabBar = Instance.new("Frame", mainFrame)
+tabBar.Size            = UDim2.new(1, -20, 0, 32)
+tabBar.Position        = UDim2.new(0, 10, 0, 10)
+tabBar.BackgroundTransparency = 1
+
+local function makeTab(name, posX)
+    local btn = Instance.new("TextButton", tabBar)
+    btn.Name             = name .. "Tab"
+    btn.Text             = name
+    btn.Size             = UDim2.new(0, 150, 1, 0)
+    btn.Position         = UDim2.new(posX, 0, 0, 0)
+    btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    btn.TextColor3       = Color3.new(1,1,1)
+    btn.AutoButtonColor  = false
+    local cr = Instance.new("UICorner", btn)
+    cr.CornerRadius = UDim.new(0, 8)
+    return btn
+end
+
+local itemsTab  = makeTab("Items", 0)
+local coinsTab  = makeTab("Coins", 0.5)
+
+-- Content Frames
+local itemsFrame = Instance.new("Frame", mainFrame)
+itemsFrame.Name             = "ItemsFrame"
+itemsFrame.Size             = UDim2.new(1, -20, 1, -60)
+itemsFrame.Position         = UDim2.new(0, 10, 0, 52)
+itemsFrame.BackgroundTransparency = 1
+
+local coinsFrame = Instance.new("Frame", mainFrame)
+coinsFrame.Name             = "CoinsFrame"
+coinsFrame.Size             = itemsFrame.Size
+coinsFrame.Position         = itemsFrame.Position
+coinsFrame.BackgroundTransparency = 1
+coinsFrame.Visible          = false
+
+-- Search Bar (in ItemsFrame)
+local searchBox = Instance.new("TextBox", itemsFrame)
+searchBox.Name             = "SearchBar"
+searchBox.PlaceholderText  = "Search items..."
+searchBox.ClearTextOnFocus = false
+searchBox.Size             = UDim2.new(1, -20, 0, 32)
+searchBox.Position         = UDim2.new(0, 0, 0, 0)
+searchBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+searchBox.TextColor3       = Color3.new(1,1,1)
+searchBox.TextXAlignment   = Enum.TextXAlignment.Left
+Instance.new("UICorner", searchBox).CornerRadius = UDim.new(0, 8)
+
+-- ScrollingFrame (in ItemsFrame)
+local scrollFrame = Instance.new("ScrollingFrame", itemsFrame)
+scrollFrame.Name               = "ItemList"
+scrollFrame.Size               = UDim2.new(1, 0, 1, -40)
+scrollFrame.Position           = UDim2.new(0, 0, 0, 40)
+scrollFrame.BackgroundTransparency = 1
+scrollFrame.ScrollBarThickness = 6
+
+local listLayout = Instance.new("UIListLayout", scrollFrame)
+listLayout.SortOrder = Enum.SortOrder.Name
+listLayout.Padding   = UDim.new(0, 4)
+Instance.new("UIPadding", scrollFrame).PaddingTop   = UDim.new(0, 4)
+Instance.new("UIPadding", scrollFrame).PaddingLeft  = UDim.new(0, 4)
+Instance.new("UIPadding", scrollFrame).PaddingRight = UDim.new(0, 4)
+
+local function updateCanvas()
+    scrollFrame.CanvasSize = UDim2.new(0,0,0,listLayout.AbsoluteContentSize.Y + 4)
+end
+listLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(updateCanvas)
+
+-- Coins Input (in CoinsFrame)
+local coinsLabel = Instance.new("TextLabel", coinsFrame)
+coinsLabel.Text            = "Set Your Coins:"
+coinsLabel.Size            = UDim2.new(1, 0, 0, 24)
+coinsLabel.Position        = UDim2.new(0, 0, 0, 0)
+coinsLabel.BackgroundTransparency = 1
+coinsLabel.TextColor3      = Color3.new(1,1,1)
+coinsLabel.TextXAlignment  = Enum.TextXAlignment.Left
+
+local coinsInput = Instance.new("TextBox", coinsFrame)
+coinsInput.PlaceholderText = "Enter number"
+coinsInput.ClearTextOnFocus = false
+coinsInput.Size            = UDim2.new(1, -40, 0, 32)
+coinsInput.Position        = UDim2.new(0, 0, 0, 30)
+coinsInput.BackgroundColor3= Color3.fromRGB(50, 50, 50)
+coinsInput.TextColor3      = Color3.new(1,1,1)
+coinsInput.TextXAlignment  = Enum.TextXAlignment.Left
+Instance.new("UICorner", coinsInput).CornerRadius = UDim.new(0, 8)
+
+local setButton = Instance.new("TextButton", coinsFrame)
+setButton.Text            = "Set"
+setButton.Size            = UDim2.new(0, 40, 0, 32)
+setButton.Position        = UDim2.new(1, -40, 0, 30)
+setButton.BackgroundColor3= Color3.fromRGB(70, 70, 70)
+setButton.TextColor3      = Color3.new(1,1,1)
+Instance.new("UICorner", setButton).CornerRadius = UDim.new(0, 6)
+
+-- Sound Effects
+local searchSound = Instance.new("Sound", mainFrame)
+searchSound.SoundId = "rbxassetid://911997516"
+searchSound.Volume  = 0.5
+
+local clickSound = Instance.new("Sound", mainFrame)
+clickSound.SoundId = "rbxassetid://147722227"
+clickSound.Volume  = 0.5
+
+-- Draggable MainFrame
+do
+    local dragging, dragInput, dragStart, startPos
+    mainFrame.InputBegan:Connect(function(inp)
+        if inp.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging, dragStart, startPos = true, inp.Position, mainFrame.Position
+            inp.Changed:Connect(function() if inp.UserInputState == Enum.UserInputState.End then dragging = false end end)
+        end
+    end)
+    mainFrame.InputChanged:Connect(function(inp)
+        if inp.UserInputType == Enum.UserInputType.MouseMovement then dragInput = inp end
+    end)
+    UserInputService.InputChanged:Connect(function(inp)
+        if dragging and inp == dragInput then
+            local delta = inp.Position - dragStart
+            mainFrame.Position = UDim2.new(
+                startPos.X.Scale, startPos.X.Offset + delta.X,
+                startPos.Y.Scale, startPos.Y.Offset + delta.Y
+            )
+        end
+    end)
+end
+
+-- Populate Items List
+local buttons = {}
+for _, item in ipairs(ReplicatedStore:WaitForChild("Items"):GetChildren()) do
+    local btn = Instance.new("TextButton", scrollFrame)
+    btn.Name             = item.Name
+    btn.Text             = item.Name
+    btn.Size             = UDim2.new(1, 0, 0, 28)
+    btn.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+    btn.TextColor3       = Color3.new(1,1,1)
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
+
+    btn.MouseButton1Click:Connect(function()
+        clickSound:Play()
+        getItemRemote:FireServer(item.Name)
+    end)
+
+    table.insert(buttons, btn)
+end
+updateCanvas()
+
+-- Tab Switching Logic
+local function showItems()
+    itemsFrame.Visible = true
+    coinsFrame.Visible = false
+    itemsTab.BackgroundColor3 = Color3.fromRGB(70,70,70)
+    coinsTab.BackgroundColor3 = Color3.fromRGB(50,50,50)
+end
+local function showCoins()
+    itemsFrame.Visible = false
+    coinsFrame.Visible = true
+    coinsTab.BackgroundColor3 = Color3.fromRGB(70,70,70)
+    itemsTab.BackgroundColor3 = Color3.fromRGB(50,50,50)
+end
+
+itemsTab.MouseButton1Click:Connect(showItems)
+coinsTab.MouseButton1Click:Connect(showCoins)
+showItems()
+
+-- Search Filtering
+searchBox:GetPropertyChangedSignal("Text"):Connect(function()
+    local q = searchBox.Text:lower()
+    for _, btn in ipairs(buttons) do
+        btn.Visible = (q == "") or btn.Name:lower():find(q)
+    end
+    updateCanvas()
+    searchSound:Play()
+end)
+
+-- Set Coins Button Logic
+setButton.MouseButton1Click:Connect(function()
+    local num = tonumber(coinsInput.Text)
+    if num then
+        coinsValue.Value = num
+        clickSound:Play()
+    end
+end)
