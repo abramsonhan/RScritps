@@ -1,0 +1,290 @@
+local Workspace = game:GetService("Workspace")
+local CoreGui = game:GetService("CoreGui")
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+
+local screenGui = Instance.new("ScreenGui", PlayerGui)
+screenGui.Name = "GlassHighlightMenu"
+screenGui.ResetOnSpawn = false
+
+local frame = Instance.new("Frame", screenGui)
+frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+frame.Size = UDim2.new(0, 200, 0, 320)
+frame.Position = UDim2.new(0.1, 0, 0.1, 0)
+frame.BorderSizePixel = 0
+frame.BackgroundTransparency = 0.1
+
+local dragging = false
+local dragStart, startPos
+frame.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = true
+		dragStart = input.Position
+		startPos = frame.Position
+	end
+end)
+UserInputService.InputChanged:Connect(function(input)
+	if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+		local delta = input.Position - dragStart
+		frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+	end
+end)
+UserInputService.InputEnded:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = false
+	end
+end)
+
+local scrollFrame = Instance.new("ScrollingFrame", frame)
+scrollFrame.Size = UDim2.new(1, 0, 1, -5)
+scrollFrame.Position = UDim2.new(0, 0, 0, 5)
+scrollFrame.CanvasSize = UDim2.new(0, 0, 0, 500)
+scrollFrame.ScrollBarThickness = 6
+scrollFrame.BackgroundTransparency = 1
+
+local title = Instance.new("TextLabel", scrollFrame)
+title.Size = UDim2.new(1, 0, 0, 30)
+title.BackgroundTransparency = 1
+title.Text = "The Glass Bridge Script"
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.Font = Enum.Font.SourceSansBold
+title.TextScaled = false
+title.TextSize = 18
+
+local function createButton(text, yPos, color)
+	local btn = Instance.new("TextButton", scrollFrame)
+	btn.Size = UDim2.new(1, -20, 0, 30)
+	btn.Position = UDim2.new(0, 10, 0, yPos)
+	btn.Text = text
+	btn.BackgroundColor3 = color or Color3.fromRGB(60, 60, 60)
+	btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+	btn.Font = Enum.Font.SourceSansBold
+	btn.TextScaled = true
+	btn.BorderSizePixel = 0
+	return btn
+end
+
+local toggleButton = createButton("Glass ESP: OFF", 40)
+local immortalityButton = createButton("Immortality: OFF", 80)
+local moveToEndButton = createButton("Move To End", 120)
+local noclipButton = createButton("Noclip: OFF", 160)
+local safetyNetButton = createButton("Safety Net: OFF", 200)
+local deleteButton = createButton("Delete The Jump Rope", 240, Color3.fromRGB(100, 40, 40))
+local unloadButton = createButton("Unload", 280, Color3.fromRGB(80, 30, 30))
+
+local hintText = Instance.new("TextLabel", scrollFrame)
+hintText.Size = UDim2.new(1, -20, 0, 20)
+hintText.Position = UDim2.new(0, 10, 0, 310)
+hintText.BackgroundTransparency = 1
+hintText.Text = "Press K to Hide/Show GUI"
+hintText.TextColor3 = Color3.fromRGB(255, 255, 255)
+hintText.Font = Enum.Font.SourceSans
+hintText.TextScaled = true
+
+local highlightFolder = Instance.new("Folder")
+highlightFolder.Name = "GlassHighlights"
+highlightFolder.Parent = CoreGui
+
+local highlighting = false
+local immortalityOn = false
+local noclipEnabled = false
+local running = true
+local safetyNetEnabled = false
+local endPoint = Vector3.new(-17, 53, -44)
+local safetyNetPart
+
+local function clearHighlights()
+	for _, v in pairs(highlightFolder:GetChildren()) do
+		v:Destroy()
+	end
+end
+
+local function highlightModel(model)
+	local highlight = Instance.new("Highlight")
+	highlight.Name = model.Name .. "_Highlight"
+	highlight.FillColor = Color3.fromRGB(0, 255, 255)
+	highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+	highlight.DepthMode = Enum.HighlightDepthMode.Occluded
+	highlight.Adornee = model
+	highlight.Parent = highlightFolder
+end
+
+local function highlightGlass()
+	if not highlighting then return end
+	clearHighlights()
+	for _, step in pairs(Workspace:GetDescendants()) do
+		if step:IsA("Model") and step.Name == "Step" then
+			local glass = step:FindFirstChild("glass_tempered")
+			if glass and glass:IsA("Model") then
+				highlightModel(glass)
+			end
+		end
+	end
+end
+
+toggleButton.MouseButton1Click:Connect(function()
+	highlighting = not highlighting
+	if highlighting then
+		toggleButton.Text = "Glass ESP: ON"
+		toggleButton.BackgroundColor3 = Color3.fromRGB(0, 120, 0)
+	else
+		toggleButton.Text = "Glass ESP: OFF"
+		toggleButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+		clearHighlights()
+	end
+end)
+
+local function setCanTouch(state)
+	if LocalPlayer.Character then
+		for _, part in pairs(LocalPlayer.Character:GetDescendants()) do
+			if part:IsA("BasePart") then
+				part.CanTouch = state
+			end
+		end
+	end
+end
+
+immortalityButton.MouseButton1Click:Connect(function()
+	local char = LocalPlayer.Character
+	if not char or not char:FindFirstChild("HumanoidRootPart") then return end
+	local z = char.HumanoidRootPart.Position.Z
+	if z <= -35 then
+		immortalityOn = false
+		immortalityButton.Text = "Immortality: OFF"
+		immortalityButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+		setCanTouch(true)
+		return
+	end
+	immortalityOn = not immortalityOn
+	if immortalityOn then
+		immortalityButton.Text = "Immortality: ON"
+		immortalityButton.BackgroundColor3 = Color3.fromRGB(0, 120, 0)
+		setCanTouch(false)
+	else
+		immortalityButton.Text = "Immortality: OFF"
+		immortalityButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+		setCanTouch(true)
+	end
+end)
+
+moveToEndButton.MouseButton1Click:Connect(function()
+	local char = LocalPlayer.Character
+	if not char or not char:FindFirstChild("HumanoidRootPart") then return end
+	local hrp = char.HumanoidRootPart
+	local targetY = endPoint.Y + 5
+	local speed = 5
+	task.spawn(function()
+		while math.abs(hrp.Position.Y - targetY) > 0.5 and running do
+			local dir = Vector3.new(0, targetY - hrp.Position.Y, 0).Unit
+			hrp.CFrame = hrp.CFrame + dir * speed
+			RunService.Heartbeat:Wait()
+		end
+		while ((Vector3.new(endPoint.X, targetY, endPoint.Z)) - hrp.Position).Magnitude > 2 and running do
+			local dir = (Vector3.new(endPoint.X, targetY, endPoint.Z) - hrp.Position).Unit
+			hrp.CFrame = hrp.CFrame + dir * speed
+			RunService.Heartbeat:Wait()
+		end
+	end)
+end)
+
+noclipButton.MouseButton1Click:Connect(function()
+	noclipEnabled = not noclipEnabled
+	if noclipEnabled then
+		noclipButton.Text = "Noclip: ON"
+		noclipButton.BackgroundColor3 = Color3.fromRGB(0, 120, 0)
+	else
+		noclipButton.Text = "Noclip: OFF"
+		noclipButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+	end
+end)
+
+safetyNetButton.MouseButton1Click:Connect(function()
+	safetyNetEnabled = not safetyNetEnabled
+	if safetyNetEnabled then
+		if not safetyNetPart then
+			safetyNetPart = Instance.new("Part")
+			safetyNetPart.Size = Vector3.new(1000, 1, 1000)
+			safetyNetPart.Position = Vector3.new(0, 45, 0)
+			safetyNetPart.Anchored = true
+			safetyNetPart.Transparency = 0.5
+			safetyNetPart.Color = Color3.fromRGB(255, 0, 0)
+			safetyNetPart.Parent = Workspace
+		end
+		safetyNetButton.Text = "Safety Net: ON"
+		safetyNetButton.BackgroundColor3 = Color3.fromRGB(0, 120, 0)
+	else
+		if safetyNetPart then
+			safetyNetPart:Destroy()
+			safetyNetPart = nil
+		end
+		safetyNetButton.Text = "Safety Net: OFF"
+		safetyNetButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+	end
+end)
+
+deleteButton.MouseButton1Click:Connect(function()
+	local rope = Workspace:FindFirstChild("The Jump Rope") or Workspace:FindFirstChild("TheRope")
+	if rope then
+		rope:Destroy()
+	end
+end)
+
+unloadButton.MouseButton1Click:Connect(function()
+	running = false
+	clearHighlights()
+	if safetyNetPart then
+		safetyNetPart:Destroy()
+		safetyNetPart = nil
+	end
+	immortalityOn = false
+	setCanTouch(true)
+	highlighting = false
+	noclipEnabled = false
+	screenGui:Destroy()
+	highlightFolder:Destroy()
+end)
+
+task.spawn(function()
+	while running do
+		if highlighting then
+			highlightGlass()
+		end
+		task.wait(3)
+	end
+end)
+
+RunService.Stepped:Connect(function()
+	local char = LocalPlayer.Character
+	if char and char:FindFirstChild("HumanoidRootPart") then
+		local z = char.HumanoidRootPart.Position.Z
+		if immortalityOn and z > -35 then
+			local humanoid = char:FindFirstChildOfClass("Humanoid")
+			if humanoid then
+				humanoid.Health = humanoid.MaxHealth
+			end
+		end
+		if z <= -35 and immortalityOn then
+			immortalityOn = false
+			immortalityButton.Text = "Immortality: OFF"
+			immortalityButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+			setCanTouch(true)
+		end
+		if noclipEnabled then
+			for _, part in pairs(char:GetDescendants()) do
+				if part:IsA("BasePart") then
+					part.CanCollide = false
+				end
+			end
+		end
+	end
+end)
+
+UserInputService.InputBegan:Connect(function(input, gpe)
+	if gpe then return end
+	if input.KeyCode == Enum.KeyCode.K then
+		frame.Visible = not frame.Visible
+	end
+end)
