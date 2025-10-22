@@ -1,0 +1,44 @@
+--[[
+
+    Auto Attack (Killaura)
+    Kills the closest player towards you
+    -- [ stav.lua ] --
+
+]]
+
+shared.Aura = true
+
+local cloneref = cloneref or function(obj)
+    return obj
+end
+local playersService = cloneref(game:GetService('Players'))
+local replicatedStorage = cloneref(game:GetService('ReplicatedStorage'))
+local lplr = playersService.LocalPlayer
+
+local function getClosestPlayer()
+    local closestdist, closestplr = math.huge, nil
+    for i,v in playersService:GetPlayers() do
+        if v == lplr then continue end
+
+        pcall(function()
+            local dist = lplr:DistanceFromCharacter(v.Character.PrimaryPart.Position)
+            if dist < 6 and dist < closestdist then
+                closestdist = dist
+                closestplr = v
+            end
+        end)
+    end
+
+    return closestplr
+end
+
+task.spawn(function()
+    repeat
+        local plr = getClosestPlayer()
+        if plr then
+            replicatedStorage.meleeEvent:FireServer(plr)
+        end
+
+        task.wait()
+    until not shared.Aura
+end)
