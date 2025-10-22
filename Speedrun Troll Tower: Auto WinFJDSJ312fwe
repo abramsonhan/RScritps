@@ -1,0 +1,117 @@
+local TeleportService = game:GetService("TeleportService")
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+-- Game ID check
+local targetPlaceId = 131252227006772
+if game.PlaceId ~= targetPlaceId then
+    TeleportService:Teleport(targetPlaceId, player)
+    return
+end
+
+-- GUI Setup
+local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+gui.Name = "TeleportControlGui"
+gui.ResetOnSpawn = false
+
+local frame = Instance.new("Frame", gui)
+frame.Size = UDim2.new(0, 240, 0, 180)
+frame.Position = UDim2.new(0, 100, 0, 100)
+frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+frame.Active = true
+frame.Draggable = true
+
+Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 10)
+
+-- Gradient background
+local gradient = Instance.new("UIGradient", frame)
+gradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 0, 255)), -- Blue
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0))    -- Black
+}
+gradient.Rotation = 90
+
+-- Title
+local title = Instance.new("TextLabel", frame)
+title.Size = UDim2.new(1, 0, 0, 30)
+title.Text = "Teleport Controller"
+title.TextColor3 = Color3.new(1, 1, 1)
+title.BackgroundTransparency = 1
+title.Font = Enum.Font.GothamBold
+title.TextSize = 18
+
+-- Button style
+local function createButton(text, position)
+    local btn = Instance.new("TextButton", frame)
+    btn.Size = UDim2.new(0.9, 0, 0, 30)
+    btn.Position = position
+    btn.Text = text
+    btn.BackgroundColor3 = Color3.fromRGB(100, 100, 100) -- Grey
+    btn.TextColor3 = Color3.new(1, 1, 1)
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 16
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
+    return btn
+end
+
+local toggleBtn = createButton("Toggle TP: OFF", UDim2.new(0.05, 0, 0, 40))
+local cooldownBox = Instance.new("TextBox", frame)
+cooldownBox.Size = UDim2.new(0.9, 0, 0, 30)
+cooldownBox.Position = UDim2.new(0.05, 0, 0, 80)
+cooldownBox.Text = "0.5"
+cooldownBox.PlaceholderText = "Cooldown (seconds)"
+cooldownBox.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+cooldownBox.TextColor3 = Color3.new(1, 1, 1)
+cooldownBox.Font = Enum.Font.GothamBold
+cooldownBox.TextSize = 16
+cooldownBox.ClearTextOnFocus = false
+Instance.new("UICorner", cooldownBox).CornerRadius = UDim.new(0, 6)
+
+local destroyBtn = createButton("Destroy GUI", UDim2.new(0.05, 0, 0, 120))
+
+-- Logic
+local toggled = false
+local cooldown = 0.5
+
+local function teleportCycle()
+    while toggled do
+        local char = player.Character or player.CharacterAdded:Wait()
+        local hrp = char:FindFirstChild("HumanoidRootPart")
+        local hum = char:FindFirstChildOfClass("Humanoid")
+        local speedrunners = workspace:FindFirstChild("Rounds") and workspace.Rounds:FindFirstChild("Markers") and workspace.Rounds.Markers:FindFirstChild("Speedrunners")
+        local hitbox = workspace:FindFirstChild("Portal") and workspace.Portal:FindFirstChild("Hitbox")
+
+        if hrp and hum and speedrunners and hitbox then
+            hrp.CFrame = speedrunners.CFrame
+            wait(cooldown)
+            hrp.CFrame = hitbox.CFrame
+            wait(cooldown)
+            hum.Health = 0
+        end
+
+        wait(cooldown)
+    end
+end
+
+toggleBtn.MouseButton1Click:Connect(function()
+    toggled = not toggled
+    toggleBtn.Text = toggled and "Toggle TP: ON" or "Toggle TP: OFF"
+    toggleBtn.BackgroundColor3 = toggled and Color3.fromRGB(150, 150, 150) or Color3.fromRGB(100, 100, 100)
+
+    if toggled then
+        spawn(teleportCycle)
+    end
+end)
+
+cooldownBox.FocusLost:Connect(function()
+    local input = tonumber(cooldownBox.Text)
+    if input and input > 0 then
+        cooldown = input
+    else
+        cooldownBox.Text = tostring(cooldown)
+    end
+end)
+
+destroyBtn.MouseButton1Click:Connect(function()
+    gui:Destroy()
+end)
