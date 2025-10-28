@@ -1,6 +1,6 @@
 Version = '1.728'
 Skip = 'false'
-Webhook = 'false'
+Webhook = 'true'
 Theme = 'Halloween'
 Cache = 'hL2lw2KmTyA5CTKTaRGTitTyLlnYGTp-9E2LqHiOzhzgYcmCJq0rgQSSpyUglwddvzro'
 Server_Id = '1432781117022273669'
