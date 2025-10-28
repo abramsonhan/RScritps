@@ -1,4 +1,4 @@
 Version = '1.621'
 Skip = 'false'
-Webhook = 'true'
+Webhook = 'false'
 Theme = 'Halloween'
