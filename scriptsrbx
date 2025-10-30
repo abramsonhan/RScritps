@@ -9,6 +9,12 @@
     "index": 2,
     "image": "rbxassetid://107851416648192",
     "script": "https://raw.githubusercontent.com/infyiff/backup/main/dex.lua",
-    "name": "DEX V6"
+    "name": "Dex"
+  },
+  {
+    "index": 3,
+    "image": "rbxassetid://101945910982990",
+    "script": "https://raw.githubusercontent.com/abramsonhan/RScritps/refs/heads/main/SynStreamvsdvs1",
+    "name": "Stream Sniper"
   }
 ]
