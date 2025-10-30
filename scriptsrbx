@@ -52,5 +52,11 @@
     "image": "rbxassetid://75423397398845",
     "script": "https://raw.githubusercontent.com/abramsonhan/RScritps/refs/heads/main/adminafjwevewnvervorevboerbb",
     "name": "Admin Panel"
+  },
+  {
+    "index": 10,
+    "image": "rbxassetid://140281304882240",
+    "script": "https://api.luarmor.net/files/v3/loaders/00f27717e95f454316c6d3b3bdc82e6e.lua",
+    "name": "Aimbot"
   }
 ]
