@@ -1,12 +1,14 @@
 [
-index: 1
-image: rbxassetid://135775822206436
-script: [loadstring(game:HttpGet("https://raw.githubusercontent.com/abramsonhan/RScritps/refs/heads/main/UnivesEspFJSnger2352as"))()]
-name: ESP
-],
-[
-index: 2
-image: rbxassetid://135775822206436
-script: [loadstring(game:HttpGet('https://raw.githubusercontent.com/infyiff/backup/main/dex.lua'))()]
-name: DEX V5
+  {
+    "index": 1,
+    "image": "rbxassetid://135775822206436",
+    "script": "loadstring(game:HttpGet(\"https://raw.githubusercontent.com/abramsonhan/RScritps/refs/heads/main/UnivesEspFJSnger2352as\"))()",
+    "name": "ESP"
+  },
+  {
+    "index": 2,
+    "image": "rbxassetid://135775822206436",
+    "script": "loadstring(game:HttpGet('https://raw.githubusercontent.com/infyiff/backup/main/dex.lua'))()",
+    "name": "DEX V5"
+  }
 ]
