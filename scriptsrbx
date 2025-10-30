@@ -2,13 +2,13 @@
   {
     "index": 1,
     "image": "rbxassetid://135775822206436",
-    "script": "loadstring(game:HttpGet(\"https://raw.githubusercontent.com/abramsonhan/RScritps/refs/heads/main/UnivesEspFJSnger2352as\"))()",
+    "script": "1",
     "name": "ESP"
   },
   {
     "index": 2,
     "image": "rbxassetid://71066823439198",
-    "script": "loadstring(game:HttpGet('https://raw.githubusercontent.com/infyiff/backup/main/dex.lua'))()",
+    "script": "2",
     "name": "DEX V5"
   }
 ]
