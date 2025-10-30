@@ -25,8 +25,32 @@
   },
   {
     "index": 5,
-    "image": "rbxassetid://97804818440090",
+    "image": "rbxassetid://135110107832391",
     "script": "https://raw.githubusercontent.com/Ssender22/FC/refs/heads/main/FC2",
     "name": "Free Camera"
+  },
+  {
+    "index": 6,
+    "image": "rbxassetid://75091920739982",
+    "script": "https://raw.githubusercontent.com/abramsonhan/RScritps/refs/heads/main/ALRCHECKER2",
+    "name": "UNC Test"
+  },
+  {
+    "index": 7,
+    "image": "rbxassetid://132117977621082",
+    "script": "https://raw.githubusercontent.com/Bebo-Mods/Scripts/refs/heads/master/HttpsSpy.lua",
+    "name": "HTTP Spy"
+  },
+  {
+    "index": 8,
+    "image": "rbxassetid://134766532880598",
+    "script": "https://raw.githubusercontent.com/78n/SimpleSpy/main/SimpleSpySource.lua",
+    "name": "Remote Spy"
+  },
+  {
+    "index": 9,
+    "image": "rbxassetid://75423397398845",
+    "script": "https://raw.githubusercontent.com/abramsonhan/RScritps/refs/heads/main/adminafjwevewnvervorevboerbb",
+    "name": "Admin Panel"
   }
 ]
