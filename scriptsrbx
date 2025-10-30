@@ -22,5 +22,11 @@
     "image": "rbxassetid://91085056336596",
     "script": "https://raw.githubusercontent.com/abramsonhan/RScritps/refs/heads/main/SynStreamvsdvs1",
     "name": "Aimbot"
+  },
+  {
+    "index": 5,
+    "image": "rbxassetid://97804818440090",
+    "script": "https://raw.githubusercontent.com/Ssender22/FC/refs/heads/main/FC2",
+    "name": "Free Camera"
   }
 ]
