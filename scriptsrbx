@@ -58,5 +58,11 @@
     "image": "rbxassetid://140281304882240",
     "script": "https://api.luarmor.net/files/v3/loaders/00f27717e95f454316c6d3b3bdc82e6e.lua",
     "name": "Aimbot"
+  },
+  {
+    "index": 11,
+    "image": "rbxassetid://95868425608405",
+    "script": "https://raw.githubusercontent.com/Prnx69/Universal-Fly/refs/heads/main/Universal_Fly.lua",
+    "name": "Fly"
   }
 ]
