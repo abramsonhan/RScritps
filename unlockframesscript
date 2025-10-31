@@ -1,5 +1,3 @@
-print("FPSUNLOCKED")
-
 -- Target FPS
 local TARGET_FPS = 500
 
