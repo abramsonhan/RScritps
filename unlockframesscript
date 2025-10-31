@@ -1,0 +1,53 @@
+-- Target FPS
+local TARGET_FPS = 500
+
+-- Helper function: safe call
+local function safeCall(name, fn, ...)
+    if type(fn) ~= "function" then
+        warn(name .. " is not available.")
+        return false, ("missing function: %s"):format(name)
+    end
+    local ok, res = pcall(fn, ...)
+    if ok then
+        print(("Call %s executed successfully."):format(name))
+        return true, res
+    else
+        warn(("Error calling %s: %s"):format(name, tostring(res)))
+        return false, res
+    end
+end
+
+print("Attempting to unlock FPS to", TARGET_FPS)
+
+-- Try setfflag (if available)
+if setfflag then
+    safeCall("setfflag TaskSchedulerTargetFps", setfflag, "TaskSchedulerTargetFps", tostring(TARGET_FPS))
+    safeCall("setfflag TaskSchedulerRate", setfflag, "TaskSchedulerRate", tostring(TARGET_FPS))
+    safeCall("setfflag DFIntTaskSchedulerTargetFps", setfflag, "DFIntTaskSchedulerTargetFps", tostring(TARGET_FPS))
+else
+    warn("setfflag is not available in this environment.")
+end
+
+-- Try setfpscap (if available)
+if setfpscap then
+    safeCall("setfpscap", setfpscap, tonumber(TARGET_FPS))
+else
+    warn("setfpscap is not available in this environment.")
+end
+
+-- Optional: force a render restart (can help some clients apply new FPS)
+local RunService = game:GetService("RunService")
+local ok, err = pcall(function()
+    if RunService.Set3dRenderingEnabled then
+        RunService:Set3dRenderingEnabled(false)
+        wait(0.03)
+        RunService:Set3dRenderingEnabled(true)
+    end
+end)
+if ok then
+    print("Render restart attempt completed.")
+else
+    warn("Failed to restart render:", tostring(err))
+end
+
+print("FPS unlock script finished.")
