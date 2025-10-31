@@ -1,0 +1,97 @@
+-- Settings
+local TARGET_FPS = 500
+local TRY_SETFFLAGS = true
+local APPLY_VISUAL_OPTIMIZATIONS = true
+
+local RunService = game:GetService("RunService")
+local Lighting = game:GetService("Lighting")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+-- Helper function: safe call
+local function safeCall(name, fn, ...)
+    if type(fn) ~= "function" then
+        warn(name .. " is not available.")
+        return false, ("missing function: %s"):format(name)
+    end
+    local ok, res = pcall(fn, ...)
+    if ok then
+        print(("Call %s executed successfully."):format(name))
+        return true, res
+    else
+        warn(("Error calling %s: %s"):format(name, tostring(res)))
+        return false, res
+    end
+end
+
+-- Attempt to unlock/increase FPS
+if TRY_SETFFLAGS then
+    print("Attempting to increase FPS to", TARGET_FPS)
+
+    if setfflag then
+        safeCall("setfflag TaskSchedulerTargetFps", setfflag, "TaskSchedulerTargetFps", tostring(TARGET_FPS))
+        safeCall("setfflag TaskSchedulerRate", setfflag, "TaskSchedulerRate", tostring(TARGET_FPS))
+        safeCall("setfflag DFIntTaskSchedulerTargetFps", setfflag, "DFIntTaskSchedulerTargetFps", tostring(TARGET_FPS))
+    else
+        warn("setfflag is not available in this environment.")
+    end
+
+    if setfpscap then
+        safeCall("setfpscap", setfpscap, tonumber(TARGET_FPS))
+    else
+        warn("setfpscap is not available in this environment.")
+    end
+
+    -- Optional: force a render restart
+    local ok, err = pcall(function()
+        if RunService.Set3dRenderingEnabled then
+            RunService:Set3dRenderingEnabled(false)
+            wait(0.03)
+            RunService:Set3dRenderingEnabled(true)
+        end
+    end)
+    if ok then
+        print("Render restart attempt completed.")
+    else
+        warn("Failed to restart render:", tostring(err))
+    end
+end
+
+-- Visual optimizations
+if APPLY_VISUAL_OPTIMIZATIONS then
+    print("Applying visual optimizations (reducing graphics quality)")
+
+    pcall(function() Lighting.GlobalShadows = false end)
+    pcall(function()
+        if settings() and settings().Rendering then
+            pcall(function() settings().Rendering.QualityLevel = 1 end)
+        end
+    end)
+    pcall(function() Lighting.FogEnd = 100000 end)
+    pcall(function() Lighting.Outlines = false end)
+    pcall(function() Lighting.BloomEnabled = false end)
+    pcall(function() Lighting.ColorCorrectionEnabled = false end)
+
+    pcall(function()
+        if workspace.CurrentCamera then
+            -- Optional: camera tweaks can go here
+        end
+    end)
+
+    pcall(function()
+        if LocalPlayer then
+            local PlayerGui = LocalPlayer:FindFirstChildOfClass("PlayerGui")
+            if PlayerGui then
+                for _, v in ipairs(PlayerGui:GetDescendants()) do
+                    if v:IsA("PostEffect") or v:IsA("BloomEffect") or v:IsA("BlurEffect") then
+                        pcall(function() v.Enabled = false end)
+                    end
+                end
+            end
+        end
+    end)
+
+    print("Visual optimizations applied (as much as possible).")
+end
+
+print("Script finished attempting to unlock FPS and optimize the client.")
