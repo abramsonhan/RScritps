@@ -1,5 +1,7 @@
 Version = '2.109'
 Skip = 'false'
+AntiKick = 'false'
+UnlockFrames = 'false'
 Webhook = 'false'
 Theme = 'Halloween'
 Cache = 'hL2lw2KmTyA5CTKTaRGTitTyLlnYGTp-9E2LqHiOzhzgYcmCJq0rgQSSpyUglwddvzro'
