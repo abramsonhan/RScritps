@@ -64,5 +64,11 @@
     "image": "rbxassetid://95868425608405",
     "script": "https://raw.githubusercontent.com/Prnx69/Universal-Fly/refs/heads/main/Universal_Fly.lua",
     "name": "Fly"
+  },
+  {
+    "index": 12,
+    "image": "rbxassetid://132298819608872",
+    "script": "https://raw.githubusercontent.com/abramsonhan/RScritps/refs/heads/main/optimizedscriptrobloxfdsj",
+    "name": "Optimized Frames"
   }
 ]
