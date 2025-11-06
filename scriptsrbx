@@ -76,5 +76,23 @@
     "image": "rbxassetid://102846312434751",
     "script": "https://paste.myconan.net/539341.txt",
     "name": "Click Teleport"
+  },
+  {
+    "index": 14,
+    "image": "rbxassetid://122585414668036",
+    "script": "https://raw.githubusercontent.com/abramsonhan/RScritps/refs/heads/main/ANTI%20AFKSCRIPT",
+    "name": "Anti Afk"
+  },
+  {
+    "index": 15,
+    "image": "rbxassetid://104843667226233",
+    "script": "https://raw.githubusercontent.com/abramsonhan/RScritps/refs/heads/main/UnviInvisible132312",
+    "name": "Invisible"
+  },
+  {
+    "index": 16,
+    "image": "rbxassetid://108571008933010",
+    "script": "https://raw.githubusercontent.com/AAPVdev/scripts/refs/heads/main/UI_LimbExtender.lua",
+    "name": "Hitbox Extender"
   }
 ]
