@@ -70,5 +70,11 @@
     "image": "rbxassetid://132298819608872",
     "script": "https://raw.githubusercontent.com/abramsonhan/RScritps/refs/heads/main/optimizedscriptrobloxfdsj",
     "name": "Optimized Frames"
+  },
+  {
+    "index": 13,
+    "image": "rbxassetid://102846312434751",
+    "script": "https://paste.myconan.net/539341.txt",
+    "name": "Click Teleport"
   }
 ]
