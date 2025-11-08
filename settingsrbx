@@ -1,7 +1,5 @@
 Version = '4.431'
 Skip = 'false'
-AntiKick = 'false'
-UnlockFrames = 'false'
 Watermark = 'true'
 RejoinView = 'true'
 Theme = 'Autumn'
