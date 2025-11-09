@@ -1,5 +1,5 @@
 Version = '4.789'
 Skip = 'false'
 Watermark = 'true'
-RejoinView = 'false'
+RejoinView = 'true'
 Theme = 'Autumn'
