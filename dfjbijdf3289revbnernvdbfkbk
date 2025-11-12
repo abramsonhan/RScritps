@@ -1,0 +1,99 @@
+-- Zenith-compatible Auto-Miner
+
+if not game:IsLoaded() then game.Loaded:Wait() end
+
+local Players = game:GetService("Players")
+local RS = game:GetService("ReplicatedStorage")
+local CS = game:GetService("CollectionService")
+local LP = Players.LocalPlayer
+
+-- Knit Load
+local Knit = require(RS:WaitForChild("Packages"):WaitForChild("Knit"))
+
+-- Get OreController
+local OreController
+repeat
+    pcall(function()
+        Knit.Start()
+        OreController = Knit.GetController("OreController")
+    end)
+    task.wait(0.1)
+until OreController
+
+-- Helpers
+local function hrp()
+    local char = LP.Character or LP.CharacterAdded:Wait()
+    return char:WaitForChild("HumanoidRootPart", 5)
+end
+
+local function isModelOre(m)
+    if not m or not m:IsA("Model") or not m.PrimaryPart then return false end
+    if CS:HasTag(m, "Ore") or CS:HasTag(m, "AfkOre") then return true end
+    if m:GetAttribute("roomId") and m:GetAttribute("id") then return true end
+    return false
+end
+
+local function nearestOre()
+    local root = hrp()
+    if not root then return nil end
+
+    local closestOre, closestDist
+
+    local function consider(m)
+        if not isModelOre(m) then return end
+        local dist = (m.PrimaryPart.Position - root.Position).Magnitude
+        if not closestDist or dist < closestDist then
+            closestOre, closestDist = m, dist
+        end
+    end
+
+    -- Prefer regular ores
+    for _, m in ipairs(CS:GetTagged("Ore")) do consider(m) end
+    if not closestOre then
+        for _, m in ipairs(CS:GetTagged("AfkOre")) do consider(m) end
+    end
+    if not closestOre then
+        local debris = workspace:FindFirstChild("Debris")
+        if debris then
+            for _, m in ipairs(debris:GetChildren()) do consider(m) end
+        end
+    end
+
+    return closestOre
+end
+
+local function canMine(target)
+    local ok, res = pcall(function()
+        return OreController:isStrongEnough(target)
+    end)
+    return (ok and res ~= false)
+end
+
+local function mineOne(target)
+    if not target or not target.Parent then return end
+    if not canMine(target) then return end
+
+    OreController:moveToOre(target)
+    OreController:updateOreHealth()
+
+    local timeout = 12
+    local t0 = os.clock()
+    while target.Parent and (OreController._currentOre == target or OreController._selectedOre == target) do
+        task.wait(0.1)
+        if os.clock() - t0 > timeout then
+            pcall(function() OreController:cancelAutoDamageOre() end)
+            break
+        end
+    end
+end
+
+-- Main loop
+while true do
+    local target = nearestOre()
+    if target then
+        mineOne(target)
+        task.wait(0.2)
+    else
+        task.wait(0.5)
+    end
+end
