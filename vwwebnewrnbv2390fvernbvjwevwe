@@ -1,0 +1,8 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Battle = ReplicatedStorage.Remote.Battle -- RemoteEvent 
+
+Battle:FireServer(
+    "GetCoin",
+    10000000000000000000000000000000
+)
