@@ -1,0 +1,91 @@
+--// Services
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
+
+--// Local Player and Camera
+local localPlayer = Players.LocalPlayer
+local camera = Workspace.CurrentCamera
+
+--// Settings
+local FOV_RADIUS = 150
+local AIMLOCK_KEY = Enum.UserInputType.MouseButton2
+local IGNORE_LIST = {localPlayer.Character, camera}
+
+--// FOV Circle
+local fovCircle = Drawing.new("Circle")
+fovCircle.Position = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
+fovCircle.Radius = FOV_RADIUS
+fovCircle.Color = Color3.fromRGB(255, 0, 0)
+fovCircle.Thickness = 2
+fovCircle.Transparency = 0.5
+fovCircle.Visible = true
+
+--// Aimlock State
+local aimlockHeld = false
+
+--// Helper: Team Check
+local function isEnemy(player)
+    if localPlayer.Team == nil or player.Team == nil then return true end
+    return player.Team ~= localPlayer.Team
+end
+
+--// Helper: Wall Check
+local function hasLineOfSight(targetPart)
+    local origin = camera.CFrame.Position
+    local direction = (targetPart.Position - origin).Unit * (targetPart.Position - origin).Magnitude
+    local raycastParams = RaycastParams.new()
+    raycastParams.FilterDescendantsInstances = IGNORE_LIST
+    raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+    local result = Workspace:Raycast(origin, direction, raycastParams)
+    return not result or result.Instance:IsDescendantOf(targetPart.Parent)
+end
+
+--// Helper: Get Closest Valid Player in FOV
+local function getClosestPlayer()
+    local closestPlayer = nil
+    local shortestDistance = FOV_RADIUS
+
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= localPlayer and player.Character and player.Character:FindFirstChild("Head") and isEnemy(player) then
+            local head = player.Character.Head
+            local screenPos, onScreen = camera:WorldToViewportPoint(head.Position)
+            if onScreen then
+                local distance = (Vector2.new(screenPos.X, screenPos.Y) - fovCircle.Position).Magnitude
+                if distance < shortestDistance and hasLineOfSight(head) then
+                    shortestDistance = distance
+                    closestPlayer = player
+                end
+            end
+        end
+    end
+
+    return closestPlayer
+end
+
+--// Input Handling
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if input.UserInputType == AIMLOCK_KEY then
+        aimlockHeld = true
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(input, gameProcessed)
+    if input.UserInputType == AIMLOCK_KEY then
+        aimlockHeld = false
+    end
+end)
+
+--// Main Loop (Pure Lock-On)
+RunService.RenderStepped:Connect(function()
+    if aimlockHeld then
+        local targetPlayer = getClosestPlayer()
+        if targetPlayer and targetPlayer.Character then
+            local head = targetPlayer.Character:FindFirstChild("Head")
+            if head then
+                camera.CFrame = CFrame.new(camera.CFrame.Position, head.Position)
+            end
+        end
+    end
+end)
