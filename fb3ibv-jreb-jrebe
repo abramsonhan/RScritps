@@ -1,0 +1,5 @@
+local args = {
+	game:GetService("Players").LocalPlayer:WaitForChild("leaderstats"):WaitForChild("Points"),
+	888888
+}
+game:GetService("ReplicatedStorage"):WaitForChild("changestat"):FireServer(unpack(args))
