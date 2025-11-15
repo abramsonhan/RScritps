@@ -1,0 +1,7 @@
+local rs = game:GetService("ReplicatedStorage")
+local event = rs:WaitForChild("GlassMoney"):WaitForChild("Give_1k")
+
+while true do
+    event:FireServer()
+    task.wait(0.1) -- change the number (seconds) to how fast you want it
+end
