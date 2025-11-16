@@ -1,0 +1,9 @@
+
+_G.auto = true
+
+while _G.auto do
+
+game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("ClickService"):WaitForChild("RF"):WaitForChild("Click"):InvokeServer()
+
+task.wait(0.00)
+end
