@@ -1,0 +1,6 @@
+_G.auto = true
+
+while _G.auto do
+game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Click"):FireServer()
+task.wait(0.00)
+end
