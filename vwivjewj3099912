@@ -1,0 +1,69 @@
+--[[
+	WARNING: Heads up! This script has not been verified by ScriptBlox. Use at your own risk!
+]]
+--!strict
+local SCRIPT_VERSION = "0.0.1"
+local LIBRARY_ID = "sc_pubmain"
+local GAME_NAME = "Steel Crossfire"
+if getgenv()[LIBRARY_ID] then
+	pcall(function()
+		getgenv()[LIBRARY_ID]:Destroy()
+	end)
+end
+
+local run_service = game:GetService("RunService")
+local hit_character = game:GetService("ReplicatedStorage").Events.GunEvents.HitCharacter
+local players = game:GetService("Players")
+local local_player = players.LocalPlayer
+local function load_url<A..., R...>(url: string): (A...) -> R...
+	local Callback, Error = loadstring(game:HttpGet(url))
+	if Error then
+		return error(Error, 2)
+	end
+	return (Callback :: any) :: (A...) -> R...
+end
+local empty_callback = function() end
+
+local library: AnkaUi = load_url("https://raw.githubusercontent.com/nfpw/XXSCRIPT/refs/heads/main/Library/Module.lua")()
+getgenv()[LIBRARY_ID] = library
+local window = library:CreateWindow({
+	WindowName = `Public Main {GAME_NAME} v{SCRIPT_VERSION}`,
+}, gethui())
+
+local main_tab = window:CreateTab("main")
+local main_section = main_tab:CreateSection("main")
+main_section
+	:CreateButton("kill all", function()
+		local original_pivot = local_player.Character:GetPivot()
+		for _, player in game.Players:GetPlayers() do
+			if
+				not player.Character
+				or not player.Character:FindFirstChild("InitialPoses")
+				or player == local_player
+				or player.Team == local_player.Team
+			then
+				continue
+			end
+			local_player.Character:PivotTo(player.Character:GetPivot())
+			run_service.Heartbeat:Wait()
+			hit_character:FireServer(
+				local_player.Character.Animate,
+				player.Character,
+				1000,
+				nil,
+				"isTakeDamage",
+				nil,
+				nil
+			)
+		end
+		local_player.Character:PivotTo(original_pivot)
+	end)
+	:CreateKeybind(Enum.KeyCode.L, empty_callback)
+
+main_section:CreateButton("destroy map (will lag!)", function()
+-- ud exploit :sob: :skull: dont skid pls thx
+	local Event = game:GetService("ReplicatedStorage").Events.GunEvents.UnanchorDestruction
+	for _, descendant in workspace:GetDescendants() do
+		Event:FireServer(descendant)
+	end
+end)
