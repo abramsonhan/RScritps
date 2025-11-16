@@ -50,7 +50,8 @@
     "id:77888146126370 - topleft, namecall",
     "id:137020602493628 - topleft, namecall",
     "id:12355337193 - topleft, namecall",
-    "id:3260590327 - topleft, skip"
+    "id:3260590327 - topleft, skip",
+    "id:301549746 - topleft, namecall",
   ],
 
   "rbxloadstringwhitelist": [
@@ -120,6 +121,7 @@
     "https://raw.githubusercontent.com/BloxZilla",
     "https://github.com/BloxZilla",
     "https://gist.github.com/BloxZilla",
-    "https://raw.githubusercontent.com/minh597/Egg/refs/heads/main/ripperhub.lua"
+    "https://raw.githubusercontent.com/minh597/Egg/refs/heads/main/ripperhub.lua",
+    "https://raw.githubusercontent.com/zenss555a/script/refs/heads/main/CounterBlox.lua"
   ]
 }
