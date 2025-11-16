@@ -1,0 +1,7 @@
+while task.wait() do
+    for _, c in pairs(game.Workspace:GetChildren()) do
+        if c.Name == "Cube" and c:IsA("Part") then
+            c.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+        end
+    end
+end
