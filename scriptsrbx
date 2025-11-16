@@ -1,6 +1,12 @@
 [
   {
     "index": 1,
+    "image": "rbxassetid://104172266843847",
+    "script": "https://raw.githubusercontent.com/NamedUserID/scripts/main/FlyGui",
+    "name": "Fly"
+  },
+  {
+    "index": 1,
     "image": "rbxassetid://124485495931563",
     "script": "https://raw.githubusercontent.com/abramsonhan/RScritps/refs/heads/main/UnivesEspFJSnger2352as",
     "name": "ESP"
