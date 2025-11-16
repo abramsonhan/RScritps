@@ -1,0 +1,1 @@
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("itemPurchased"):FireServer("Walk", -math.huge)
