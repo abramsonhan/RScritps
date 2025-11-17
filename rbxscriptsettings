@@ -160,7 +160,7 @@
       "index": "old",
       "date": "15.11.2025 15:13:23",
       "developer": "unknown",
-      "status": "premium",
+      "status": "basic",
       "image": "rbxassetid://124485495931563",
       "script": "https://raw.githubusercontent.com/abramsonhan/RScritps/refs/heads/main/UnivesEspFJSnger2352as",
       "name": "ESP"
@@ -168,7 +168,7 @@
     {
       "index": "old",
       "date": "15.11.2025 15:13:23",
-      "developer": "platinum",
+      "developer": "basic",
       "status": "basic",
       "image": "rbxassetid://107851416648192",
       "script": "https://raw.githubusercontent.com/infyiff/backup/main/dex.lua",
