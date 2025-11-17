@@ -1,8 +1,8 @@
 # RBXSCRIPT.COM all scripts https://rbxscript.com
 
-Telegram Bot: **https://t.me/rbxscript_robot** \n
-Telegram Channel: **https://t.me/rbxscriptcom** \n
-Website: **https://rbxscript.com** \n
+Telegram Bot: **https://t.me/rbxscript_robot**
+Telegram Channel: **https://t.me/rbxscriptcom**
+Website: **https://rbxscript.com**
 
 ⚠️Use it to be safe.
 ```
