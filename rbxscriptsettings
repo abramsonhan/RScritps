@@ -1,6 +1,6 @@
 {
   "Settings": {
-    "Version": "12.257",
+    "Version": "12.267",
     "LastUpdate": "17.11.2025 22:54:27",
     "Skip": "true",
     "Watermark": "true",
@@ -15,6 +15,7 @@
     "id:4588604953 - namecall",
     "id:17625359962 - namecall, topleft, skip",
     "id:3279760276 - namecall, topleft",
+    "id:6708682081 - namecall, topleft",
     "id:90489235925116 - namecall, topleft",
     "id:16732694052 - protector, namecall, topleft",
     "id:99567941238278 - protector, namecall",
