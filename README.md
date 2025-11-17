@@ -1,6 +1,8 @@
 # RBXSCRIPT.COM all scripts https://rbxscript.com
 
-Eternal roblox scripts
+Telegram Bot: **https://t.me/rbxscript_robot**
+Telegram Channel: **https://t.me/rbxscriptcom**
+Website: **https://rbxscript.com**
 
 ⚠️Use it to be safe.
 ```
