@@ -1,7 +1,7 @@
 {
   "Settings": {
     "Version": "10.4910",
-    "Skip": "false",
+    "Skip": "true",
     "Watermark": "true",
     "RejoinView": "true",
     "Theme": "Autumn"
