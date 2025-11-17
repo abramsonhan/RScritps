@@ -146,7 +146,7 @@
 
   "rbxscripts": [
     {
-      "index": old,
+      "index": "old",
       "date": "15.11.2025 15:13:23",
       "developer": "unknown",
       "status": "basic",
@@ -155,7 +155,7 @@
       "name": "Fly"
     },
     {
-      "index": old,
+      "index": "old",
       "date": "15.11.2025 15:13:23",
       "developer": "unknown",
       "status": "basic",
@@ -164,7 +164,7 @@
       "name": "ESP"
     },
     {
-      "index": old,
+      "index": "old",
       "date": "15.11.2025 15:13:23",
       "developer": "unknown",
       "status": "basic",
@@ -173,7 +173,7 @@
       "name": "Dex"
     },
     {
-      "index": old,
+      "index": "old",
       "date": "17.11.2025 20:00:00",
       "developer": "unknown",
       "status": "basic",
@@ -182,7 +182,7 @@
       "name": "Stream Sniper"
     },
     {
-      "index": old,
+      "index": "old",
       "date": "17.11.2025 20:53:43",
       "developer": "unknown",
       "status": "basic",
@@ -191,7 +191,7 @@
       "name": "Aimbot"
     },
     {
-      "index": old,
+      "index": "old",
       "date": "17.11.2025 20:53:43",
       "developer": "unknown",
       "status": "basic",
@@ -200,7 +200,7 @@
       "name": "Free Camera"
     },
     {
-      "index": old,
+      "index": "old",
       "date": "17.11.2025 20:53:43",
       "developer": "unknown",
       "status": "basic",
@@ -209,7 +209,7 @@
       "name": "UNC Test"
     },
     {
-      "index": old,
+      "index": "old",
       "date": "13.11.2025 20:53:43",
       "developer": "unknown",
       "status": "basic",
@@ -218,7 +218,7 @@
       "name": "Admin Panel"
     },
     {
-      "index": old,
+      "index": "old",
       "date": "13.11.2025 20:53:43",
       "developer": "unknown",
       "status": "basic",
@@ -227,7 +227,7 @@
       "name": "Aimbot"
     },
     {
-      "index": old,
+      "index": "old",
       "date": "13.11.2025 17:13:43",
       "developer": "unknown",
       "status": "basic",
@@ -236,7 +236,7 @@
       "name": "Fly"
     },
     {
-      "index": old,
+      "index": "old",
       "date": "12.11.2025 20:32:43",
       "developer": "unknown",
       "status": "basic",
@@ -245,7 +245,7 @@
       "name": "Optimized Frames"
     },
     {
-      "index": old,
+      "index": "old",
       "date": "10.11.2025 11:23:43",
       "developer": "unknown",
       "status": "basic",
@@ -254,7 +254,7 @@
       "name": "Click Teleport"
     },
     {
-      "index": old,
+      "index": "old",
       "date": "14.11.2025 15:53:43",
       "developer": "unknown",
       "status": "basic",
@@ -263,7 +263,7 @@
       "name": "Anti Afk"
     },
     {
-      "index": old,
+      "index": "old",
       "date": "13.11.2025 20:53:43",
       "developer": "unknown",
       "status": "basic",
@@ -272,7 +272,7 @@
       "name": "Invisible"
     },
     {
-      "index": old,
+      "index": "old",
       "date": "17.11.2025 20:53:43",
       "developer": "unknown",
       "status": "basic",
