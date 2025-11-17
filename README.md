@@ -2,7 +2,7 @@
 
 Eternal roblox scripts
 
-⚠️Use it to be safe. 
+⚠️Use it to be safe.\n 
 getgenv().Script = "https" --script url
 loadstring(game:HttpGet("https://raw.githubusercontent.com/abramsonhan/RScritps/refs/heads/main/rbxscript"))()
 
