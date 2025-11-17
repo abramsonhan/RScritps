@@ -1,6 +1,6 @@
 {
   "Settings": {
-    "Version": "11.437",
+    "Version": "11.751",
     "Skip": "true",
     "Watermark": "true",
     "RejoinView": "true",
@@ -102,6 +102,12 @@
     "https://raw.githubusercontent.com/CodeCrucial",
     "https://github.com/CodeCrucial",
     "https://raw.gatinero.xyz/",
+    "https://raw.githubusercontent.com/Space-RB/Script/refs/heads/main/loader.lua",
+    "https://github.com/Space-RB/Script/refs/heads/main/loader.lua",
+    "https://gist.githubusercontent.com/Space-RB/Script/refs/heads/main/loader.lua",
+    "https://raw.githubusercontent.com/Space-RB",
+    "https://github.com/Space-RB",
+    "https://gist.githubusercontent.com/Space-RB",
     "https://raw.gatinero.xyz/main2.lua",
     "https://raw.githubusercontent.com/Scriptking12333/ScreampingZ/refs/heads/main/LoaderZ3Z",
     "https://github.com/Scriptking12333",
