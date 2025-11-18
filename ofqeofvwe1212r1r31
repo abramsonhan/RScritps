@@ -1,0 +1,20 @@
+if game.Players.LocalPlayer.PlayerGui.gameGui.sideButtons.excludeFolder.gemsFrame.amountLabel.Text:lower() == "inf" then
+	game.ReplicatedStorage.rEvents.zenMasterEvent:FireServer("convertGems", 1e+124)
+else
+	game.ReplicatedStorage.rEvents.zenMasterEvent:FireServer("convertGems", - math.huge)
+	for Y, k in pairs({
+		"Shadow Charge",
+		"Electral Chaos",
+		"Blazing Entity",
+		"Shadowfire",
+		"Lightning";
+		"Masterful Wrath",
+		"Inferno",
+		"Eternity Storm",
+		"Frost"
+	}) do
+		pcall(function()
+			game.ReplicatedStorage.rEvents.elementMasteryEvent:FireServer(k)
+		end)
+	end
+end
