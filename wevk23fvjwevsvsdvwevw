@@ -1,0 +1,229 @@
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local player = Players.LocalPlayer
+local playerStatsFolder = nil
+local settingsFolder = nil
+
+task.spawn(function()
+    local stats = ReplicatedStorage:WaitForChild("Stats", 10)
+    if not stats then return end
+
+    playerStatsFolder = stats:WaitForChild(player.Name, 10)
+    if not playerStatsFolder then return end
+
+    settingsFolder = playerStatsFolder:WaitForChild("Settings", 10)
+end)
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "POC_SettingsUI"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = player:WaitForChild("PlayerGui")
+
+local Frame = Instance.new("Frame")
+Frame.Size = UDim2.new(0, 220, 0, 420)
+Frame.Position = UDim2.new(0.5, -110, 0.4, 0)
+Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Frame.Active = true
+Frame.Draggable = true
+Frame.Parent = ScreenGui
+
+local UIStroke = Instance.new("UIStroke", Frame)
+UIStroke.Thickness = 2
+UIStroke.Color = Color3.fromRGB(80, 80, 255)
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, -35, 0, 30)
+Title.Position = UDim2.fromOffset(5,0)
+Title.BackgroundTransparency = 1
+Title.Text = "made by rdreadpirate - free"
+Title.TextColor3 = Color3.fromRGB(200, 200, 255)
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 14
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.Parent = Frame
+
+local Close = Instance.new("TextButton")
+Close.Size = UDim2.new(0, 30, 0, 30)
+Close.Position = UDim2.new(1, -30, 0, 0)
+Close.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+Close.Text = "X"
+Close.TextColor3 = Color3.fromRGB(255, 150, 150)
+Close.Font = Enum.Font.GothamBold
+Close.TextSize = 18
+Close.Parent = Frame
+
+Close.MouseButton1Click:Connect(function()
+    Frame.Visible = false
+end)
+
+local function MakeToggle(name, yPos)
+    local button = Instance.new("TextButton")
+    button.Size = UDim2.new(1, -20, 0, 40)
+    button.Position = UDim2.new(0, 10, 0, yPos)
+    button.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+    button.Font = Enum.Font.Gotham
+    button.TextSize = 16
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    button.Text = name .. ": (loading)"
+    button.Parent = Frame
+
+    button.MouseButton1Click:Connect(function()
+        if not settingsFolder then return end
+        local setting = settingsFolder:FindFirstChild(name)
+        if setting and setting:IsA("BoolValue") then
+            setting.Value = not setting.Value
+            button.Text = name .. ": " .. tostring(setting.Value)
+        end
+    end)
+
+    task.spawn(function()
+        repeat task.wait() until settingsFolder
+        local setting = settingsFolder:WaitForChild(name, 3)
+        if setting then
+            button.Text = name .. ": " .. tostring(setting.Value)
+        else
+            button.Text = name .. ": (missing)"
+        end
+    end)
+end
+
+local function MakeSetButton(name, yPos, targetValue)
+    local button = Instance.new("TextButton")
+    button.Size = UDim2.new(1, -20, 0, 40)
+    button.Position = UDim2.new(0, 10, 0, yPos)
+    button.BackgroundColor3 = Color3.fromRGB(55, 55, 55)
+    button.Font = Enum.Font.Gotham
+    button.TextSize = 16
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    button.Text = name .. ": Set"
+    button.Parent = Frame
+
+    button.MouseButton1Click:Connect(function()
+        local eggStats = ReplicatedStorage.Stats:FindFirstChild(player.Name)
+        if eggStats then
+            eggStats = eggStats:FindFirstChild("EggStats")
+            if eggStats then
+                local stat = eggStats:FindFirstChild("HatchSpeed")
+                if stat and stat:IsA("NumberValue") then
+                    stat.Value = targetValue
+                    button.Text = name .. ": " .. tostring(stat.Value)
+                end
+            end
+        end
+    end)
+end
+
+local function MakeDirectToggle(name, valueObj, yPos)
+    local button = Instance.new("TextButton")
+    button.Size = UDim2.new(1, -20, 0, 40)
+    button.Position = UDim2.new(0, 10, 0, yPos)
+    button.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+    button.Font = Enum.Font.Gotham
+    button.TextSize = 16
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    button.Text = name .. ": (loading)"
+    button.Parent = Frame
+
+    button.MouseButton1Click:Connect(function()
+        if valueObj and valueObj:IsA("BoolValue") then
+            valueObj.Value = not valueObj.Value
+            button.Text = name .. ": " .. tostring(valueObj.Value)
+        end
+    end)
+
+    task.spawn(function()
+        task.wait(0.5)
+        if valueObj then
+            button.Text = name .. ": " .. tostring(valueObj.Value)
+        end
+    end)
+end
+
+local autoRewardEnabled = false
+local function MakeAutoRewardToggle(yPos)
+    local button = Instance.new("TextButton")
+    button.Size = UDim2.new(1, -20, 0, 40)
+    button.Position = UDim2.new(0, 10, 0, yPos)
+    button.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+    button.Font = Enum.Font.Gotham
+    button.TextSize = 16
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    button.Text = "AutoRewardEgg: OFF"
+    button.Parent = Frame
+
+    button.MouseButton1Click:Connect(function()
+        autoRewardEnabled = not autoRewardEnabled
+        button.Text = "AutoRewardEgg: " .. (autoRewardEnabled and "ON" or "OFF")
+    end)
+
+    task.spawn(function()
+        while true do
+            task.wait(0.25)
+            if autoRewardEnabled then
+                local menus = player.PlayerGui:FindFirstChild("Menus")
+                if not menus then continue end
+                local rewardUI = menus:FindFirstChild("Reward")
+                if not rewardUI then continue end
+                local main = rewardUI.Frame.Main
+                local available = main.Claim.Main:FindFirstChild("Available")
+                if available and available.Visible == true then
+                    pcall(function()
+                        main.Claim:Activate()
+                    end)
+                end
+            end
+        end
+    end)
+end
+
+local function MakeMiningSpeedSlider(yPos)
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1, -20, 0, 20)
+    label.Position = UDim2.new(0, 10, 0, yPos)
+    label.BackgroundTransparency = 1
+    label.Font = Enum.Font.Gotham
+    label.TextSize = 14
+    label.TextColor3 = Color3.fromRGB(255,255,255)
+    label.Text = "MiningSpeedBoost: 1"
+    label.Parent = Frame
+
+    local slider = Instance.new("TextButton")
+    slider.Size = UDim2.new(1, -20, 0, 30)
+    slider.Position = UDim2.new(0, 10, 0, yPos + 20)
+    slider.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+    slider.Font = Enum.Font.Gotham
+    slider.Text = "Drag to Set"
+    slider.TextColor3 = Color3.fromRGB(255,255,255)
+    slider.TextSize = 14
+    slider.Parent = Frame
+
+    local dragging = false
+    slider.MouseButton1Down:Connect(function() dragging = true end)
+    game:GetService("UserInputService").InputEnded:Connect(function() dragging = false end)
+
+    game:GetService("RunService").RenderStepped:Connect(function()
+        if dragging then
+            local mouse = player:GetMouse()
+            local relativeX = mouse.X - slider.AbsolutePosition.X
+            local percent = math.clamp(relativeX / slider.AbsoluteSize.X, 0, 1)
+            local value = math.floor(percent * 9) + 1
+            label.Text = "MiningSpeedBoost: " .. value
+
+            local boost = ReplicatedStorage.Stats:FindFirstChild(player.Name)
+            if boost then
+                boost = boost:FindFirstChild("MiningSpeedBoost")
+                if boost and boost:IsA("NumberValue") then
+                    boost.Value = value
+                end
+            end
+        end
+    end)
+end
+
+MakeToggle("AutoRebirth", 40)
+MakeToggle("AutoTrain", 90)
+MakeSetButton("Egg Hatch Speed", 140, 7)
+MakeDirectToggle("Premium", ReplicatedStorage.Stats:WaitForChild(player.Name):WaitForChild("Analytics"):WaitForChild("IsPremium"), 190)
+MakeDirectToggle("In Group", ReplicatedStorage.Stats:WaitForChild(player.Name):WaitForChild("Analytics"):WaitForChild("IsInGroup"), 240)
+MakeAutoRewardToggle(290)
+MakeMiningSpeedSlider(340)
