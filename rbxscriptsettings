@@ -71,7 +71,6 @@
 
   "rbxloadstringblacklist": [
     "https://github.com/dancingninjarest96/",
-    "https://raw.githubusercontent.com/Bebo-Mods/Scripts/refs/heads/master/HttpsSpy.lua",
     "https://github.com/alximikgoose/aimscript/raw/refs/heads/main/aim",
     "https://github.com/alximikgoose",
     "https://gist.githubusercontent.com/alximikgoose",
