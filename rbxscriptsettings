@@ -1,7 +1,7 @@
 {
   "Settings": {
-    "Version": "12.436",
-    "LastUpdate": "18.11.2025 15:20:13",
+    "Version": "12.446",
+    "LastUpdate": "18.11.2025 18:29:59",
     "Skip": "true",
     "Watermark": "true",
     "RejoinView": "true",
@@ -89,7 +89,6 @@
     "http://c1.play2go.cloud",
     "https://raw.githubusercontent.com/scripter383-commits/EjayScriptv2.5/refs/heads/main/PVBHUB",
     "https://github.com/scripter383-commits/",
-    "https://gist.githubusercontent.com/",
     "https://8ulem.wtf/loader.lua",
     "https://ulem.wtf/loader.lua",
     "https://ulem.wtf/",
