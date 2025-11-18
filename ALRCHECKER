@@ -1,7 +1,0 @@
-local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
-
-Fluent:Notify({
-    Title = "rbxscript.com",
-    Content = "Your cheat is active  💥",
-    Duration = 8
-})
