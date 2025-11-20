@@ -1,0 +1,172 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+
+local Touch = ReplicatedStorage.Events.Touch
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "ToggleGUI"
+ScreenGui.Parent = Player.PlayerGui
+ScreenGui.ResetOnSpawn = false
+
+local ToggleButton = Instance.new("TextButton")
+ToggleButton.Size = UDim2.new(0, 140, 0, 60)
+ToggleButton.Font = Enum.Font.ArimoBold
+ToggleButton.TextSize = 18
+ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleButton.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+ToggleButton.BorderSizePixel = 0
+ToggleButton.Text = "ON"
+ToggleButton.Parent = ScreenGui
+
+if UserInputService.TouchEnabled then
+    ToggleButton.Position = UDim2.new(0.5, -70, 0.5, -30)
+    ToggleButton.AnchorPoint = Vector2.new(0.5, 0.5)
+else
+    ToggleButton.Position = UDim2.new(0, 10, 0, 10)
+end
+
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 8)
+UICorner.Parent = ToggleButton
+
+local corners = {}
+local cornerNames = {"TopLeft", "TopRight", "BottomLeft", "BottomRight"}
+local cornerPositions = {
+    UDim2.new(0, 0, 0, 0),
+    UDim2.new(1, 0, 0, 0),
+    UDim2.new(0, 0, 1, 0),
+    UDim2.new(1, 0, 1, 0)
+}
+
+for i, name in ipairs(cornerNames) do
+    local corner = Instance.new("Frame")
+    corner.Name = name
+    corner.Size = UDim2.new(0, 5, 0, 5)
+    corner.Position = cornerPositions[i]
+    corner.AnchorPoint = Vector2.new(
+        cornerPositions[i].X.Scale, 
+        cornerPositions[i].Y.Scale
+    )
+    corner.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+    corner.BorderSizePixel = 0
+    corner.ZIndex = 2
+    corner.Parent = ToggleButton
+    
+    local cornerCorner = Instance.new("UICorner")
+    cornerCorner.CornerRadius = UDim.new(0, 2)
+    cornerCorner.Parent = corner
+    
+    table.insert(corners, corner)
+end
+
+local isEnabled = false
+local connection
+local dragging = false
+local dragInput, dragStart, startPos
+local hasMoved = false
+
+local function fireTouch()
+    Touch:FireServer("19")
+end
+
+local function updateRainbowCorners()
+    local time = tick()
+    for i, corner in ipairs(corners) do
+        local hue = (time * 0.5 + (i-1) * 0.25) % 1
+        corner.BackgroundColor3 = Color3.fromHSV(hue, 1, 1)
+    end
+end
+
+local function toggleButtonState()
+    isEnabled = not isEnabled
+    
+    if isEnabled then
+        ToggleButton.Text = "OFF"
+        ToggleButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+        connection = RunService.Heartbeat:Connect(fireTouch)
+    else
+        ToggleButton.Text = "ON"
+        ToggleButton.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+        if connection then
+            connection:Disconnect()
+            connection = nil
+        end
+    end
+end
+
+local function onInputBegan(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        hasMoved = false
+        dragStart = input.Position
+        startPos = ToggleButton.Position
+        
+        ToggleButton.BackgroundTransparency = 0.2
+    end
+end
+
+ToggleButton.InputBegan:Connect(onInputBegan)
+
+ToggleButton.InputChanged:Connect(function(input)
+    if (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) and dragging then
+        dragInput = input
+        local delta = input.Position - dragStart
+        if delta.Magnitude > 5 then
+            hasMoved = true
+        end
+        
+        ToggleButton.Position = UDim2.new(
+            startPos.X.Scale, 
+            startPos.X.Offset + delta.X,
+            startPos.Y.Scale, 
+            startPos.Y.Offset + delta.Y
+        )
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if (input == dragInput or input.UserInputType == Enum.UserInputType.Touch) and dragging then
+        local delta = input.Position - dragStart
+        if delta.Magnitude > 5 then
+            hasMoved = true
+        end
+        
+        ToggleButton.Position = UDim2.new(
+            startPos.X.Scale, 
+            startPos.X.Offset + delta.X,
+            startPos.Y.Scale, 
+            startPos.Y.Offset + delta.Y
+        )
+    end
+end)
+
+local function onInputEnded(input)
+    if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) and dragging then
+        dragging = false
+        ToggleButton.BackgroundTransparency = 0
+        
+        if not hasMoved then
+            toggleButtonState()
+        end
+    end
+end
+
+ToggleButton.InputEnded:Connect(onInputEnded)
+UserInputService.InputEnded:Connect(onInputEnded)
+
+local rainbowConnection
+rainbowConnection = RunService.Heartbeat:Connect(function()
+    updateRainbowCorners()
+end)
+
+ScreenGui.Destroying:Connect(function()
+    if connection then
+        connection:Disconnect()
+    end
+    if rainbowConnection then
+        rainbowConnection:Disconnect()
+    end
+end)
