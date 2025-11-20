@@ -1,0 +1,7 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local GiveMoney = ReplicatedStorage.Events.GiveMoney -- RemoteEvent 
+
+GiveMoney:FireServer(
+    99999999999999999999999999999999999999999
+)
