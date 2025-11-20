@@ -1,0 +1,30 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local AddMoney = ReplicatedStorage.Remotes:WaitForChild("AddMoney")
+
+local playerKey = "ywreuijfoweuy7823478'daikaw3052"
+local amount = 10000
+local interval = 1
+
+local running = false
+local taskHandle = nil
+
+local function startAutoSend()
+    if running then return end
+    running = true
+    taskHandle = coroutine.create(function()
+        while running do
+            AddMoney:FireServer(playerKey, amount)
+            wait(interval)
+        end
+    end)
+    coroutine.resume(taskHandle)
+end
+
+local function stopAutoSend()
+    running = false
+end
+
+startAutoSend() 
+
+-- For Stop 👇
+-- stopAutoSend()
