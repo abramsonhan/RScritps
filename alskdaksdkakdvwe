@@ -1,0 +1,102 @@
+local Library = loadstring(game:HttpGet("https://pastefy.app/LykT6C8f/raw"))()
+
+local Window = Library:CreateWindow("Basilia Ui V2")
+local Tab1 = Window:AddTab("Main")
+local Tab2 = Window:AddTab("Visual")
+local Tab3 = Window:AddTab("New")
+
+Tab1:AddButton({
+    Text = "Execute",
+    Callback = function()
+        print("Button pressed!")
+    end
+})
+
+Tab1:AddToggle({
+    Text = "Enable Feature",
+    Default = true,
+    Callback = function(Value)
+        print("Toggle state:", Value)
+    end
+})
+
+Tab1:AddToggle({
+    Text = "Enable Feature",
+    Default = true,
+    Callback = function(Value)
+        print("Toggle state:", Value)
+    end
+})
+
+Tab1:AddToggle({
+    Text = "Enable Feature",
+    Default = true,
+    Callback = function(Value)
+        print("Toggle state:", Value)
+    end
+})
+
+Tab1:AddSlider({
+    Text = "Intensity",
+    Min = 0,
+    Max = 100,
+    Default = 50,
+    Callback = function(Value)
+        print("Slider value:", Value)
+    end
+})
+
+-- New components
+Tab2:AddDropdown({
+    Text = "Select Weapon",
+    Options = {"Sword", "Gun", "Bow", "Staff"},
+    Default = "Sword",
+    Callback = function(Value)
+        print("Selected:", Value)
+    end
+})
+
+Tab2:AddTextbox({
+    Text = "Player Name",
+    Placeholder = "Enter username...",
+    Callback = function(Value)
+        print("Name entered:", Value)
+    end
+})
+
+Tab2:AddKeybind({
+    Text = "Teleport Key",
+    Default = Enum.KeyCode.F,
+    Callback = function(Key)
+        print("Keybind set to:", Key)
+    end
+})
+
+Tab2:AddLabel({
+    Text = "Welcome to the Game!",
+    Size = 18,
+    Color = Color3.new(1, 0.5, 0),
+    Center = true,
+    Stroke = true
+})
+
+Tab3:AddSearchBox({
+    Placeholder = "Search options..."
+})
+
+Tab3:AddToggleWithKeybind({
+    Text = "Toggle Feature",
+    Default = false,
+    Keybind = Enum.KeyCode.F,
+    Callback = function(state)
+        print("Toggle state:", state)
+    end
+})
+
+Tab3:AddMultiDropdown({
+    Text = "Choose Fruit",
+    Options = {"Banana", "Apple", "Orange", "Ananas"},
+    Callback = function(selected)
+        print("Choose", table.concat(selected, ", "))
+    end
+})
