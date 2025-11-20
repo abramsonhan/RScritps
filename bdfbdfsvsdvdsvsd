@@ -1,0 +1,53 @@
+local lib = loadstring(game:HttpGet("https://raw.githubusercontent.com/acsu123/HOHO_H/main/hoho_lib.lua", true))()
+local win = lib:Window("Dinas Hub", "Dalgona Tycoon", Color3.new(0.85, 0.95, 0.9))
+local tab = win:Tab("Script")
+local label = tab:Label("Label", properties)
+label:NewLabel("Cheats", properties)
+tab:Line()
+local toggle = tab:Toggle("Auto Dalgona(Inf Money)", false, function(val)
+    print(val)
+    lib:Nof("Auto Complete Dalgona", 3)
+	
+    if val then
+        local function exploitDalgona()
+        	
+            local argsStreak = {
+                "Streak"
+            }
+            game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Player"):WaitForChild("Dalgona"):FireServer(unpack(argsStreak))
+        	
+            local argsStartedNew = {
+                "StartedNew"
+            }
+        	game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Player"):WaitForChild("Dalgona"):FireServer(unpack(argsStartedNew))
+        	
+            local argsFinished = {
+                "Finished"
+            }
+            game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Player"):WaitForChild("Dalgona"):FireServer(unpack(argsFinished))
+        end
+    	
+        while true do
+            exploitDalgona()
+            wait(0.0000001)
+        end
+    end
+end)
+toggle:NewText("Auto Dalgona(Inf Money)")
+toggle:NewState(false)
+
+local drop = tab:Dropdown("Auto Upgrade", {"Money per Dalgona", "Worker Speed", "Cut Gaps", "Time Delay"}, function(val)
+    lib:Nof("Try Buy" .. val, 3)
+	
+    local function buyUpgrade(upgradeName)
+        local args = {
+            upgradeName
+        }
+    	
+        game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Upgrades"):WaitForChild("DoUpgrade"):FireServer(unpack(args))
+    end
+	
+    buyUpgrade(val)
+end)
+
+drop:NewText("Choose")
