@@ -1,0 +1,97 @@
+--[[
+	WARNING: Heads up! This script has not been verified by ScriptBlox. Use at your own risk!
+]]
+local Library = loadstring(game:HttpGet("https://pastefy.app/EA8kBjOQ/raw"))()
+
+local Window = Library:CreateWindow("Dinas Hub Merge Brainrot")
+local Tab1 = Window:AddTab("Main")
+local Tab2 = Window:AddTab("Potion")
+local Tab3 = Window:AddTab("Roulette")
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local AddValueEvent = ReplicatedStorage.Remotes.AddValueEvent
+
+local infiniteMoneyActive = false
+local infiniteMoneyThread
+
+Tab1:AddButton({
+    Text = "On/Off Infinity Money",
+    Callback = function()
+        infiniteMoneyActive = not infiniteMoneyActive
+
+        if infiniteMoneyActive then
+            infiniteMoneyThread = coroutine.create(function()
+                while infiniteMoneyActive do
+                    AddValueEvent:FireServer("Cash", 99999999999999999999999999999999999999999999999999999999)
+                    wait(0.1)
+                end
+            end)
+            coroutine.resume(infiniteMoneyThread)
+        else
+        end
+    end
+})
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local NewDropBlocksEvent = ReplicatedStorage.Remotes.NewDropBlocksEvent -- RemoteEvent
+
+local autoDropActive = false
+local autoDropThread
+
+Tab1:AddButton({
+    Text = "On/Off Auto Drop",
+    Callback = function()
+        autoDropActive = not autoDropActive
+
+        if autoDropActive then
+            autoDropThread = coroutine.create(function()
+                while autoDropActive do
+                    firesignal(NewDropBlocksEvent.OnClientEvent, 5)
+                    wait(0.2)
+                end
+            end)
+            coroutine.resume(autoDropThread)
+        else
+        end
+    end
+})
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local BuyPotionEvent = ReplicatedStorage.Remotes.BuyPotionEvent
+
+Tab2:AddButton({
+    Text = "Get All Potions",
+    Callback = function()
+        local potions = {"Potion1", "Potion2", "Potion3"}
+        for _, potionName in ipairs(potions) do
+            BuyPotionEvent:FireServer(potionName, 0)
+            wait(0.3)
+        end
+    end
+})
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local SpinWheelPrizeEvent = ReplicatedStorage.Remotes.SpinWheelPrizeEvent
+
+local prizeNames = {
+    [1] = "Get 10 Brain",
+    [2] = "Get x10 Money",
+    [3] = "Get 1 Spin",
+    [5] = "Get 250 Diamond (Inf)",
+    [6] = "Get x2 Money",
+    [7] = "Get 50 Brain",
+    [8] = "Get x2 Max Brainrot",
+    [9] = "Get 1k Diamonds (Inf)",
+    [10] = "Get 1M Money"
+}
+
+for i = 1, 10 do
+    if i ~= 4 then
+        Tab3:AddButton({
+            Text = prizeNames[i] or ("Prize " .. i),
+            Callback = function()
+                SpinWheelPrizeEvent:FireServer(i)
+            end
+        })
+    end
+end
