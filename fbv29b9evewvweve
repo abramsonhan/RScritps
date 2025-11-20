@@ -1,0 +1,6 @@
+local clicker = game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Clicker")
+
+while true do
+    clicker:FireServer()
+    wait(0.1)
+end
