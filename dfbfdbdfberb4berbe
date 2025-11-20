@@ -1,0 +1,162 @@
+--[[
+	WARNING: Heads up! This script has not been verified by ScriptBlox. Use at your own risk!
+]]
+local summitLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/Vovabro46/DinasMenu/refs/heads/main/DinasMenus.lua"))()
+
+local window = summitLib:CreateWindow({Name = "Dinas Hub",AccentColor3 = Color3.new(1, 0.235294, 0.337255)})
+local Tab1 = window:CreateTab({Name = "Labels", Icon = 'rbxassetid://7733964719'})
+local Tab2 = window:CreateTab({Name = "Interactables", Icon = 'rbxassetid://7743878358'})
+local Tab3 = window:CreateTab({Name = "Auto Egg", Icon = 'rbxassetid://8997385940'})
+local Tab4 = window:CreateTab({Name = "Miscecellaneous", Icon = 'rbxassetid://7733673466'})
+
+Tab1:CreateLabel("Information")
+Tab1:CreateParagraph("This menu is the final one for my design for them. I will use only this one. This is the best script for this game so far.Also this script will be updated because I haven't finished it yet")
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Hatch = ReplicatedStorage.Functions.Hatch
+
+local eggNames = {"Basic", "Beach", "Yeti", "Candy", "Ninja", "Atlantis", "Spooky", "Toxic", "Jungle", "Lava", "Matrix", "Classic", "Party"}
+local selectedEgg = eggNames[1]
+local autoOpen = false
+
+Tab3:CreateDropdown({
+    Text = "Choose Egg For Open",
+    Options = eggNames,
+    Callback = function(option)
+        selectedEgg = option
+    end
+})
+
+Tab3:CreateToggle({
+    Text = "Auto Open Egg(X3)",
+    Callback = function(state)
+        autoOpen = state
+        if autoOpen then
+            spawn(function()
+                while autoOpen do
+                    Hatch:InvokeServer(selectedEgg, "Triple")
+                    wait(0.5)
+                end
+            end)
+        end
+    end
+})
+
+Tab3:CreateToggle({
+    Text = "Auto Open Egg (X1)",
+    Callback = function(state)
+        autoOpen = state
+        if autoOpen then
+            spawn(function()
+                while autoOpen do
+                    Hatch:InvokeServer(selectedEgg, "Single")
+                    wait(0.5)
+                end
+            end)
+        end
+    end
+})
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Rebirth = ReplicatedStorage.Events.Rebirth
+local LevelXPRequest = ReplicatedStorage.LevelXPRequest
+
+local AutoRebirthEnabled = false
+local AutoLevelXPEnabled = false
+local SelectedRebirthValue = 1
+
+local function AutoRebirthLoop()
+    while AutoRebirthEnabled do
+        Rebirth:FireServer(SelectedRebirthValue)
+        wait(1)
+    end
+end
+
+local function AutoLevelXPLoop()
+    while AutoLevelXPEnabled do
+        LevelXPRequest:FireServer(2)
+        wait(0.1)
+    end
+end
+
+Tab2:CreateDropdown({
+    Text = "Rebirth Value",
+    Options = {"1", "5", "10"},
+    Callback = function(Option)
+        SelectedRebirthValue = tonumber(Option)
+        print("Selected Rebirth value:", SelectedRebirthValue)
+    end
+})
+
+Tab2:CreateToggle({
+    Text = "Auto Rebirth",
+    Default = false,
+    Callback = function(Value)
+        AutoRebirthEnabled = Value
+        if Value then
+            spawn(AutoRebirthLoop)
+        end
+    end
+})
+
+Tab2:CreateToggle({
+    Text = "Auto Click & Level XP",
+    Default = false,
+    Callback = function(Value)
+        AutoLevelXPEnabled = Value
+        if Value then
+            spawn(AutoLevelXPLoop)
+        end
+    end
+})
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+
+local PurchaseUpgrade = ReplicatedStorage.Events.PurchaseUpgrade
+local LocalPlayer = Players.LocalPlayer
+
+local availableUpgrades = {
+    "ClickMultiplier",
+    "CraftAllButton",
+    "GemMultiplier",
+    "HatchingSpeed",
+    "LongerOfflineGains",
+    "LuckMultiplier",
+    "MoreOfflineGains",
+    "MoreStorage",
+    "MoreWalkSpeed",
+    "PetEquip",
+    "RebirthButtons",
+    "TeleportButton"
+}
+
+local SelectedUpgrade = availableUpgrades[1]
+local AutoPurchaseEnabled = false
+
+local function AutoPurchaseLoop()
+    while AutoPurchaseEnabled do
+        PurchaseUpgrade:FireServer("Spawn", SelectedUpgrade)
+        wait(1)
+    end
+end
+
+Tab4:CreateToggle({
+    Text = "Auto Purchase Upgrade",
+    Default = false,
+    Callback = function(value)
+        AutoPurchaseEnabled = value
+        if value then
+            spawn(AutoPurchaseLoop)
+        end
+    end
+})
+
+Tab4:CreateDropdown({
+    Text = "Select Upgrade",
+    Options = availableUpgrades,
+    Callback = function(option)
+        SelectedUpgrade = option
+    end
+})
