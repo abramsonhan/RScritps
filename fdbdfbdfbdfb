@@ -1,0 +1,8 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local GetWinsEvent = ReplicatedStorage.Packages._Index["sleitnick_knit@1.5.1"].knit.Services.FightService.RE.GetWinsEvent
+
+GetWinsEvent:FireServer(
+    "WinGate_12",
+    Vector3.new(1816, 786, -55387)
+)
