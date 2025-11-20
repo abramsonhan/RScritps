@@ -1,0 +1,195 @@
+loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/rodus", true))()
+
+CreateMain("DinasHub")
+
+CreateTab("AutoScripts")
+CreateTab("Egg & Teleport")
+
+CreateLabel(tabs['AutoScripts'], "Cheats", Color3.fromRGB(0,255,0))
+
+local RE_PATH = "ReplicatedStorage.GiveCash"
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
+local autoGiveCashEnabled = false
+local selectedItem = "Rusty"
+local items = {"Rusty", "Steel", "Golden", "Candy", "Neon", "Cyber", "Diamond", "Lava", "Infinity"}
+
+local function giveCash(item)
+    local player = Players.LocalPlayer
+    if not player or not player.Character then
+        return
+    end
+
+    local itemObject = player.Character:FindFirstChild(item)
+
+    if not itemObject then
+        return
+    end
+
+    local RE = ReplicatedStorage:WaitForChild("GiveCash")
+    if RE then
+        RE:FireServer(itemObject)
+    else
+    end
+end
+
+CreateToggle(tabs['AutoScripts'], "Give Cash(Inf Money)", "Enable/Disable Auto Give Cash", function()
+    autoGiveCashEnabled = toggled
+end)
+
+CreateSideDropToggle(tabs['AutoScripts'], "Select Drill for cash", items, function(arg)
+    selectedItem = arg
+end)
+
+RunService.Heartbeat:Connect(function()
+    if autoGiveCashEnabled then
+        giveCash(selectedItem)
+        task.wait(1)
+    end
+end)
+
+local RE_PATH = "ReplicatedStorage.DrillShop.BuySkin"
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+
+local selectedSkin = "Rusty"
+local skins = {"Rusty", "Steel", "Golden", "Candy", "Neon", "Cyber", "Diamond", "Lava", "Infinity"}
+
+local function buySkin(skinName)
+    local RE = ReplicatedStorage:WaitForChild("DrillShop"):WaitForChild("BuySkin")
+    if RE then
+        local success, result = pcall(function()
+            return RE:InvokeServer(skinName)
+        end)
+
+        if success then
+            if result then
+            else
+            end
+        else
+        end
+    else
+    end
+end
+
+CreateSideDropToggle(tabs['AutoScripts'], "Select Buy Skin", skins, function(arg)
+    selectedSkin = arg
+    buySkin(selectedSkin)
+end)
+
+local RE_PATH = "ReplicatedStorage.DrillShop.EquipSkin"
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local items = {"Rusty", "Steel", "Golden", "Candy", "Neon", "Cyber", "Diamond", "Lava", "Infinity"}
+local selectedItem = "Rusty"
+
+local function equipSkin(skinName)
+    local RE = ReplicatedStorage:WaitForChild("DrillShop"):WaitForChild("EquipSkin")
+    if RE then
+        local success, result = pcall(function()
+            return RE:InvokeServer(skinName, true)
+        end)
+        if not success then
+        end
+    else
+    end
+end
+
+CreateSideDropToggle(tabs['AutoScripts'], "Auto Equip", items, function(arg)
+    selectedItem = arg
+    equipSkin(selectedItem)
+end)
+
+local RE_PATH = "ReplicatedStorage.KPets.Events.Hatch"
+local HATCH_INTERVAL = 5
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+
+local autoHatchEnabled = false
+local selectedEgg = "Beach Egg"
+
+local EGGS = {
+    "Beach Egg",
+    "Blizzard Egg",
+    "Celestial Egg",
+    "Easter Egg",
+    "Ember Egg",
+    "Enigma Egg",
+    "Fossil Egg",
+    "Glacier Egg",
+    "Jungle Egg",
+    "Jurassic Egg",
+    "Lava Egg",
+    "Nebula Egg",
+    "Necromancer Egg",
+    "Oceanic Egg",
+    "Olympian Egg",
+    "Pantheon Egg",
+    "Tropical Egg",
+}
+
+local function hatchEgg(eggName, amount)
+    local RE = ReplicatedStorage:WaitForChild("KPets"):WaitForChild("Events"):WaitForChild("Hatch")
+    if RE then
+        RE:FireServer(eggName, amount)
+    else
+    end
+end
+
+CreateToggle(tabs['Egg & Teleport'], "Auto Hatch", "Enable/Disable Auto Hatch", function()
+    autoHatchEnabled = toggled
+end)
+
+CreateSideDropToggle(tabs['Egg & Teleport'], "Select Egg", EGGS, function(arg)
+    selectedEgg = arg
+end)
+
+RunService.Heartbeat:Connect(function()
+    if autoHatchEnabled then
+        hatchEgg(selectedEgg, 1)
+        task.wait(HATCH_INTERVAL)
+    end
+end)
+
+local RE_PATH = "ReplicatedStorage.ChangeWorld"
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local selectedWorld = "Main"
+local WORLDS = {
+    "Ancient Greek",
+    "Astral",
+    "Dinosaur",
+    "Frozen",
+    "Jungle",
+    "Magic",
+    "Main",
+}
+
+local function changeWorld(worldName)
+    local RE = ReplicatedStorage:WaitForChild("ChangeWorld")
+    if RE then
+        local success, result = pcall(function()
+            return RE:InvokeServer(worldName)
+        end)
+
+        if success then
+            if result then
+            else
+            end
+        else
+        end
+    else
+    end
+end
+
+CreateSideDropToggle(tabs['Egg & Teleport'], "Select World(Teleport)", WORLDS, function(arg)
+    selectedWorld = arg
+    changeWorld(selectedWorld)
+end)
