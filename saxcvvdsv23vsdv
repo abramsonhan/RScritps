@@ -1,0 +1,48 @@
+local Library = loadstring(game:HttpGet("https://pastefy.app/Rf8iYjYI/raw"))()
+
+local Window = Library:CreateWindow("Dinas Hub")
+local Tab1 = Window:AddTab("Game")
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Claim = ReplicatedStorage.Source.Packages.Knit.Services.PickupService.RF.Claim
+
+local toggles = {}
+
+Tab1:AddToggle({
+    Text = "Auto Money(inf)",
+    Default = false,
+    Callback = function(value)
+        toggles.autoMoney = value
+        if value then
+            spawn(function()
+                while toggles.autoMoney do
+                    Claim:InvokeServer({Coins = 0.09375})
+                    wait(0.0001)
+                end
+            end)
+        end
+    end,
+})
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Rebirth = ReplicatedStorage.Source.Packages.Knit.Services.RebirthService.RF.Rebirth
+
+local toggles = toggles or {}
+
+Tab1:AddToggle({
+    Text = "Auto Rebirth",
+    Default = false,
+    Callback = function(value)
+        toggles.autoRebirth = value
+        if value then
+            spawn(function()
+                while toggles.autoRebirth do
+                    Rebirth:InvokeServer()
+                    wait(1)
+                end
+            end)
+        end
+    end,
+})dfbfdb
