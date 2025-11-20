@@ -1,0 +1,4 @@
+local Event = game:GetService("ReplicatedStorage").Events.Sell
+Event:FireServer(
+    99999999999999999
+)
