@@ -1,0 +1,75 @@
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Vovabro46/DinasMenu/refs/heads/main/NewMenu.lua"))()
+
+local window = Library:CreateWindow("Dinas Hub")
+local mainTab = window:AddTab("Main", "🏠")
+local settingsTab = window:AddTab("Settings", "⚙️")
+
+Library:AddToggle(settingsTab, "Enable Rainbow Corner", function(state)
+    if state then
+        window:EnableRainbowCorners()
+    else
+        window:DisableRainbowCorners()
+    end
+end)
+
+Library:AddButton(mainTab, "Inf Energy", function()
+    local args = {
+        {
+            Type = "Orb",
+            ItemType = "SpawnOrb4",
+            CrateType = "None"
+        }
+    }
+    
+    local remoteEvent = game:GetService("ReplicatedStorage")
+        :WaitForChild("Packages")
+        :WaitForChild("Network")
+        :WaitForChild("RemoteEventStorage")
+        :WaitForChild("CollectCollectible")
+    
+    remoteEvent:FireServer(unpack(args))
+end)
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RemoteEvent = ReplicatedStorage:WaitForChild("Packages"):WaitForChild("Network"):WaitForChild("RemoteEventStorage"):WaitForChild("GiftRewardClaimed")
+
+local rewards = {
+    "Pennywose",
+    "TaxiRacer",
+    "MagicEvolved",
+    "HatchEvolved",
+    "EnergyEvolved",
+    "LuckEvolved",
+    "WinEvolved",
+    "Mystery Box",
+    "Mythic Aura Box",
+    "LuckV",
+    "WinV",
+    "HatchV",
+    "EnergyV",
+    "HatchIV",
+    "LuckIV",
+    "EnergyIV",
+    "WinIV",
+    "Token Box",
+    "Part Box",
+    "Aura Box",
+    "LuckIII",
+    "HatchIII",
+    "WinIII",
+    "EnergyIII",
+    "Essence",
+    "LuckII",
+    "Wins"
+}
+
+local function claimAllRewards()
+    for _, reward in ipairs(rewards) do
+        RemoteEvent:FireServer("Gift1", reward)
+        wait(0.1)
+    end
+end
+
+Library:AddButton(mainTab, "Get All Gift Reward", function()
+    claimAllRewards()
+end)
