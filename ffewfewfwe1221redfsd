@@ -1,0 +1,141 @@
+local Library = loadstring(game:HttpGet("https://pastefy.app/Rf8iYjYI/raw"))()
+
+local Window = Library:CreateWindow("Dinas Hub Very Op")
+local Tab1 = Window:AddTab("Spin")
+local Tab2 = Window:AddTab("Game")
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local SpinPrizeEvent = ReplicatedStorage.Remotes:WaitForChild("SpinPrizeEvent")
+
+local enabled = false
+
+Tab1:AddToggle({
+    Text = "Collect 75 Gems",
+    Default = false,
+    Callback = function(value)
+        enabled = value
+        if enabled then
+            SpinPrizeEvent:FireServer(9)
+        end
+    end
+})
+
+Tab1:AddToggle({
+    Text = "Collect x10 Cash",
+    Default = false,
+    Callback = function(value)
+        enabled = value
+        if enabled then
+            SpinPrizeEvent:FireServer(8)
+        end
+    end
+})
+
+Tab1:AddToggle({
+    Text = "Collect 3 Spin",
+    Default = false,
+    Callback = function(value)
+        enabled = value
+        if enabled then
+            SpinPrizeEvent:FireServer(7)
+        end
+    end
+})
+
+Tab1:AddToggle({
+    Text = "Collect 1K Cash",
+    Default = false,
+    Callback = function(value)
+        enabled = value
+        if enabled then
+            SpinPrizeEvent:FireServer(6)
+        end
+    end
+})
+
+Tab1:AddToggle({
+    Text = "Collect 250 Gems",
+    Default = false,
+    Callback = function(value)
+        enabled = value
+        if enabled then
+            SpinPrizeEvent:FireServer(5)
+        end
+    end
+})
+
+Tab1:AddToggle({
+    Text = "Collect Dominus(Dupe Lol)",
+    Default = false,
+    Callback = function(value)
+        enabled = value
+        if enabled then
+            SpinPrizeEvent:FireServer(4)
+        end
+    end
+})
+
+Tab1:AddToggle({
+    Text = "Collect Spin",
+    Default = false,
+    Callback = function(value)
+        enabled = value
+        if enabled then
+            SpinPrizeEvent:FireServer(3)
+        end
+    end
+})
+
+Tab1:AddToggle({
+    Text = "Collect 2.5K Cash",
+    Default = false,
+    Callback = function(value)
+        enabled = value
+        if enabled then
+            SpinPrizeEvent:FireServer(2)
+        end
+    end
+})
+
+Tab1:AddToggle({
+    Text = "Collect 100 Gems",
+    Default = false,
+    Callback = function(value)
+        enabled = value
+        if enabled then
+            SpinPrizeEvent:FireServer(1)
+        end
+    end
+})
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local DigEvent = ReplicatedStorage.Remotes.DigEvent
+
+local toggles = {}
+
+toggles.hello = false
+
+local running = false
+local loopThread = nil
+
+Tab2:AddToggle({
+    Text = "Auto Money(inf)",
+    Default = false,
+    Callback = function(value)
+        toggles.hello = value
+        if value then
+            if not running then
+                running = true
+                loopThread = coroutine.create(function()
+                    while running do
+                        DigEvent:FireServer("hello")
+                        wait(0.1)
+                    end
+                end)
+                coroutine.resume(loopThread)
+            end
+        else
+            running = false
+        end
+    end,
+})
