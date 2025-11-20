@@ -1,0 +1,70 @@
+local Lib = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/dirt",true))()
+local Table = {}
+local window = Lib:CreateWindow("Dinas Hub")
+window:Section("Strong Simulator")
+window:Button("Auto Click", function()
+    local Event = game:GetService("ReplicatedStorage").Common.Library.Network.RemoteFunction
+    
+    local clickInterval = 0.01
+    
+    while true do
+        
+        local success, result = pcall(function()
+            return Event:InvokeServer("S_Tools_Activate", {})
+        end)
+        
+        if not success then
+        end
+        
+        wait(clickInterval)
+    end
+end)
+
+local autoRebirthEnabled = false
+
+window:Button("AutoRebirth", function()
+    autoRebirthEnabled = not autoRebirthEnabled
+
+    if autoRebirthEnabled then
+        coroutine.wrap(function()
+            while autoRebirthEnabled do
+                local args = {
+                    "S_Rebirth_Request",
+                    {}
+                }
+                
+                local success, result = pcall(function()
+                    return game:GetService("ReplicatedStorage"):WaitForChild("Common"):WaitForChild("Library"):WaitForChild("Network"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
+                end)
+
+                if not success then
+                end
+                
+                wait(2)
+            end
+        end)()
+    else
+    end
+end)
+
+window:Button("Buy 10 Energy Bars", function()
+    local function buyEnergyBars()
+        local args = {
+            "s.vending.purchase",
+            {
+                10 
+            }
+        }
+        
+        local success, result = pcall(function()
+            return game:GetService("ReplicatedStorage"):WaitForChild("Common"):WaitForChild("Library"):WaitForChild("Network"):WaitForChild("RemoteFunction"):InvokeServer(unpack(args))
+        end)
+
+        if not success then
+        end
+    end
+    
+    while true do
+        buyEnergyBars()
+    end
+end)
