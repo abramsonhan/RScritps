@@ -1,0 +1,241 @@
+local GUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/Lopp"))()
+local Page = GUI:CreateUI("Dinas Hub",true,15,2,"Center")
+
+Page:addLabel("Hacks","script for game")
+
+local autoBubbleEnabled = false
+local autoBubbleInterval = 0.1
+local autoBubbleTimer = 0
+local remoteEvent
+
+if game:GetService("ReplicatedStorage"):FindFirstChild("Remotes") and game:GetService("ReplicatedStorage").Remotes:FindFirstChild("Bubble") then
+    remoteEvent = game:GetService("ReplicatedStorage").Remotes:WaitForChild("Bubble")
+
+    Page:addButton("Auto Bubble", "Automatically send a Bubble", function()
+        autoBubbleEnabled = not autoBubbleEnabled
+        if autoBubbleEnabled then
+            autoBubbleTimer = autoBubbleInterval
+        else
+        end
+    end)
+end
+
+game:GetService("RunService").Heartbeat:Connect(function(dt)
+    if autoBubbleEnabled and remoteEvent then
+        autoBubbleTimer = autoBubbleTimer - dt
+        if autoBubbleTimer <= 0 then
+            remoteEvent:FireServer()
+            autoBubbleTimer = autoBubbleInterval
+        end
+    end
+end)
+
+local autoClaimEnabled = false
+local claimInterval = 5
+local claimTimer = 0
+local claimRemoteFunction
+
+if game:GetService("ReplicatedStorage"):FindFirstChild("Remotes") and game:GetService("ReplicatedStorage").Remotes:FindFirstChild("ClaimTimeGift") then
+    claimRemoteFunction = game:GetService("ReplicatedStorage").Remotes:WaitForChild("ClaimTimeGift")
+
+    Page:addButton("Auto Claim Gifts", "Automatically claims available time-based gifts", function()
+        autoClaimEnabled = not autoClaimEnabled
+        if autoClaimEnabled then
+            claimTimer = 0
+        end
+    end)
+end
+
+local function claimGift(giftId)
+    if not claimRemoteFunction then return end
+
+    local success, result = pcall(function()
+        return claimRemoteFunction:InvokeServer(giftId)
+    end)
+end
+
+-- Main loop
+game:GetService("RunService").Heartbeat:Connect(function(dt)
+    if autoClaimEnabled and claimRemoteFunction then
+        claimTimer = claimTimer - dt
+        if claimTimer <= 0 then
+            for giftId = 1, 12 do
+                claimGift(giftId)
+            end
+            claimTimer = claimInterval
+        end
+    end
+end)
+
+local rebirthRemoteEvent = game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("Rebirth")
+local autoRebirthEnabled = false
+local rebirthInterval = 30
+local rebirthTimer = 0
+
+Page:addButton("Auto Rebirth", "Automatically triggers rebirth", function()
+    autoRebirthEnabled = not autoRebirthEnabled
+    if autoRebirthEnabled then
+    else
+    end
+end)
+
+-- Main loop
+game:GetService("RunService").Heartbeat:Connect(function(dt)
+    if autoRebirthEnabled then
+        rebirthTimer = rebirthTimer - dt
+        if rebirthTimer <= 0 then
+            if rebirthRemoteEvent then
+                rebirthRemoteEvent:FireServer()
+            end
+            rebirthTimer = rebirthInterval
+        end
+    end
+end)
+
+local equipBestPetsRemoteEvent = game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Pets"):WaitForChild("EquipBestPets")
+local autoEquipEnabled = false
+local equipInterval = 15
+local equipTimer = 0
+
+Page:addButton("Auto Equip Best Pets", "Automatically equips the best pets", function()
+    autoEquipEnabled = not autoEquipEnabled
+    if autoEquipEnabled then
+    else
+    end
+end)
+
+game:GetService("RunService").Heartbeat:Connect(function(dt)
+    if autoEquipEnabled then
+        equipTimer = equipTimer - dt
+        if equipTimer <= 0 then
+            if equipBestPetsRemoteEvent then
+                equipBestPetsRemoteEvent:FireServer()
+            end
+            equipTimer = equipInterval
+        end
+    end
+end)
+
+local buyEnergyRemoteEvent = game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("BuyEnergy")
+local equipEnergyRemoteEvent = game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("EquipEnergy")
+local energyTypes = {}
+
+for i = 2, 33 do
+    energyTypes[#energyTypes + 1] = "Energy" .. i
+end
+
+local autoEnergyEnabled = false
+local energyInterval = 5
+local energyTimer = 0
+
+local function buyAllEnergy()
+    for _, energyType in pairs(energyTypes) do
+        if buyEnergyRemoteEvent then
+            buyEnergyRemoteEvent:FireServer(energyType)
+        end
+    end
+end
+
+local function equipBestEnergy()
+    if equipEnergyRemoteEvent then
+      equipEnergyRemoteEvent:FireServer("BestEnergy")
+    end
+end
+
+Page:addButton("Auto Buy and Equip Bubble", "Automatically buys all bubble types and equips the best", function()
+    autoEnergyEnabled = not autoEnergyEnabled
+    if autoEnergyEnabled then
+    else
+    end
+end)
+
+game:GetService("RunService").Heartbeat:Connect(function(dt)
+    if autoEnergyEnabled then
+        energyTimer = energyTimer - dt
+        if energyTimer <= 0 then
+            buyAllEnergy()
+            equipBestEnergy()
+            energyTimer = energyInterval
+        end
+    end
+end)
+
+local buyWingRemoteEvent = game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("BuyWing")
+local equipWingRemoteEvent = game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("EquipWing")
+local wingTypes = {}
+
+for i = 1, 15 do
+    wingTypes[#wingTypes + 1] = "Wings" .. i
+end
+
+local autoWingsEnabled = false
+local wingsInterval = 5
+local wingsTimer = 0
+
+local function buyAllWindows()
+    for _, wingType in pairs(wingTypes) do
+        if buyWingRemoteEvent then
+            buyWingRemoteEvent:FireServer(wingType)
+        end
+    end
+end
+
+local function equipBestWing()
+    if equipWingRemoteEvent then
+        equipWingRemoteEvent:FireServer("BestWings")
+    end
+end
+
+Page:addButton("Auto Buy and Equip Wings", "Automatically buys all wings and equips the best", function()
+    autoWingsEnabled = not autoWingsEnabled
+    if autoWingsEnabled then
+    else
+    end
+end)
+
+game:GetService("RunService").Heartbeat:Connect(function(dt)
+    if autoWingsEnabled then
+        wingsTimer = wingsTimer - dt
+        if wingsTimer <= 0 then
+            buyAllWindows()
+            equipBestWing()
+            wingsTimer = wingsInterval
+        end
+    end
+end)
+
+Page:addButton("Try Infinite Money", "Attempts to get infinite money", function()
+    local args = {
+     {
+      value = 9e999999999999,
+      type = "Money",
+      chance = 0.45
+     }
+    }
+    game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Roulette"):WaitForChild("GiveOutReward"):FireServer(unpack(args))
+end)
+
+Page:addButton("Spam trophies", "Constantly attempts to change your trophies", function()
+    while true do
+        local args = {
+            "Layer6"
+        }
+        game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("LayerChanged"):FireServer(unpack(args))
+        wait(0.1)
+    end
+end)
+
+local spamName = "Script By Dinas"
+local spamInterval = 5
+local spamMessage = "" .. spamName .. "!"
+
+Page:addButton("Start Chat Spam", "Starts spamming the chat with messages", function()
+    local function sendMessage(message)
+        game:GetService("Chat"):Chat(game.Players.LocalPlayer.Character, message)
+    end
+    
+    while true do
+        sendMessage(spamMessage)
+        wait(spamInterval)
+    end
+end)
