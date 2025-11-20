@@ -1,0 +1,229 @@
+local summitLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/Vovabro46/DinasMenu/refs/heads/main/DinasMenuTest.lua"))()
+
+local window = summitLib:CreateWindow({Name = "Dinas Hub Op",AccentColor3 = Color3.new(1, 0.235294, 0.337255)})
+local Tab1 = window:CreateTab({Name = "Info", Icon = 'rbxassetid://7733964719'})
+local Tab2 = window:CreateTab({Name = "Pets", Icon = 'rbxassetid://8997385940'})
+local Tab3 = window:CreateTab({Name = "GamePass", Icon = 'rbxassetid://7734086558'})
+local Tab4 = window:CreateTab({Name = "Other", Icon = 'rbxassetid://7743874482'})
+Tab1:CreateLabel("Information!")
+Tab1:CreateParagraph("This script is the best at the moment. With free Gamepasses, issuing pets, issuing paid riders, endless money!")
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local R_Pets = ReplicatedStorage.R_Pets
+
+local petNames = {
+    "Bombini_Guzzini_BloodMoon",
+    "Cappuccino_Assassino_BloodMoon",
+    "Pet_Alien",
+    "Pet_Angel",
+    "Pet_Arctic",
+    "Pet_Baby_Tralalero_Diamond",
+    "Pet_Baby_Tralalero_Golden",
+    "Pet_Blue",
+    "Pet_Boku",
+    "Pet_Boshiro",
+    "Pet_Bot",
+    "Pet_Cake",
+    "Pet_Camelo",
+    "Pet_Cappuccino_Diamond",
+    "Pet_Cappuccino_Golden",
+    "Pet_Capybara_Kiwini",
+    "Pet_Cat",
+    "Pet_Cat_Legendary",
+    "Pet_Celestial",
+    "Pet_Chef_Crabracadabra",
+    "Pet_Chicken",
+    "Pet_Chimpanzini_Bananini",
+    "Pet_ClownDog",
+    "Pet_Cocofanto_Elefanto",
+    "Pet_Cold_Dragon",
+    "Pet_Crab_Pixel",
+    "Pet_D.Dark",
+    "Pet_Dark_Boshiro",
+    "Pet_Desert_Bunny",
+    "Pet_Desert_Dragon",
+    "Pet_Desert_Spider",
+    "Pet_Desert_Stegosaurus",
+    "Pet_Desert_Tiger",
+    "Pet_Dog",
+    "Pet_Duck",
+    "Pet_EasterIce",
+    "Pet_Frozen",
+    "Pet_GolemHydra",
+    "Pet_Honey_Alien",
+    "Pet_Honey_Bunny",
+    "Pet_Honey_Huge",
+    "Pet_Honey_Kitten",
+    "Pet_Honey_Mutant",
+    "Pet_Husky",
+    "Pet_Ice_Alien",
+    "Pet_Ice_Dragon",
+    "Pet_Ice_Frost",
+    "Pet_Justice",
+    "Pet_Kingdom",
+    "Pet_Knight",
+    "Pet_Knight_V",
+    "Pet_Magic_Snow",
+    "Pet_Mystery_Cat",
+    "Pet_Parrot",
+    "Pet_Patapim",
+    "Pet_Peak",
+    "Pet_Pianta",
+    "Pet_Pixel_Dark",
+    "Pet_Pixel_Drake",
+    "Pet_Pixel_Null",
+    "Pet_Pixel_Purple",
+    "Pet_Poseidon",
+    "Pet_Punk",
+    "Pet_Pure",
+    "Pet_Puzzel",
+    "Pet_Rasta",
+    "Pet_Red_Dominus",
+    "Pet_Reniamru",
+    "Pet_Rhino_Toasterino",
+    "Pet_Roro",
+    "Pet_Snow_Golem",
+    "Pet_Snow_Wolf",
+    "Pet_Snow_Yeti",
+    "Pet_SuperClown",
+    "Pet_Suprise_Dog",
+    "Pet_Sweet_Axolotl",
+    "Pet_Thor",
+    "Pet_Tralalero_Tralala",
+    "Pet_TungSahur",
+    "Pet_Ultra_Capybara",
+    "Pet_Volcano",
+    "Pet_Warrior",
+    "Pet_Zeus",
+    "Tralalero_Tralala_BloodMoon",
+    "Tung_Tung_Sahur_BloodMoon",
+}
+
+for _, petName in ipairs(petNames) do
+    Tab2:CreateButton({
+        Text = "Get " .. petName,
+        Callback = function()
+            R_Pets:FireServer("Give_Pet", petName)
+            window:CreateNotification({
+                Description = "Give Pet: " .. petName,
+                Title = "Pets",
+                Duration = 5
+            })
+        end
+    })
+end
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local R_Server = ReplicatedStorage.R_Server
+
+local gamepasses = {
+    {id = 1317699134, display = "x2 Coins"},
+    {id = 1318193583, display = "x2 Speed"},
+    {id = 1318271434, display = "VIP Rank"},
+    {id = 1318135522, display = "More Storages"},
+    {id = 1318755432, display = "More Equip"},
+    {id = 1372082781, display = "Super Auto"},
+}
+
+for _, gp in ipairs(gamepasses) do
+    Tab3:CreateButton({
+        Text = "Free Get " .. gp.display,
+        Callback = function()
+            R_Server:FireServer("Gamepass_Buy", gp.id)
+            window:CreateNotification({
+                Description = "Gamepass Get: " .. gp.display,
+                Title = "Gamepass",
+                Duration = 5
+            })
+        end
+    })
+end
+
+local isRunning = false
+local moneyLoop = nil
+
+local function startMoneyLoop()
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
+    local B_Cilent = ReplicatedStorage:WaitForChild("B_Cilent")
+
+    moneyLoop = coroutine.create(function()
+        while isRunning do
+            B_Cilent:Fire("Split_Money", 99999999999999999999.25, 25)
+            wait(0.5)
+        end
+    end)
+    coroutine.resume(moneyLoop)
+end
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local R_Server = ReplicatedStorage:WaitForChild("R_Server")
+
+local riderPasses = {
+    Rider_Pirate_Pass = "PiratePass",
+    Rider_Tank_Pass = "TankPass",
+}
+
+local function GetPlayerPasses()
+    return {
+        PiratePass = true,
+        TankPass = true,
+    }
+end
+
+local function GetAccessibleRidersWithPasses()
+    local passes = GetPlayerPasses()
+    local accessible = {}
+
+    for rider, passName in pairs(riderPasses) do
+        if passes[passName] then
+            table.insert(accessible, rider)
+        end
+    end
+
+    return accessible
+end
+
+local function UpdateRiders()
+    local enabledRiders = {}
+    local accessibleRiders = GetAccessibleRidersWithPasses()
+
+    for rider, pass in pairs(riderPasses) do
+        enabledRiders[rider] = (table.find(accessibleRiders, rider) ~= nil)
+    end
+
+    R_Server:FireServer("Upd_Own_Riders", enabledRiders)
+
+    if #accessibleRiders > 0 then
+        R_Server:FireServer("Upd_Using_Rider", accessibleRiders[1])
+    else
+    end
+end
+
+Tab4:CreateButton({
+    Text = "Get All Pass Riders(with robux)",
+    Callback = function()
+        UpdateRiders()
+    end
+})
+
+Tab4:CreateButton({
+    Text = "Enable Infinity Money",
+    Callback = function()
+        if not isRunning then
+            isRunning = true
+            window:CreateNotification({
+                Description = "On!",
+                Title = "Money",
+                Duration = 5
+            })
+            startMoneyLoop()
+        else
+            isRunning = false
+            window:CreateNotification({
+                Description = "Off!",
+                Title = "Money",
+                Duration = 5
+            })
+        end
+    end
+})
