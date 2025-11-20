@@ -1,0 +1,82 @@
+local Library = loadstring(game:HttpGet("https://pastefy.app/Rf8iYjYI/raw"))()
+
+local Window = Library:CreateWindow("Dinas Hub")
+local Tab1 = Window:AddTab("Game")
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local GetDropRemote = ReplicatedStorage.Remote.GetDropRemote
+
+local isActive = false
+local taskThread
+
+Tab1:AddToggle({
+    Text = "Get Bullets",
+    Default = false,
+    Callback = function(enabled)
+        if enabled then
+            if isActive then return end
+            isActive = true
+            taskThread = coroutine.create(function()
+                while isActive do
+                    GetDropRemote:FireServer(20, Vector3.new(-194, 0, 200))
+                    wait(0.1)
+                end
+            end)
+            coroutine.resume(taskThread)
+        else
+            isActive = false
+        end
+    end,
+})
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ButtonPressRemote = ReplicatedStorage.Remote.ButtonPressRemote
+
+local isActive = false
+local taskThread
+
+Tab1:AddToggle({
+    Text = "Auto Upgrade",
+    Default = false,
+    Callback = function(enabled)
+        if enabled then
+            if isActive then return end
+            isActive = true
+            taskThread = coroutine.create(function()
+                while isActive do
+                    ButtonPressRemote:FireServer("Upgrade")
+                    wait(0.1)
+                end
+            end)
+            coroutine.resume(taskThread)
+        else
+            isActive = false
+        end
+    end,
+})
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ButtonPressRemote = ReplicatedStorage.Remote.ButtonPressRemote
+
+local isActive = false
+local taskThread
+
+Tab2:AddToggle({
+    Text = "Auto Merge",
+    Default = false,
+    Callback = function(enabled)
+        if enabled then
+            if isActive then return end
+            isActive = true
+            taskThread = coroutine.create(function()
+                while isActive do
+                    ButtonPressRemote:FireServer("Merge")
+                    wait(1)
+                end
+            end)
+            coroutine.resume(taskThread)
+        else
+            isActive = false
+        end
+    end,
+})
