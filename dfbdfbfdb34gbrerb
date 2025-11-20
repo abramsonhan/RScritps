@@ -1,0 +1,37 @@
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Vovabro46/DinasMenu/refs/heads/main/NewMenu.lua"))()
+
+local window = Library:CreateWindow("Dinas Hub")
+local mainTab = window:AddTab("Main", "🏠")
+local settingsTab = window:AddTab("Settings", "⚙️")
+
+Library:AddToggle(settingsTab, "Enable Rainbow Corner", function(state)
+    if state then
+        window:EnableRainbowCorners()
+    else
+        window:DisableRainbowCorners()
+    end
+end)
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local AddCash = ReplicatedStorage.AddCash
+local RunService = game:GetService("RunService")
+
+local autoCash = false
+local autoTix = false
+
+RunService.Heartbeat:Connect(function()
+    if autoCash then
+        AddCash:FireServer("Cash", 100)
+    end
+    if autoTix then
+        AddCash:FireServer("Tix", 100)
+    end
+end)
+
+Library:AddButton(mainTab, "Inf Cash (Turn Off if need tix)", function()
+    autoCash = not autoCash
+end)
+
+Library:AddButton(mainTab, "Inf Tix (Turn Off if need cash)", function()
+    autoTix = not autoTix
+end)
