@@ -1,0 +1,70 @@
+local S, P, U2, C3, CF = setmetatable({}, {__index = function(_,k) return game:GetService(k) end}), game:GetService("Players").LocalPlayer, UDim2.new, Color3.fromRGB, CFrame.new
+local Col = {Bg=C3(10,10,10), Side=C3(15,15,15), Item=C3(22,22,22), Txt=C3(240,240,240), Dim=C3(120,120,120), Acc=C3(255,255,255)}
+pcall(function() S.CoreGui.Sayso:Destroy() end)
+
+local function New(Class, Props)
+    local Inst = Instance.new(Class)
+    for K, V in next, Props do
+        if K == "On" then for E, F in next, V do Inst[E]:Connect(F) end
+        elseif K == "Ch" then for _, C in next, V do C.Parent = Inst end
+        elseif K ~= "P" then Inst[K] = V end
+    end
+    if Props.P then Inst.Parent = Props.P end
+    return Inst
+end
+
+local Gui = New("ScreenGui", {Name="Sayso", ResetOnSpawn=false, P=S.CoreGui})
+local Main = New("Frame", {Size=U2(0,500,0,350), Position=U2(0.5,-250,0.5,-175), BackgroundColor3=Col.Bg, BorderColor3=C3(45,45,45), ClipsDescendants=true, P=Gui})
+
+local Drag = {On={InputBegan=function(i) 
+    if i.UserInputType==Enum.UserInputType.MouseButton1 then 
+        local s, p, u = i.Position, Main.Position, S.UserInputService
+        local c1, c2
+        c1 = u.InputChanged:Connect(function(v) if v.UserInputType==Enum.UserInputType.MouseMovement then local d=v.Position-s; S.TweenService:Create(Main, TweenInfo.new(0.05), {Position=U2(p.X.Scale,p.X.Offset+d.X,p.Y.Scale,p.Y.Offset+d.Y)}):Play() end end)
+        c2 = u.InputEnded:Connect(function(v) if v.UserInputType==Enum.UserInputType.MouseButton1 then c1:Disconnect(); c2:Disconnect() end end)
+    end 
+end}}
+New("Frame", {Size=U2(1,0,0,40), BackgroundTransparency=1, P=Main, On=Drag.On}) 
+
+local Sidebar = New("Frame", {Size=U2(0,120,1,0), BackgroundColor3=Col.Side, BorderSizePixel=0, P=Main, Ch={
+    New("TextLabel", {Text="Adolf", Size=U2(1,0,0,50), BackgroundTransparency=1, TextColor3=Col.Acc, Font=17, TextSize=22})
+}})
+local TabBox = New("Frame", {Size=U2(1,0,1,-50), Position=U2(0,0,0,50), BackgroundTransparency=1, P=Sidebar, Ch={New("UIListLayout", {})}})
+local PageBox = New("Frame", {Size=U2(1,-130,1,-10), Position=U2(0,130,0,10), BackgroundTransparency=1, P=Main})
+
+local function AddTab(N, Vis)
+    local Pg = New("Frame", {Size=U2(1,0,1,0), BackgroundTransparency=1, Visible=Vis, P=PageBox})
+    New("TextButton", {Text=N, Size=U2(1,0,0,40), BackgroundColor3=Vis and Col.Item or Col.Side, TextColor3=Vis and Col.Acc or Col.Dim, Font=16, TextSize=13, BorderSizePixel=0, P=TabBox, On={MouseButton1Click=function(b)
+        for _,v in next, PageBox:GetChildren() do v.Visible = (v==Pg) end
+        for _,v in next, TabBox:GetChildren() do if v:IsA("TextButton") then v.TextColor3, v.BackgroundColor3 = Col.Dim, Col.Side end end
+        b.TextColor3, b.BackgroundColor3 = Col.Acc, Col.Item
+    end}})
+    return Pg
+end
+
+local PgTP = AddTab("Teleport", true)
+local PosLbl = New("TextLabel", {Text="Loading...", Size=U2(1,-85,0,35), BackgroundColor3=Col.Item, TextColor3=Col.Acc, Font=18, TextSize=13, P=New("Frame", {Size=U2(1,0,0,85), Position=U2(0,0,0,10), BackgroundTransparency=1, P=PgTP})})
+S.RunService.Heartbeat:Connect(function() local r = P.Character and P.Character:FindFirstChild("HumanoidRootPart"); if r then PosLbl.Text = string.format("XYZ: %.1f, %.1f, %.1f", r.Position.X, r.Position.Y, r.Position.Z) end end)
+
+local CordIn = New("TextBox", {Text="", PlaceholderText="X, Y, Z", Size=U2(0.75,-5,1,0), BackgroundColor3=Col.Item, TextColor3=Col.Txt, Font=16, TextSize=13, P=New("Frame", {Size=U2(1,0,0,35), Position=U2(0,0,0,45), BackgroundTransparency=1, P=PosLbl.Parent})})
+New("TextButton", {Text="GO", Size=U2(0.25,0,1,0), Position=U2(0.75,0,0,0), BackgroundColor3=C3(35,35,35), TextColor3=Col.Acc, Font=17, TextSize=12, P=CordIn.Parent, On={MouseButton1Click=function() 
+    local x,y,z = CordIn.Text:match("([%-%d%.]+),%s*([%-%d%.]+),%s*([%-%d%.]+)"); if x and P.Character then P.Character.HumanoidRootPart.CFrame = CF(tonumber(x), tonumber(y), tonumber(z)) end 
+end}})
+
+local Scroll = New("ScrollingFrame", {Size=U2(1,0,1,-165), Position=U2(0,0,0,165), BackgroundTransparency=1, ScrollBarThickness=2, P=PgTP, Ch={New("UIListLayout", {Padding=UDim.new(0,5)})}})
+local NameIn = New("TextBox", {Text="", PlaceholderText="Waypoint Name...", Size=U2(0.75,-5,1,0), BackgroundColor3=Col.Item, TextColor3=Col.Txt, Font=16, TextSize=13, P=New("Frame", {Size=U2(1,0,0,35), Position=U2(0,0,0,105), BackgroundTransparency=1, P=PgTP})})
+New("TextButton", {Text="SAVE POS", Size=U2(0.25,0,1,0), Position=U2(0.75,0,0,0), BackgroundColor3=Col.Item, TextColor3=Col.Green, Font=17, TextSize=11, P=NameIn.Parent, On={MouseButton1Click=function()
+    if not P.Character then return end; local p = P.Character.HumanoidRootPart.Position; local row = New("Frame", {Size=U2(1,-5,0,35), BackgroundColor3=Col.Item, P=Scroll})
+    New("TextLabel", {Text=(NameIn.Text~="" and NameIn.Text or "WP "..math.random(99)), Size=U2(1,-140,1,0), Position=U2(0,10,0,0), BackgroundTransparency=1, TextColor3=Col.Txt, Font=16, TextSize=12, TextXAlignment=0, P=row})
+    New("TextButton", {Text="TP", Size=U2(0,40,1,0), Position=U2(1,-130,0,0), BackgroundColor3=C3(30,30,30), TextColor3=Col.Acc, Font=17, TextSize=11, BorderSizePixel=0, P=row, On={MouseButton1Click=function() if P.Character then P.Character.HumanoidRootPart.CFrame = CF(p) end end}})
+    New("TextButton", {Text="CPY", Size=U2(0,40,1,0), Position=U2(1,-85,0,0), BackgroundColor3=C3(25,25,25), TextColor3=Col.Dim, Font=17, TextSize=10, BorderSizePixel=0, P=row, On={MouseButton1Click=function() setclipboard(tostring(p)); end}})
+    New("TextButton", {Text="X", Size=U2(0,40,1,0), Position=U2(1,-40,0,0), BackgroundColor3=Col.Red, TextColor3=Col.Txt, Font=17, TextSize=12, BorderSizePixel=0, P=row, On={MouseButton1Click=function() row:Destroy(); Scroll.CanvasSize=U2(0,0,0,Scroll.UIListLayout.AbsoluteContentSize.Y) end}})
+    Scroll.CanvasSize, NameIn.Text = U2(0,0,0,Scroll.UIListLayout.AbsoluteContentSize.Y+35), ""
+end}})
+New("TextLabel", {Text="SAVED PLACES", Size=U2(1,0,0,20), Position=U2(0,0,0,145), BackgroundTransparency=1, TextColor3=Col.Dim, Font=17, TextSize=11, TextXAlignment=0, P=PgTP})
+
+local PgSys, Mini = AddTab("System", false), false
+New("TextLabel", {Text="Made by Tapn\nadolf lib", Size=U2(1,-20,1,0), Position=U2(0,10,0,0), BackgroundTransparency=1, TextColor3=Col.Txt, Font=18, TextSize=13, TextXAlignment=0, P=New("Frame", {Size=U2(1,0,0,60), Position=U2(0,0,0,40), BackgroundColor3=Col.Item, P=PgSys, Ch={New("TextLabel", {Text="ABOUT", Size=U2(1,0,0,25), Position=U2(0,0,-1,0), BackgroundTransparency=1, TextColor3=Col.Dim, Font=17, TextSize=12, TextXAlignment=0})}})})
+local Ctrls = New("Frame", {Size=U2(0,80,0,40), Position=U2(1,-80,0,0), BackgroundTransparency=1, ZIndex=100, P=Main})
+New("TextButton", {Text="−", Size=U2(0,40,0,40), BackgroundTransparency=1, TextColor3=Col.Txt, Font=16, TextSize=24, ZIndex=101, P=Ctrls, On={MouseButton1Click=function(b) Mini=not Mini; Main:TweenSize(Mini and U2(0,500,0,40) or U2(0,500,0,350), "Out", "Quart", 0.3, true); b.Text=Mini and "+" or "−" end}})
+New("TextButton", {Text="×", Size=U2(0,40,0,40), Position=U2(0,40,0,0), BackgroundTransparency=1, TextColor3=C3(180,40,40), Font=16, TextSize=24, ZIndex=101, P=Ctrls, On={MouseButton1Click=function() Gui:Destroy() end}})
