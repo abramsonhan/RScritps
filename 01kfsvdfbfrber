@@ -1,0 +1,30 @@
+if not game:IsLoaded() then game.Loaded:Wait() end
+local Players, UIS, Cam = game:GetService("Players"), game:GetService("UserInputService"), workspace.CurrentCamera
+local Plr, Circle, Set = Players.LocalPlayer, Drawing.new("Circle"), {FOV=150, Key=0}
+Circle.Color, Circle.Thickness, Circle.Transparency = Color3.new(1,1,1), 1, 1
+
+game:GetService("RunService").RenderStepped:Connect(function()
+    Circle.Visible, Circle.Radius, Circle.Position = true, Set.FOV, UIS:GetMouseLocation()
+end)
+
+local old; old = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
+    local args, method = {...}, getnamecallmethod()
+    if self == workspace and UIS:IsMouseButtonPressed(Set.Key) and (method == "Raycast" or method:find("PartOnRay")) then
+        local target, min = nil, Set.FOV
+        for _, v in next, Players:GetPlayers() do
+            if v ~= Plr and v.Team ~= Plr.Team and v.Character and v.Character:FindFirstChild("Humanoid") and v.Character.Humanoid.Health > 0 then
+                local pos, vis = Cam:WorldToViewportPoint(v.Character.Head.Position)
+                local dist = (Vector2.new(pos.X, pos.Y) - UIS:GetMouseLocation()).Magnitude
+                if vis and dist < min and #Cam:GetPartsObscuringTarget({v.Character.Head.Position}, {Plr.Character, v.Character}) == 0 then
+                    target, min = v.Character.Head, dist
+                end
+            end
+        end
+        if target then
+            local origin = method == "Raycast" and args[1] or args[2].Origin
+            local dir = (target.Position - origin); if method ~= "Raycast" then dir = dir.Unit * 1000 args[2] = Ray.new(origin, dir) else args[2] = dir end
+            return old(self, unpack(args))
+        end
+    end
+    return old(self, ...)
+end))
