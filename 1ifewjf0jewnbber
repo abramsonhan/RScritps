@@ -1,0 +1,29 @@
+local ReplicatedStorage = game:GetService('ReplicatedStorage')
+local AddXP = ReplicatedStorage:WaitForChild('Events'):WaitForChild('AddXP')
+local GunModules = ReplicatedStorage:WaitForChild('GunModules')
+
+for _, gun in pairs(GunModules:GetChildren()) do
+    if gun:IsA('ModuleScript') then
+        for i = 1, 50 do
+            AddXP:FireServer(1, 900000000000000, gun.Name)
+        end
+    end
+end
+
+local MeleeFolder = GunModules:FindFirstChild('Melee')
+if MeleeFolder then
+    for _, meleeWeapon in pairs(MeleeFolder:GetChildren()) do
+        for i = 1, 50 do
+            AddXP:FireServer(1, 900000000000000, meleeWeapon.Name)
+        end
+    end
+end
+
+local EquipmentFolder = GunModules:FindFirstChild('Equipment')
+if EquipmentFolder then
+    for _, equipment in pairs(EquipmentFolder:GetChildren()) do
+        for i = 1, 50 do
+            AddXP:FireServer(1, 900000000000000, equipment.Name)
+        end
+    end
+end
