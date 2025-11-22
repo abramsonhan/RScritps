@@ -1,0 +1,21 @@
+local WSP, Plrs = workspace, game:GetService("Players")
+local CharFolder, Ignore, Cache = WSP:WaitForChild("characters"), WSP:FindFirstChild("ignore"), {}
+
+local function Cleanup(m) 
+	if Cache[m] then Cache[m]:Destroy() Cache[m] = nil end 
+end
+
+local function Setup(m)
+	if not m:IsA("Model") or m == Plrs.LocalPlayer.Character or Cache[m] or (Ignore and m:IsDescendantOf(Ignore)) then return end
+	if not m:WaitForChild("humanoid_root_part", 1) then return end -- Ensure valid rig
+
+	local H = Instance.new("Highlight")
+	H.Name, H.Adornee, H.FillColor, H.FillTransparency, H.OutlineTransparency = "ESP", m, Color3.new(1, 1, 1), 0.7, 0
+	H.Parent, Cache[m] = m, H
+	
+	m.AncestryChanged:Connect(function(_, p) if not p then Cleanup(m) end end)
+end
+
+CharFolder.ChildAdded:Connect(function(c) task.wait(0.1) Setup(c) end)
+CharFolder.ChildRemoved:Connect(Cleanup)
+for _, c in ipairs(CharFolder:GetChildren()) do Setup(c) end
