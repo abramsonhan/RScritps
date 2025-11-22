@@ -1,0 +1,33 @@
+local S, P, C3 = setmetatable({}, {__index = function(_,k) return game:GetService(k) end}), game:GetService("Players"), Color3.fromRGB
+local LP, Tag, Cons = P.LocalPlayer, "AdolfFX", {}
+
+if _G.UnloadChams then _G.UnloadChams() end
+
+local Cfg = {Enemy=C3(180,40,40), Ally=C3(40,180,80), FillTr=0.5, OutTr=0.1, TeamCheck=true}
+
+local function Paint(Chr, Plr)
+    if not Chr or Chr:FindFirstChild(Tag) then return end
+    local H = Instance.new("Highlight")
+    local IsEnemy = (Cfg.TeamCheck and Plr.Team ~= LP.Team) or not Cfg.TeamCheck
+    
+    H.Name, H.FillColor, H.OutlineColor = Tag, IsEnemy and Cfg.Enemy or Cfg.Ally, C3(255,255,255)
+    H.FillTransparency, H.OutlineTransparency = Cfg.FillTr, Cfg.OutTr
+    H.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+    H.Adornee, H.Parent = Chr, Chr
+end
+
+local function Hook(Plr)
+    if Plr == LP then return end
+    Cons[Plr] = Plr.CharacterAdded:Connect(function(c) task.wait(0.1); Paint(c, Plr) end)
+    if Plr.Character then Paint(Plr.Character, Plr) end
+end
+
+for _, v in next, P:GetPlayers() do Hook(v) end
+Cons.Add = P.PlayerAdded:Connect(Hook)
+
+_G.UnloadChams = function()
+    if Cons.Add then Cons.Add:Disconnect() end
+    for _, c in next, Cons do if c.Disconnect then c:Disconnect() end end
+    for _, v in next, P:GetPlayers() do if v.Character and v.Character:FindFirstChild(Tag) then v.Character[Tag]:Destroy() end end
+    _G.UnloadChams = nil
+end
