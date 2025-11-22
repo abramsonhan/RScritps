@@ -1,0 +1,37 @@
+-- Adonis Bypass (Not Mine)
+loadstring(
+    game:HttpGet(
+        'https://raw.githubusercontent.com/Pixeluted/adoniscries/main/Source.lua',
+        true
+    )
+)()
+
+-- Knife Aura
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+while task.wait(0.1) do
+    local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    local Root = Character:FindFirstChild("HumanoidRootPart")
+    local LocalCrit = Character:FindFirstChild("Crit")
+    if not (Root and LocalCrit) then continue end
+
+    local Closest, Distance = nil, math.huge
+
+    for _, Player in pairs(Players:GetPlayers()) do
+        if Player ~= LocalPlayer and Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
+            local Magnitude = (Player.Character.HumanoidRootPart.Position - Root.Position).Magnitude
+            if Magnitude < Distance then
+                Distance = Magnitude
+                Closest = Player
+            end
+        end
+    end
+
+    if Closest and Closest.Character and Closest.Character:FindFirstChild("Crit") then
+        local TargetCrit = Closest.Character.Crit
+        TargetCrit.CFrame = LocalCrit.CFrame
+        local args = { TargetCrit }
+        LocalPlayer:WaitForChild("ClientRemotes"):WaitForChild("MeleeEvent"):FireServer(unpack(args))
+    end
+end
