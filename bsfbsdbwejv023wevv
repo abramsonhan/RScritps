@@ -1,0 +1,61 @@
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+
+local player = Players.LocalPlayer
+
+local castEvent = ReplicatedStorage.Packages.Net:WaitForChild("RE/FishingRod.Cast")
+local minigameClickEvent = ReplicatedStorage.Packages.Net:WaitForChild("RE/FishingRod.MinigameClick")
+local cooldownEvent = ReplicatedStorage.Packages.Net:WaitForChild("RE/Tools/Cooldown")
+
+local hasCasted = false
+
+local function getLuckBar()
+    local gui = player:FindFirstChild("PlayerGui")
+    if gui then
+        local toolGui = gui:FindFirstChild("ToolGuis")
+        if toolGui then
+            local fishingGui = toolGui:FindFirstChild("Fishing")
+            if fishingGui then
+                local castBar = fishingGui:FindFirstChild("CastBar")
+                if castBar then
+                    local bar = castBar:FindFirstChild("Bar")
+                    if bar then
+                        return bar:FindFirstChild("Luck")
+                    end
+                end
+            end
+        end
+    end
+end
+
+local function getFillBar()
+    local gui = player:FindFirstChild("PlayerGui")
+    if gui then
+        local toolGui = gui:FindFirstChild("ToolGuis")
+        if toolGui then
+            local fishingGui = toolGui:FindFirstChild("Fishing")
+            if fishingGui then
+                return fishingGui:FindFirstChild("Fillbar")
+            end
+        end
+    end
+end
+
+RunService.RenderStepped:Connect(function()
+    local luckBar = getLuckBar()
+    local fillBar = getFillBar()
+
+    if luckBar and luckBar.Size.X.Scale >= 1 and not hasCasted then
+        castEvent:FireServer(0)
+        hasCasted = true
+    elseif fillBar and fillBar.Size.X.Scale < 1 then
+        minigameClickEvent:FireServer()
+        hasCasted = false
+    end
+
+    if fillBar and fillBar.Size.X.Scale >= 1 then
+        local cooldownArgs = {[1] = "\0\0\0\0\0\0\0\0"}
+        cooldownEvent:FireServer(unpack(cooldownArgs))
+    end
+end)
