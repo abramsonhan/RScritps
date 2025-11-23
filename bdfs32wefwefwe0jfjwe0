@@ -1,0 +1,61 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LP = Players.LocalPlayer
+local Cam = workspace.CurrentCamera
+
+-- SETTINGS
+local TRIGGER_DIST = 5
+local FOV_BACK = 130
+local TEAM_CHECK = true
+
+local function sameTeam(p)
+    if TEAM_CHECK == false then return false end
+    if LP.Team == nil or p.Team == nil then return false end
+    return LP.Team == p.Team
+end
+
+local function isBehind(targetPos)
+    local root = LP.Character and LP.Character:FindFirstChild("HumanoidRootPart")
+    if not root then return false end
+
+    local dir = (targetPos - root.Position).Unit
+    local forward = root.CFrame.LookVector
+
+    local dot = forward:Dot(dir)
+    local angle = math.deg(math.acos(dot))
+
+    return angle > (180 - (FOV_BACK / 2))
+end
+
+local function flickTo(pos)
+    Cam.CFrame = CFrame.lookAt(Cam.CFrame.Position, pos)
+end
+
+RunService.RenderStepped:Connect(function()
+    local root = LP.Character and LP.Character:FindFirstChild("HumanoidRootPart")
+    if not root then return end
+
+    local closest = nil
+    local dist = 999
+
+    for _, p in pairs(Players:GetPlayers()) do
+        if p ~= LP and p.Character then
+
+            if not sameTeam(p) then
+                local hrp = p.Character:FindFirstChild("HumanoidRootPart")
+                if hrp then
+                    local d = (hrp.Position - root.Position).Magnitude
+
+                    if d < TRIGGER_DIST and d < dist and isBehind(hrp.Position) then
+                        closest = hrp
+                        dist = d
+                    end
+                end
+            end
+        end
+    end
+
+    if closest then
+        flickTo(closest.Position)
+    end
+end)
