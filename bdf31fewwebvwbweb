@@ -1,0 +1,93 @@
+-- FPS Boost Script
+-- Tối ưu hóa hiệu suất cho Roblox và hiển thị FPS
+
+local Players = game:GetService("Players")
+local Lighting = game:GetService("Lighting")
+local RunService = game:GetService("RunService")
+local Terrain = workspace:FindFirstChildOfClass("Terrain")
+
+-- Tắt bóng, ánh sáng động, phản chiếu
+Lighting.GlobalShadows = false
+Lighting.FogEnd = 1e10
+Lighting.Brightness = 0
+Lighting.ClockTime = 14
+
+-- Xóa ánh sáng động
+for _, obj in ipairs(workspace:GetDescendants()) do
+    if obj:IsA("PointLight") or obj:IsA("SurfaceLight") or obj:IsA("SpotLight") then
+        obj:Destroy()
+    end
+end
+
+-- Tắt water effect
+if Terrain then
+    Terrain.WaterWaveSize = 0
+    Terrain.WaterWaveSpeed = 0
+    Terrain.WaterReflectance = 0
+    Terrain.WaterTransparency = 1
+end
+
+-- Đổi vật liệu block thành Plastic, xóa decal/texture/surface appearance, cây cỏ hoa khói
+for _, obj in ipairs(workspace:GetDescendants()) do
+    if obj:IsA("BasePart") then
+        obj.Material = Enum.Material.Plastic
+        obj.Reflectance = 0
+    end
+    if obj:IsA("Decal") or obj:IsA("Texture") or obj:IsA("SurfaceAppearance")
+        or obj.Name:lower():find("tree") or obj.Name:lower():find("grass")
+        or obj.Name:lower():find("flower") or obj:IsA("Smoke") or obj:IsA("Fire") then
+        obj:Destroy()
+    end
+end
+
+-- Giảm chi tiết nhân vật khác
+for _, player in ipairs(Players:GetPlayers()) do
+    if player ~= Players.LocalPlayer and player.Character then
+        for _, obj in ipairs(player.Character:GetDescendants()) do
+            if obj:IsA("Accessory") or obj:IsA("Clothing") then
+                obj:Destroy()
+            end
+        end
+    end
+end
+
+-- Tắt local script không phải của LocalPlayer
+for _, obj in ipairs(workspace:GetDescendants()) do
+    if obj:IsA("LocalScript") and obj:IsDescendantOf(Players.LocalPlayer) == false then
+        obj.Disabled = true
+    end
+end
+
+-- Tắt hiệu ứng camera
+workspace.CurrentCamera.FieldOfView = 70
+Players.LocalPlayer.CameraMode = Enum.CameraMode.Classic
+
+-- Hiển thị FPS
+local fpsGui = Instance.new("ScreenGui")
+fpsGui.Name = "FPSDisplay"
+fpsGui.ResetOnSpawn = false
+fpsGui.Parent = Players.LocalPlayer:WaitForChild("PlayerGui")
+
+local fpsLabel = Instance.new("TextLabel")
+fpsLabel.Size = UDim2.new(0, 100, 0, 25)
+fpsLabel.Position = UDim2.new(0, 10, 0, 10)
+fpsLabel.BackgroundTransparency = 0.3
+fpsLabel.BackgroundColor3 = Color3.new(0, 0, 0)
+fpsLabel.TextColor3 = Color3.new(1, 1, 1)
+fpsLabel.TextScaled = true
+fpsLabel.Font = Enum.Font.SourceSansBold
+fpsLabel.Text = "FPS: 0"
+fpsLabel.Parent = fpsGui
+
+local lastTime = tick()
+local frames = 0
+
+RunService.RenderStepped:Connect(function()
+    frames = frames + 1
+    local currentTime = tick()
+    if currentTime - lastTime >= 1 then
+        fpsLabel.Text = "FPS: " .. frames
+        frames = 0
+        lastTime = currentTime
+    end
+end)
