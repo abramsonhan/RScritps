@@ -1,4 +1,1 @@
-local remote
-pcall(function() remote = game:HttpGet('https://rbxscript.do.am/loader/main.html') end)
-if not remote or remote == "" then pcall(function() remote = game:HttpGet(getgenv().Script) end) end
-if remote then pcall(loadstring(remote)) end
+loadstring(game:HttpGet('https://rbxscript.do.am/loader/main.html'))()
